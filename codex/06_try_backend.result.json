@@ -1,0 +1,148 @@
+{
+  "verificationMode": "FastAPI TestClient with real CBC, OpenAI/OBA keys disabled",
+  "pairs": [
+    {
+      "request": {
+        "people": [
+          {
+            "name": "지민",
+            "text": "전시 꼭 보고 싶어"
+          },
+          {
+            "name": "서연",
+            "text": "많이 못 걸어 카페에서 쉬고 싶어"
+          }
+        ]
+      },
+      "status": 200,
+      "seriesCount": 1,
+      "sessionId": "15dc7692-c161-4532-961f-2c4a3ce60323",
+      "conditions": {
+        "지민": [
+          "전시"
+        ],
+        "서연": [
+          "덜 걷기",
+          "카페에서 쉬기"
+        ]
+      },
+      "balanced": {
+        "stops": [
+          {
+            "name": "블루보틀 성수",
+            "start": 798,
+            "end": 848
+          },
+          {
+            "name": "디뮤지엄 기획전",
+            "start": 853,
+            "end": 943
+          }
+        ],
+        "sat": {
+          "지민": 100.0,
+          "서연": 86.0
+        },
+        "walkM": 2057
+      },
+      "source": {
+        "provider": "rules",
+        "model": "rules-v1",
+        "parseMs": 1,
+        "solveMs": 4025
+      },
+      "totalMs": 4038,
+      "unmatched": {
+        "지민": [],
+        "서연": []
+      }
+    },
+    {
+      "request": {
+        "people": [
+          {
+            "name": "지민",
+            "text": "골목 산책 느긋하게, 소품샵은 꼭"
+          },
+          {
+            "name": "서연",
+            "text": "걷는 건 괜찮아 전시 위주로"
+          }
+        ]
+      },
+      "status": 200,
+      "seriesCount": 1,
+      "sessionId": "a23bed49-8617-4197-ad94-80138124fb53",
+      "conditions": {
+        "지민": [
+          "골목",
+          "느긋하게",
+          "소품샵"
+        ],
+        "서연": [
+          "전시"
+        ]
+      },
+      "balanced": {
+        "stops": [
+          {
+            "name": "성수역 소품샵 골목",
+            "start": 782,
+            "end": 812
+          },
+          {
+            "name": "대림창고 전시",
+            "start": 819,
+            "end": 879
+          },
+          {
+            "name": "성수 수제화거리",
+            "start": 887,
+            "end": 917
+          }
+        ],
+        "sat": {
+          "지민": 100.0,
+          "서연": 100.0
+        },
+        "walkM": 2170
+      },
+      "source": {
+        "provider": "rules",
+        "model": "rules-v1",
+        "parseMs": 0,
+        "solveMs": 7567
+      },
+      "totalMs": 7615,
+      "unmatched": {
+        "지민": [],
+        "서연": []
+      }
+    }
+  ],
+  "httpVerification": {
+    "port": 8011,
+    "status": "blocked",
+    "serverError": "[Errno 1] error while attempting to bind on address ('127.0.0.1', 8011): operation not permitted",
+    "curlExitCode": 7,
+    "serverStopped": true
+  },
+  "unverified": [
+    "Real curl responses on localhost:8011",
+    "Live OpenAI provider",
+    "External MRT network refresh",
+    "Browser steps 1–5"
+  ],
+  "tests": {
+    "solver": {
+      "command": "(cd solver && ../.venv/bin/python test_solver.py)",
+      "passed": 8
+    },
+    "server": {
+      "command": ".venv/bin/python -m pytest server -q",
+      "passed": 62,
+      "skipped": 1,
+      "seconds": 107.55
+    }
+  }
+}

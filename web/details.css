@@ -1,0 +1,97 @@
+/* Evidence and details use the existing bento palette and geometry. */
+.brand { display:inline-flex; align-items:center; gap:7px; height:28px; font:600 26px/1 var(--gr); letter-spacing:-.04em; color:var(--navy); flex:none; }
+.brand[hidden] { display:none; }
+.brand-mark { overflow:visible; flex:none; }
+.app-brand { font-size:25px; }
+.brand-enter .logo-left { animation:logo-left .55s var(--spring) both; }
+.brand-enter .logo-right { animation:logo-right .55s var(--spring) both; }
+.brand-enter .logo-lens { animation:logo-lens .25s .28s both; }
+.brand-enter .logo-check { stroke-dasharray:14; animation:logo-check .25s .48s both; }
+@keyframes logo-left { from { transform:translateX(-10px); } to { transform:translateX(0); } }
+@keyframes logo-right { from { transform:translateX(10px); } to { transform:translateX(0); } }
+@keyframes logo-lens { from { opacity:0; } to { opacity:1; } }
+@keyframes logo-check { from { stroke-dashoffset:14; } to { stroke-dashoffset:0; } }
+.fn-n,.bn,.eg-big,.stats .v,.prod .pr,#split .gr { min-width:0; max-width:100%; white-space:nowrap; }
+.fn-n { height:auto; min-height:72px; }
+.fn-n > *, .bn > *, .eg-big > *, .prod .pr > * { flex-shrink:0; }
+.big2 { grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); }
+.rc .gr { max-width:60%; white-space:nowrap; }
+.balance-note { display:flex; flex-direction:column; gap:5px; font-size:11px; line-height:1.5; margin-top:12px; }
+.balance-note b { font-weight:600; }
+.formula-toggle { width:100%; min-height:36px; gap:6px; text-align:left; }
+.formula-toggle .cap-up { font-size:10px; letter-spacing:0; }
+.formula-toggle b::after { content:' +'; font:500 14px var(--gr); }
+.formula-toggle[aria-expanded=true] b::after { content:' −'; }
+.cl .b.expanded { grid-column:1/-1; }
+.formula { border-top:1px solid var(--navy); margin:10px 0 12px; padding-top:12px; }
+.formula[hidden] { display:none; }
+.formula small { display:block; font-size:11px; margin-top:7px; }
+.equation { font-size:16px; line-height:1.65; margin-top:6px; overflow-wrap:anywhere; word-break:normal; }
+.ci .intensity { background:var(--navy); color:var(--cream); border:0; }
+.cl .ci { grid-template-columns:minmax(0,1fr) 26px 31px; font-size:11px; }
+.stop[role=button], .mks [role=button], .bn[role=button] { cursor:pointer; }
+.mks [data-pid] { pointer-events:all; }
+.mks [data-pid]::before { content:''; }
+.sheet .sheet-head { padding-top:30px; }
+.sheet-title { font:600 25px/1.24 var(--kr); letter-spacing:-.045em; margin:12px 0 10px; }
+.sheet-close { width:34px; height:34px; border-radius:50%; border:1.5px solid currentColor; font-size:20px; flex:none; }
+.sheet .small-pill { height:23px; padding:0 9px; font-size:10px; }
+.sheet .info-line { font-size:12px; line-height:1.65; margin-top:9px; }
+.poi-summary { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; font-size:13px; line-height:1.5; }
+.poi-summary b { display:block; font-weight:600; }
+.q-title { display:flex; align-items:baseline; gap:8px; }
+.q-title b { font:500 38px/1 var(--gr); letter-spacing:-.04em; }
+.q-row { margin-top:13px; font-size:12px; }
+.q-row .row { gap:6px; }
+.q-row .q-value { margin-left:auto; font:600 15px var(--gr); }
+.q-track { height:7px; border-radius:99px; background:rgba(14,42,58,.15); overflow:hidden; margin-top:6px; }
+.q-track i { display:block; height:100%; border-radius:99px; background:var(--navy); }
+.q-row small { display:block; font-size:10px; margin-top:5px; line-height:1.4; }
+.fills { display:flex; flex-direction:column; gap:9px; margin-top:12px; font-size:12px; line-height:1.5; }
+.fills b { font-weight:600; }
+.poi-coord { font:500 11px/1.6 var(--gr); margin-top:10px; }
+.prod { padding:30px 20px 20px; min-height:0; }
+.prod .sheet-title { font-size:24px; }
+.prod .pr { margin:22px 0 12px; gap:9px; flex-wrap:nowrap; padding-bottom:4px; }
+.prod .pr small { font-size:13px; }
+.prod .info-line { color:var(--cream); opacity:1; }
+.prod .note { color:var(--cream); opacity:1; }
+.prod .verified { color:var(--cream); font-size:10px; margin-top:14px; line-height:1.5; }
+.prod .estimate { border-color:var(--cream); color:var(--cream); vertical-align:middle; margin-left:4px; }
+.prod .rating { font-size:14px; font-weight:600; }
+.product-link-row { display:flex; justify-content:flex-end; margin-top:18px; }
+a.product-link { background:var(--cream); border-color:var(--cream); color:var(--navy); text-decoration:none; font-size:12px; padding:0 12px; height:36px; }
+.option-chips { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:5px; margin-top:14px; }
+.option-chip { text-align:center; border:1px solid var(--cream); border-radius:15px; padding:8px 2px; color:var(--cream); font:600 16px/1.2 var(--gr); }
+.option-chip.in-window { background:var(--cream); color:var(--navy); }
+.option-chip.out-window { opacity:.65; }
+.option-chip small { display:block; font:500 8px/1.4 var(--kr); margin-top:4px; white-space:nowrap; }
+.option-chip.sold-out b { text-decoration:line-through; }
+.slots.single { grid-template-columns:1fr !important; }
+.slots.single .slot { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:20px; }
+.slots.single .slot b { margin:0; }
+.slot .slot-end { font:500 12px/1.5 var(--kr); white-space:nowrap; }
+.sheet > .note { color:var(--cream); padding:12px 16px; font-size:12px; }
+.ledger-line { display:flex; align-items:center; flex-wrap:wrap; gap:9px; padding:13px 16px; color:var(--cream); font-size:12px; text-align:left; width:100%; }
+.person-dot { width:8px; height:8px; display:inline-block; border-radius:50%; background:var(--c); margin-right:4px; }
+.relax { width:100%; text-align:left; padding:18px; display:block; border:2px solid transparent; }
+.relax.recommended { border:3px solid var(--lime); padding:17px; }
+.relax:not(.recommended) { opacity:.8; }
+.relax .relax-title { display:flex; align-items:center; justify-content:space-between; gap:6px; font-weight:600; font-size:16px; }
+.relax .recommended-pill { background:var(--lime); border:0; height:23px; padding:0 9px; font-size:10px; }
+.relax .reasons { display:flex; flex-direction:column; gap:5px; margin:12px 0; font-size:11.5px; line-height:1.5; }
+.relax .preview { border-top:1px solid var(--navy); margin-top:12px; padding-top:12px; font-size:12px; line-height:1.7; }
+.relax .preview b { font:600 19px var(--gr); margin-right:6px; }
+.ledger-record { padding:13px 0; border-bottom:1px solid rgba(14,42,58,.2); font-size:13px; line-height:1.6; }
+.ledger-record:last-child { border:0; }
+.concession-next { font-size:12px; line-height:1.65; margin-top:14px; }
+.chain button.ico { cursor:pointer; }
+body.mobile .cl .ci { grid-template-columns:minmax(0,1fr) 24px 28px; }
+body.mobile .prod .pr { font-size:58px; }
+body.mobile .cl .b.expanded { padding:16px; }
+@media (prefers-reduced-motion:reduce) { .brand-enter * { animation:none !important; } }
+/* Cream on violet is 3.86:1; small evidence text sits on navy (13.2:1). */
+.prod .product-evidence { background:var(--navy); border-radius:22px; padding:16px; margin-top:16px; }
+.prod .pr small { background:var(--navy); color:var(--cream); border-radius:99px; padding:5px 9px; }
+.prod > .row .pill { background:var(--cream); color:var(--navy); }
+.product-evidence .option-chip.out-window { opacity:.8; border-style:dashed; }

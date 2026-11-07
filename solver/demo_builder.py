@@ -9,9 +9,11 @@ import time
 from dataclasses import replace
 
 if __package__:
+    from .demo_extras import HISTORY, attach_fills, place_facts, recommend
     from .sample_seongsu import HIDDEN, PLACES, REQUEST, MRT_META, MRT_SNAPSHOT, hm
     from .tripfit_solver import CATEGORY_KO, TAG_KO, Infeasible, Plan, TripFitSolver, diff_plans
 else:
+    from demo_extras import HISTORY, attach_fills, place_facts, recommend
     from sample_seongsu import HIDDEN, PLACES, REQUEST, MRT_META, MRT_SNAPSHOT, hm
     from tripfit_solver import CATEGORY_KO, TAG_KO, Infeasible, Plan, TripFitSolver, diff_plans
 
@@ -47,6 +49,10 @@ class DemoSolver(TripFitSolver):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.solver_name = "CBC"
+
+    def _solve(self, req, label):
+        plan, status = super()._solve(req, label)
+        return attach_fills(plan, req), status
 
     @staticmethod
     def _checklist_expr(m, prefs, places, P, y, walk_m):
@@ -92,6 +98,7 @@ def stop_json(s):
         "url": p.url, "mrt": MRT_META.get(p.id),
         "fixed": p.fixed_start_min is not None, "crowd": CROWD.get(p.id), "tags": p.tags,
         "quality": p.quality, "q": p.quality_parts,
+        "fills": getattr(s, "_fills", []),
     }
 
 
@@ -245,10 +252,11 @@ def build_whatif(solver, request, pick, base, messages=MESSAGES):
         saved = plan_json(plan, "w", round((time.perf_counter() - started) * 1000))
         options.append({**option, "plan": saved, "diff": diff_plans(base, plan, request.people),
                         "replan": replan_for(solver, relaxed, pick, saved)})
-    default = next((o for o in options if o["id"] == "category_min:cafe"), options[0] if options else None)
+    recommended = recommend(options, request.people)
+    default = next((o for o in options if o["id"] == recommended["id"]), None) if recommended else None
     chosen = ({"relaxationId": default["id"], **{k: default[k] for k in ("plan", "diff", "replan")}}
               if default else None)
-    return {**payload, **diagnostic, "relaxations": options, "chosen": chosen}
+    return {**payload, **diagnostic, "relaxations": options, "chosen": chosen, "recommended": recommended}
 
 
 def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES, muted=()):
@@ -259,6 +267,12 @@ def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES,
     orderings = sum(math.perm(n, k) for k in range(0, 7))
 
     front, ms = pareto_series(solver, request)
+    if not front:
+        result = solver.solve_or_explain(request)
+        if isinstance(result, Infeasible):
+            return {"infeasible": True,
+                    "explanation": infeasible_json(result, request, places, messages)}
+        front = [result]
     series = []
     for i, plan in enumerate(front):
         plan.label = label_for(plan)
@@ -291,8 +305,7 @@ def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES,
         replace(request, tag_min={"heritage": 1}, weights={q: 0.01 for q in request.people},
                 fairness_weight=100.0, sat_scale=scale), label="숨은 한 곳")
     hidden_ms = round((time.time() - t0) * 1000)
-    assert hidden_plan is not None
-    if not request.prefs:
+    if hidden_plan is not None and not request.prefs:
         hidden_plan.satisfaction_pct = {p: round(100 * hidden_plan.satisfaction[p] / scale[p], 1) for p in request.people}
     heritage = [p for p in places + hidden if "heritage" in p.tags]
 
@@ -308,11 +321,13 @@ def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES,
         "availability": p.availability, "duration": p.duration_min, "crowd": CROWD.get(p.id),
         "tags": p.tags, "story": p.story, "credit": p.credit, "quality": p.quality, "q": p.quality_parts,
         "hidden": p in hidden, "url": p.url, "mrt": MRT_META.get(p.id),
+        "facts": place_facts(p),
     } for p in places + hidden]
 
     prefs = {person: [{"label": it.label, "kind": it.kind, "weight": it.weight, "quote": it.quote,
                        "full": it.full, "zero": it.zero, "match": it.match} for it in items] for person, items in request.prefs.items()}
     data = {
+        "history": [dict(row) for row in HISTORY],
         "prefs": prefs,
         "people": [
             {"name": "지민", "color": "#F2643D", "initial": "지", **messages["지민"]},
@@ -331,8 +346,9 @@ def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES,
                    "alt": choices[1] if len(choices) > 1 else None},
         "replan": replan_data,
         "hidden": {"tag": "heritage", "label": "숨은 한 곳 +1", "source": "서울미래유산",
-                   "candidates": [p.id for p in heritage], "plan": plan_json(hidden_plan, "h", hidden_ms),
-                   "diff": diff_plans(base, hidden_plan, request.people)},
+                   "candidates": [p.id for p in heritage],
+                   "plan": plan_json(hidden_plan, "h", hidden_ms) if hidden_plan else None,
+                   "diff": diff_plans(base, hidden_plan, request.people) if hidden_plan else None},
         "conflict": {"limitM": 1500, "relaxations": relax, "ms": conflict_ms},
         "pay": {"item": MRT_META.get(primary["pick"], {}).get("name", "체험 없음"),
                 "price": next((p.price for p in places if p.id == primary["pick"]), 0), "people": 2},

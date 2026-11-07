@@ -8,6 +8,7 @@
 <meta property="og:description" content="둘이 한 말로, 둘 다 OK인 일정">
 <meta property="og:image" content="og.png">
 <title>TripFit</title>
+<link rel="icon" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -360,11 +361,13 @@ body.mobile .eg-rule { flex: none; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 </style>
+<link rel="stylesheet" href="details.css">
 </head>
 <body>
 <div class="stage">
   <div class="rig" id="rig">
     <div class="cap" id="cap">
+      <div id="capLogo" class="brand"></div>
       <div class="cap-n" id="capN"></div>
       <div class="cap-t" id="capT"></div>
       <div class="cap-s" id="capS"></div>
@@ -404,6 +407,7 @@ body.mobile .eg-rule { flex: none; }
 (async () => {
 let LIVE = false;
 async function api(path, body, timeout = 30000, allowInfeasible = false) {
+  if (body && window.DEMO?.sessionId && !body.sessionId) body = {sessionId:window.DEMO.sessionId, ...body};
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
   try {
@@ -497,7 +501,34 @@ const whyOf = s => {
   return out.slice(0, 2);
 };
 const pickOf = s => { const sc = s.scores; if (!sc) return null; const d = sc[P[0].name] - sc[P[1].name]; return d >= 3 ? 0 : d <= -3 ? 1 : null; };
-const LOGO = `<svg width="30" height="20" viewBox="0 0 30 20"><circle cx="10" cy="10" r="8.5" fill="#FFCCE5" stroke="#0E2A3A" stroke-width="1.8"/><circle cx="20" cy="10" r="8.5" fill="#8EC5EE" stroke="#0E2A3A" stroke-width="1.8"/><path d="M15 3.1A8.5 8.5 0 0 1 15 16.9 8.5 8.5 0 0 1 15 3.1z" fill="#D6F23B" stroke="#0E2A3A" stroke-width="1.8"/></svg>`;
+const LOGO_MARK = `<svg class="brand-mark" width="44" height="28" viewBox="0 0 44 28" aria-hidden="true"><circle class="logo-left" cx="15" cy="14" r="12" fill="#FFCCE5" stroke="#0E2A3A" stroke-width="1.8"/><circle class="logo-right" cx="29" cy="14" r="12" fill="#8EC5EE" stroke="#0E2A3A" stroke-width="1.8"/><path class="logo-lens" d="M22 4.25A12 12 0 0 1 22 23.75 12 12 0 0 1 22 4.25z" fill="#D6F23B" stroke="#0E2A3A" stroke-width="1.8"/><path class="logo-check" d="m18 14 3 3 5-6" fill="none" stroke="#0E2A3A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const LOGO = `${LOGO_MARK}<span>TripFit</span>`;
+$("#capLogo").innerHTML = LOGO;
+let brandEntered = false;
+
+
+/* Fit the complete number + unit while keeping the rolling columns intact. */
+const numberSelector = ".fn-n,.bn,.prod .pr,.eg-big,.stats .v,.rc .gr,#split .gr";
+function fitNumber(el) {
+  if (!el?.isConnected || !el.clientWidth) return;
+  el.style.fontSize = "";
+  const base = parseFloat(getComputedStyle(el).fontSize);
+  for (let i = 0; i < 4; i++) {
+    const overflow = el.scrollWidth;
+    if (overflow <= el.clientWidth) break;
+    const size = parseFloat(getComputedStyle(el).fontSize);
+    el.style.fontSize = Math.min(base, size * (el.clientWidth - 2) / overflow) + "px";
+  }
+}
+let numberFrame = 0;
+function fitNumbers() {
+  cancelAnimationFrame(numberFrame);
+  numberFrame = requestAnimationFrame(() => $$(numberSelector).forEach(fitNumber));
+}
+document.fonts?.ready.then(fitNumbers);
+addEventListener("resize", fitNumbers);
+const numberResize = new ResizeObserver(fitNumbers);
+numberResize.observe($("#screen"));
 
 /* ---------- odometer (rolling digits) ---------- */
 function odo(el, str) {
@@ -517,6 +548,7 @@ function odo(el, str) {
     s.style.transform = `translateY(${-ch * 10}%)`;
   });
   el.dataset.v = str;
+  fitNumbers();
 }
 
 /* ---------- headline: per-character blur-in ---------- */
@@ -612,6 +644,15 @@ class TFMap {
       <g class="walker" opacity="0"><circle r="12" fill="#D6F23B" class="pulse"/><circle r="7" fill="#D6F23B" stroke="#0E2A3A" stroke-width="2.5"/></g>
     </svg>`;
     this.svg = $("svg", host);
+    this.stops = [];
+    const openMarker = e => {
+      const marker = e.target.closest("[data-pid]");
+      if (!marker) return;
+      const stop = this.stops.find(s => this.mk[s.id] === marker);
+      openPOI(view.lastElementChild, stop?.id || marker.dataset.pid, stop);
+    };
+    this.svg.addEventListener("click", openMarker);
+    this.svg.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); openMarker(e); } });
     this.start = this.p(D.start.lat, D.start.lng); this.end = this.p(D.end.lat, D.end.lng);
     const mks = $(".mks", this.svg);
     this.mk = {};
@@ -622,6 +663,8 @@ class TFMap {
       g.setAttribute("transform", `translate(${x},${y})`);
       g.innerHTML = idleMark(pl);
       g.dataset.pid = pl.id;
+      g.setAttribute("role", "button"); g.setAttribute("tabindex", "0");
+      g.setAttribute("aria-label", `${short(pl.name)} 장소 정보`);
       mks.appendChild(g);
       this.mk[pl.id] = g;
       if (pl.group) this.mk[pl.group] = g;
@@ -642,6 +685,7 @@ class TFMap {
     }
   }
   setRoute(stops, { crowd = null, delay = 0 } = {}) {
+    this.stops = stops;
     const pts = [this.start, ...stops.map(s => { const pl = placeById[s.id]; return this.p(pl.lat, pl.lng); }), this.end];
     const rg = $(".route", this.svg);
     [...rg.children].forEach(o => o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" }).onfinish = () => o.remove());
@@ -694,7 +738,7 @@ class Timeline {
     const tags = [];
     if (crowd) tags.push(`<span class="pill fill">${svg("people", 13, 2.4)} 지금 붐빔 · 웨이팅 40분</span>`);
     if (lock) tags.push(`<span class="pill">${svg("lock", 12, 2.4)} ${hhmm(s.start)} 예약 고정</span>`);
-    if (s.mrt?.coordSource === "approx" || s.mrt?.durationSource === "default") tags.push(`<span class="pill">추정</span>`);
+    if (s.mrt?.coordSource?.startsWith("approx") || s.mrt?.durationSource === "default") tags.push(`<span class="pill">추정</span>`);
     if (s.availability === "unverified") tags.push(`<span class="pill">자리 확인 필요</span>`);
     if ((s.tags || []).includes("heritage") && this.o.stories) tags.push(`<span class="pill story" data-story="${s.id}">${svg("heritage", 12, 2.4)} 미래유산 · 이야기</span>`);
     if (!crowd && !lock && this.o.picks) {
@@ -727,6 +771,11 @@ class Timeline {
       el._fresh = fresh; el._moved = !fresh && el.dataset.t !== String(s.start);
       el.dataset.t = s.start;
       el.innerHTML = this.html(s, o);
+      const card = $(".stop", el);
+      card.setAttribute("role", "button"); card.tabIndex = 0;
+      card.setAttribute("aria-label", `${short(s.name)} 장소 정보`);
+      card.onclick = () => openPOI(view.lastElementChild, s.id, s);
+      card.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); card.click(); } };
       this.host.insertBefore(el, this.endRow);
       return el;
     });
@@ -778,6 +827,9 @@ function openSheet(v, html) {
   dim.className = "dim"; sh.className = "sheet";
   sh.innerHTML = html;
   v.append(dim, sh);
+  sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true");
+  sh.setAttribute("aria-label", $("[data-sheet-title]", sh)?.textContent || "상세 정보");
+  fitNumbers();
   E(dim, [{ opacity: 0 }, { opacity: 1 }], 300);
   A(sh, [{ transform: "translateY(105%)" }, { transform: "none" }], "soft");
   [...sh.children].forEach((b, i) => A(b, [{ transform: `translateY(${40 + i * 30}px)` }, { transform: "none" }], "soft", { delay: 40 + i * 50 }));
@@ -790,14 +842,114 @@ function openSheet(v, html) {
     dim.remove(); sh.remove();
   };
   dim.addEventListener("click", close);
-  return { el: sh, close };
+  sh.addEventListener("keydown", e => {
+    e.stopPropagation();
+    if (e.key === "Escape") close();
+  });
+  // Drag from the handle/header, or pull down when the scroll is at the top.
+  let pull = null;
+  sh.addEventListener("touchstart", e => {
+    if (sh.scrollTop <= 0 && !e.target.closest("button,a,input")) pull = { x: e.touches[0].clientX, y: e.touches[0].clientY, dy: 0 };
+  }, { passive: true });
+  sh.addEventListener("touchmove", e => {
+    if (!pull) return;
+    const dy = e.touches[0].clientY - pull.y;
+    if (dy > 0 && dy > Math.abs(e.touches[0].clientX - pull.x) && e.cancelable) {
+      e.preventDefault(); pull.dy = dy; sh.style.transform = `translateY(${dy}px)`;
+    }
+  }, { passive: false });
+  sh.addEventListener("touchend", () => {
+    if (!pull) return;
+    if (pull.dy > 75) close();
+    else if (pull.dy) A(sh, [{ transform: `translateY(${pull.dy}px)` }, { transform: "none" }], "soft");
+    sh.style.transform = ""; pull = null;
+  });
+  const result = { el: sh, close };
+  v._sheet = result;
+  return result;
+}
+
+/* ---------- concession memory: sample history + this session ---------- */
+const ledgerKey = "tripfit.concessions.v1";
+const initialDemo = JSON.parse(JSON.stringify(D));
+let sessionHistory = [];
+try {
+  const saved = JSON.parse(localStorage.getItem(ledgerKey) || "[]");
+  if (Array.isArray(saved)) sessionHistory = saved.filter(r => r && typeof r.id === "string" && P.some(p => p.name === r.person) && typeof r.label === "string");
+} catch (_) { /* in-memory fallback */ }
+const allHistory = () => [...(D.history || []).map(r => ({...r, sample:true})), ...sessionHistory];
+const concessionCounts = () => Object.fromEntries(P.map(p => [p.name, allHistory().filter(r => r.person === p.name).length]));
+const nextPerson = () => {
+  const counts = concessionCounts(), last = allHistory().at(-1);
+  return [...P].sort((a,b) => counts[a.name] - counts[b.name] || (a.name === last?.person ? 1 : b.name === last?.person ? -1 : 0))[0].name;
+};
+function recordConcession(id, row) {
+  sessionHistory = sessionHistory.filter(r => r.id !== id);
+  if (row) sessionHistory.push({id, date:"이번", place:"성수", ...row});
+  try { localStorage.setItem(ledgerKey, JSON.stringify(sessionHistory)); } catch (_) {}
+}
+function resetConcessions() {
+  sessionHistory = []; muted.splice(0); chosen = null;
+  try { localStorage.removeItem(ledgerKey); } catch (_) {}
+  Object.assign(D, JSON.parse(JSON.stringify(initialDemo)));
+}
+function ledgerLine() {
+  const counts = concessionCounts();
+  return `<button class="ledger-line" data-ledger>양보 장부 <span class="pill small-pill on-dark">샘플 포함</span>${P.map(p => `<span><i class="person-dot" style="--c:${p.color}"></i>${p.name} ${counts[p.name]}</span>`).join(" · ")}${svg("arrow",14)}</button>`;
+}
+function openLedger(v) {
+  if (autoPlaying || v._sheet) return;
+  const sh = openSheet(v, `<div class="b pink sheet-head"><span class="grab"></span><div class="row between"><span class="cap-up">기억하는 합의</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>양보 장부</div><div class="info-line">${P.map(p => `${p.name} ${concessionCounts()[p.name]}회`).join(" · ")} · 다음엔 ${nextPerson()} 차례</div></div><div class="b cream">${allHistory().map(r => `<div class="ledger-record"><b>${escapeHTML(r.date)} · ${escapeHTML(r.place)} · ${escapeHTML(r.person)}</b> <span class="pill small-pill">${r.sample ? "샘플" : "이번 세션"}</span><div>‘${escapeHTML(r.label)}’ 양보 · ${escapeHTML(r.note || "")}</div></div>`).join("") || "아직 양보 기록이 없어요."}</div>`);
+  $(".sheet-close", sh.el).onclick = sh.close;
+}
+function recommendedFor(W) {
+  const counts = concessionCounts();
+  const options = [...W.relaxations].sort((a,b) => b.preview.minSat - a.preview.minSat || (counts[a.owner] || 0) - (counts[b.owner] || 0) || (a.id === W.recommended?.id ? -1 : 1));
+  const best = options[0], due = nextPerson(), last = allHistory().at(-1);
+  const pair = P.map(p => Math.round(best.preview.sat[p.name])).join(" : ");
+  const reasons = [`양보 후 ${pair}으로 더 고르게 · 낮은 쪽 ${best.preview.minSat.toFixed(1)}%`, last ? `${due !== best.owner ? "참고 · " : ""}${last.date === "이번" ? "앞서 성수에선" : `지난번 ${last.place}에선`} ${last.person}이 양보했어요 · 이번엔 ${due} 차례` : "양보 장부에 첫 기록을 남겨요"];
+  return {id:best.id, options, reasons};
+}
+
+/* ---------- POI details: the stop passed here always belongs to the visible route ---------- */
+function openPOI(v, id, stop = null) {
+  if (!v || autoPlaying || v._sheet) return;
+  const p = placeById[id]; if (!p) return;
+  const f = p.facts || {}, q = p.q || {}, mrt = p.mrt;
+  const source = p.source === "mrt" && mrt?.isReal ? "마이리얼트립 실조회" : p.source === "heritage" ? "서울미래유산" : "샘플";
+  const parts = [["uniqueness","고유성","0.4", `지점 ${f.branches ?? "미확인"}곳${f.heritage ? " · 미래유산" : ""}`], ["reputation","평판","0.3", f.rating == null ? "평점·리뷰 미확인 · 사전평점 4.5 사용" : `평점 ${f.rating.toFixed(1)} · 리뷰 ${f.reviews}개 · 사전평점 4.5와 보정`], ["timing","시간대","0.3", f.crowd == null ? "혼잡 미확인 · 기본값 1.0" : `혼잡 ${f.crowd}/4 · 1 여유 ~ 4 붐빔 (샘플)`]];
+  const fetched = D.mrt?.fetchedAt ? new Date(D.mrt.fetchedAt).toLocaleTimeString("ko-KR", {hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Asia/Seoul"}) : "";
+  const sh = openSheet(v, `<div class="b ${p.cat === "activity" ? "lilac" : "mint"} sheet-head"><span class="grab"></span><div class="row between"><span class="pill small-pill">${escapeHTML(p.catKo)}</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>${escapeHTML(short(p.name))}</div>
+    <div class="poi-summary">${stop ? `<div><span class="lab">이 일정에서</span><b>${hhmm(stop.start)}–${hhmm(stop.end)} · ${stop.end-stop.start}분</b><small>도착 ${hhmm(stop.arrive)}${stop.wait ? ` · 대기 ${stop.wait}분` : ""}</small></div><div><span class="lab">이전 장소에서 도보</span><b>${won(Math.round(stop.walkM))}m · ${Math.round(stop.walkMin)}분</b></div>` : `<div class="info-line">현재 일정에 포함되지 않은 후보</div>`}<div><span class="lab">가격</span><b>${p.price ? `${won(p.price)}원 / 1인` : "무료 · 샘플"}</b></div><div><span class="lab">영업${mrt ? "" : " · 샘플"}</span><b>${mrt ? "영업시간 미확인" : `${hhmm(f.open ?? 0)}–${hhmm(f.close ?? 1440)}`}</b></div></div></div>
+    <div class="b cream"><div class="q-title"><span class="cap-up">장소 점수 Q</span><b>${p.quality.toFixed(3)}</b><span class="lab">/ 1</span></div>${parts.map(([key,label,weight,reason]) => `<div class="q-row"><div class="row"><b>${label}</b><span>× ${weight}</span><span class="q-value">${(q[key] ?? 0).toFixed(2)}</span></div><div class="q-track"><i style="width:${(q[key] ?? 0)*100}%"></i></div><small>${escapeHTML(reason)}</small></div>`).join("")}<div class="info-line">Q = 고유성×0.4 + 평판×0.3 + 시간대×0.3<br><small>구성요소 표시값은 반올림</small><br><span class="pill small-pill">지점 수·혼잡 샘플</span></div></div>
+    <div class="b pink"><span class="cap-up">이 장소가 채운 말</span><div class="fills">${stop?.fills?.length ? stop.fills.map(it => `<div><b>${escapeHTML(it.person)} · ${escapeHTML(it.label)}</b><br>“${escapeHTML(it.quote)}”</div>`).join("") : stop ? "이 장소에 직접 연결된 말은 없어요." : "일정에 넣으면 연결된 말을 볼 수 있어요."}</div></div>
+    ${p.story ? `<div class="b lilac"><div class="info-line">${escapeHTML(p.story)}</div><div class="info-line">${escapeHTML(p.credit || "")} · 이야기 샘플</div></div>` : ""}
+    <div class="b ${mrt?.isReal ? "lilac" : "cream"}">${mrt ? `<div class="info-line">평점 ${mrt.rating ?? "미확인"} · 리뷰 ${mrt.reviews ?? "미확인"}개<br>시작 ${mrt.start || hhmm(p.fixedStart)} · ${p.duration}분${mrt.durationSource === "default" ? ' <span class="pill small-pill">소요시간 추정</span>' : ""}<br>${escapeHTML(mrt.meetingText || "집결지 미확인")}</div>${p.url ? `<div class="product-link-row"><a class="pill product-link" href="${escapeHTML(p.url)}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 보기 ${svg("arrow",14)}</a></div>` : ""}` : ""}<span class="pill small-pill">${source}${mrt?.isReal && fetched ? ` · ${fetched}` : ""}</span><div class="poi-coord">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${mrt?.coordSource?.startsWith("approx") ? ' <span class="pill small-pill">좌표 추정</span>' : " · 좌표 근사"}</div></div>`);
+  $(".sheet-close", sh.el).onclick = sh.close;
+}
+
+function productCard(p, snapshot) {
+  const estimatedDuration = p.durationSource === "default", estimatedCoord = p.coordSource?.startsWith("approx");
+  const fetched = snapshot?.fetchedAt ? new Date(snapshot.fetchedAt).toLocaleTimeString("ko-KR", {hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Asia/Seoul"}) : "";
+  return `<div class="b prod cut sheet-head"><span class="grab"></span><div class="row between"><span class="pill small-pill">마이리얼트립${p.isSample ? " · 샘플" : ""}</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>${escapeHTML(short(p.name))}</div>
+    <div class="pr gr"><span>${p.price == null ? "가격 미확인" : won(p.price)}</span>${p.price == null ? "" : '<small>원 / 1인</small>'}</div>
+    <div class="product-evidence"><div class="rating">${p.rating == null ? "평점·리뷰 미확인" : `평점 ${Number(p.rating).toFixed(1)} · 리뷰 ${p.reviews ?? "미확인"}개`}</div>
+    <div class="info-line">소요시간 ${p.durationMin}분 ${estimatedDuration ? '<span class="pill small-pill estimate">추정</span>' : ""}<br>${escapeHTML(p.meetingText || "집결지 미확인")} ${estimatedCoord ? '<span class="pill small-pill estimate">좌표 추정</span>' : ""}</div>
+    <div class="verified">${p.isSample ? "샘플" : `마이리얼트립 실조회 · ${fetched}`} · ${escapeHTML(snapshot?.date || "예시 날짜")}<br>평점·가격·시작 시각 기준</div>
+    <div class="option-chips">${(p.options || []).map(o => {
+      const [h,m] = o.start.split(":").map(Number), start = h*60+m;
+      const inside = start >= D.window.start && start + p.durationMin <= D.window.end;
+      return `<div class="option-chip ${inside ? "in-window" : "out-window"} ${o.available === false ? "sold-out" : ""}"><b>${escapeHTML(o.start)}</b><small>${o.available === false ? "매진" : inside ? "시간창 안" : "시간창 밖"}</small></div>`;
+    }).join("")}</div>
+    <div class="info-line">${(p.options || []).some(o => o.available === true) ? "조회 시 2인 예약 가능" : "자리 확인 필요"}${p.price != null ? ` · ${won(p.price)}원` : ""}<br>시간창 ${hhmm(D.window.start)}–${hhmm(D.window.end)} · 종료까지 포함</div></div>
+    ${p.url ? `<div class="product-link-row"><a class="pill product-link" href="${escapeHTML(p.url)}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 보기 ${svg("arrow",14)}</a></div>` : ""}</div>`;
 }
 
 /* ---------- presenter caption (desktop only) ---------- */
 const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
   ["결국 한 명이\n참는 여행", "“‘전시는 꼭 봐야 해’, ‘나 많이 못 걸어’. 같이 여행 가면 결국 한 명이 참죠.”"],
   ["한 문장이면\n조건이 된다", `“각자 한 문장이면 꼭 지킬 것과 되면 좋은 것으로 나눠요. ${won(D.sources.orderings)}가지 순서 중 둘 다 OK인 일정 ${D.series.length}개.”`],
-  ["만족도는\n한 말의 체크리스트", "“만족도는 각자 한 말이 지켜진 비율이에요. 저울을 밀면 지민 100·서연 75부터 지민 59·서연 89까지. 가운데가 79 대 83.”"],
+  ["만족도는\n한 말의 체크리스트", `“만족도는 각자 한 말이 지켜진 비율이에요. 저울을 밀면 지민 ${Math.round(D.series[0].sat["지민"])}·서연 ${Math.round(D.series[0].sat["서연"])}부터 지민 ${Math.round(D.series.at(-1).sat["지민"])}·서연 ${Math.round(D.series.at(-1).sat["서연"])}까지. 가운데가 ${Math.round(D.series[D.defaultIdx].sat["지민"])} 대 ${Math.round(D.series[D.defaultIdx].sat["서연"])}.”`],
   ["넣으면, 뭘\n빼야 하는지", "“숲체험을 넣으면? 지금 조건으론 안 된다고, 대신 누가 무엇을 양보하면 되는지 바로 계산해요.”"],
   ["둘 다 OK면\n결제까지", "“둘 다 승인하면 분담 결제 요청까지.”"],
   ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 숲체험은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
@@ -807,11 +959,15 @@ const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
 async function s0(v, t) {
   status("12:58");
   v.innerHTML = `<div class="scr" id="sc" style="padding-bottom:24px">
-    <div class="b top lime cut cl"><div class="row between"><span class="cap-up">토요일 성수</span><span class="cap-up">둘이서</span></div>
+    <div class="b top lime cut cl"><div class="row between"><span class="brand app-brand">${LOGO}</span><span class="cap-up">둘이서</span></div>
       <div class="row between" style="margin-top:14px;align-items:flex-end"><div style="font:500 40px/1.05 var(--kr);letter-spacing:-.055em">성수<br>반나절</div><div class="av-stack">${av(0, 44)}${av(1, 44)}</div></div></div>
     <div class="b pink tab tl row" style="padding:12px 14px 12px 12px"><div class="date-c"><b class="gr">14</b><small>Nov</small></div><div style="flex:1"><div class="lab">오늘 일정</div><div style="font:600 15px var(--kr);margin-top:2px">13:00 – 18:30 · 성수역 출발</div></div><span class="pill">미정</span></div>
     <div id="chat"></div>
   </div>`;
+  if (!brandEntered) {
+    brandEntered = true;
+    [$(".app-brand", v), $("#capLogo")].forEach(el => el.classList.add("brand-enter"));
+  }
   const sc = $("#sc", v), chat = $("#chat", v);
   $$(".b", v).forEach((b, i) => rise(b, 80 + i * 90));
   const add = (html, cls) => {
@@ -837,7 +993,7 @@ async function s0(v, t) {
   await say(1, "아니 그건 아닌데ㅠ"); if (!alive(t)) return;
   await sleep(250); if (!alive(t)) return;
   const fl = document.createElement("div");
-  fl.className = "flag"; fl.innerHTML = `${LOGO} TripFit`;
+  fl.className = "flag"; fl.innerHTML = `${svg("check", 16, 2.4)} 같이 만드는 일정`;
   chat.appendChild(fl);
   A(fl, [{ opacity: 0, transform: "scale(.6)" }, { opacity: 1, transform: "none" }], "pop");
   const card = add(`<div style="font:500 23px/1.35 var(--kr);letter-spacing:-.045em;margin:12px 0 18px">둘이 한 말을 조건으로 바꿔서,<br>둘 다 OK인 일정을 찾아볼게요</div><button class="btn navy"><span>같이 정하기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button>`, "lime");
@@ -944,6 +1100,7 @@ async function s1(v, t) {
   if (!alive(t)) return;
   $("#fnK", v).textContent = `${won(D.sources.orderings)}가지 중 둘 다 OK인 일정`;
   nEl.innerHTML = `<span>${D.series.length}</span><em>개</em>`;
+  fitNumbers();
   nEl.getAnimations().forEach(a => a.cancel());
   A(nEl, [{ transform: "scale(2.2)", opacity: 0 }, { transform: "none", opacity: 1 }], "pop");
   fn.style.setProperty("--bg", "var(--lime)");
@@ -973,10 +1130,11 @@ async function s2(v, t) {
       <div class="h" id="ttl" style="font-size:21px;min-height:2.5em"></div>
       <div class="big2"><div class="bn gr"><span class="odo" id="nJ">0</span><em>%</em></div><div class="colon gr">:</div><div class="bn r gr"><span class="odo" id="nS">0</span><em>%</em></div></div>
       <div class="bn-lab"><span style="--c:${P[0].color}"><i></i>${P[0].name} 만족도</span><span style="--c:${P[1].color}">${P[1].name} 만족도<i></i></span></div>
+      <div class="balance-note"><b id="minSat"></b><span>균형 = 덜 만족한 사람의 %가 가장 높은 일정</span></div>
       <div class="sc-track" id="track"><div class="sc-rail"></div>${D.series.map((_, i) => `<span class="sc-det" style="left:${(n === 1 ? 50 : i / (n - 1) * 100)}%"></span>`).join("")}<div class="sc-thumb snap" id="thumb">${svg("check", 20, 3)}</div></div>
       <div class="sc-lab"><span>${P[0].name} 쪽</span><span>균형</span><span>${P[1].name} 쪽</span></div>
     </div>
-    <div class="split cl" id="cl">${P.map((p, i) => `<div class="b ${i ? "sky tab tr" : "pink"}"><div class="head"><span class="cap-up">${p.name}이 한 말</span><b id="clp${i}"></b></div><div id="cli${i}"></div></div>`).join("")}</div>
+    <div class="split cl" id="cl">${P.map((p, i) => `<div class="b ${i ? "sky tab tr" : "pink"}"><button class="head formula-toggle" data-person="${i}" aria-expanded="false" aria-controls="formula${i}"><span class="cap-up">${p.name}이 한 말</span><b id="clp${i}"></b></button><div class="formula" id="formula${i}" hidden></div><div id="cli${i}"></div></div>`).join("")}</div>
     <div class="b mint cut mapblk" id="mapB" style="margin-top:4px"><div id="map"></div><div class="map-ov"><span class="pill" id="mapPill"></span></div></div>
     <div class="b lilac tab cut cl hid" id="hid"><span class="ico" style="color:var(--lilac)">${svg("heritage", 21, 2)}</span><div class="t"><b>${D.hidden.label}</b><small>서울미래유산에서 찾은 성수 이야기</small></div><span class="sw"></span></div>
     <div class="b pink tab tl stats" id="stats">
@@ -1011,7 +1169,9 @@ async function s2(v, t) {
     odo($("#stM", v), Math.round(p.walkMin));
     odo($("#stF", v), hhmm(p.finish));
     $("#mapPill", v).textContent = `${p.stops.length}곳 · ${km(p.walkM)}km`;
-    P.forEach((q, i) => renderChecklist($(`#cli${i}`, v), $(`#clp${i}`, v), p.checklist[q.name]));
+    $("#minSat", v).textContent = `${Math.floor(Math.min(...Object.values(p.sat)))}% · 둘 중 낮은 쪽`;
+    P.forEach((q, i) => renderChecklist($(`#cli${i}`, v), $(`#clp${i}`, v), p.checklist[q.name], p.sat[q.name], $(`#formula${i}`, v), q.name));
+    log("mip", `만족도 = Σ(강도×충족률)/Σ강도 · 지민 ${p.sat["지민"].toFixed(1)} / 서연 ${p.sat["서연"].toFixed(1)}`);
     map.setRoute(p.stops, { delay: first ? 700 : 0 });
     tl.render(p, { animate: !first, inDelay: 60 });
   };
@@ -1019,7 +1179,16 @@ async function s2(v, t) {
   await sleep(250); if (!alive(t)) return;
   map.flicker();
   paint(plan, true);
-  log("mip", `만족도 = 각자 한 말 체크리스트(가중평균) · 동점이면 장소 점수`);
+  const toggleFormula = i => {
+    const head = $(`.formula-toggle[data-person="${i}"]`, v), formula = $(`#formula${i}`, v);
+    formula.hidden = !formula.hidden;
+    head.setAttribute("aria-expanded", String(!formula.hidden));
+    head.closest(".b").classList.toggle("expanded", !formula.hidden);
+    fitNumbers();
+  };
+  $$(".formula-toggle", v).forEach(b => b.onclick = () => toggleFormula(+b.dataset.person));
+  ["#nJ", "#nS"].forEach((id, i) => { const b = $(id, v).parentElement; b.tabIndex = 0; b.setAttribute("role", "button"); b.setAttribute("aria-label", `${P[i].name} 만족도 계산 보기`); b.onclick = () => toggleFormula(i); b.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); toggleFormula(i); } }; });
+  v._run = async () => { toggleFormula(0); await sleep(1700); if (alive(t)) toggleFormula(0); };
   const apply = i => {
     if (busy || hiddenOn || i === idx) return;
     const prev = plan; idx = i; plan = D.series[i];
@@ -1080,6 +1249,7 @@ async function s2(v, t) {
       if (!alive(t)) return;
       // Commit together, so failed requests preserve the previous checklist.
       muted.splice(0, muted.length, ...nextMuted);
+      recordConcession(`pref:${person}:${label}`, conceding ? {person, label, note: "이 말은 양보할게"} : null);
       D.series = result.series;
       D.defaultIdx = result.defaultIdx;
       n = D.series.length;
@@ -1115,7 +1285,7 @@ async function s2(v, t) {
   hidBlk.addEventListener("keydown", e => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setHidden(!hiddenOn); }
   });
-  $("#tl", v).addEventListener("click", e => { const b = e.target.closest("[data-story]"); if (b) openStory(v, b.dataset.story); });
+
   v._hidden = setHidden;
   v._toggleHidden = () => setHidden(!hiddenOn);
   v._story = () => openStory(v, H.plan.stops.find(s => placeById[s.id].hidden).id);
@@ -1123,19 +1293,28 @@ async function s2(v, t) {
 }
 
 /* checklist rows: label · bar · % (bars and numbers animate in place) */
-function renderChecklist(box, total, items) {
-  if (!box.children.length) box.innerHTML = items.map(it => `<div class="ci" role="button" tabindex="0" data-label="${escapeHTML(it.label)}" aria-label="${escapeHTML(it.label)} 이 말은 양보할게"><span><span class="ci-label">${escapeHTML(it.label)}</span><small class="pill" hidden>양보</small></span><i><b style="width:0"></b></i><em></em></div>`).join("");
+function renderChecklist(box, total, items, sat, formula, person) {
+  if (!box.children.length) box.innerHTML = items.map(it => `<div class="ci" role="button" tabindex="0" data-label="${escapeHTML(it.label)}" aria-label="${escapeHTML(it.label)} 이 말은 양보할게"><span><span class="ci-label">${escapeHTML(it.label)}</span><small class="pill intensity"></small><small class="pill conceded" hidden>양보</small></span><i><b style="width:0"></b></i><em></em></div>`).join("");
   [...box.children].forEach((row, k) => {
-    const f = items[k].fulfilled;
-    const conceded = !!items[k].muted;
+    const it = items[k], f = it.fulfilled, conceded = !!it.muted || it.weight === 0;
     row.classList.toggle("muted", conceded);
     row.setAttribute("aria-pressed", String(conceded));
-    $(".pill", row).hidden = !conceded;
-    $("b", row).style.width = f * 100 + "%";
+    $(".conceded", row).hidden = !conceded;
+    const intensity = $(".intensity", row);
+    intensity.textContent = it.weight === 1 ? "꼭" : it.weight === .7 ? "보통" : it.weight === .4 ? "살짝" : "제외";
+    intensity.title = `강도 ${it.weight.toFixed(1)}`;
+    $("i b", row).style.width = f * 100 + "%";
     $("em", row).textContent = Math.round(f * 100) + "%";
   });
-  const w = items.reduce((a, it) => a + it.weight, 0);
-  total.textContent = Math.round(100 * items.reduce((a, it) => a + it.weight * it.fulfilled, 0) / (w || 1)) + "%";
+  const active = items.filter(it => it.weight > 0), w = active.reduce((a, it) => a + it.weight, 0);
+  const calculated = Math.round(1000 * active.reduce((a, it) => a + it.weight * it.fulfilled, 0) / (w || 1)) / 10;
+  const matches = calculated.toFixed(1) === sat.toFixed(1);
+  if (!matches) console.warn("만족도 식과 sat 불일치", { person, calculated, sat });
+  total.textContent = Math.round(sat) + "%";
+  formula.dataset.calculated = calculated.toFixed(1); formula.dataset.sat = sat.toFixed(1);
+  const numerator = active.map(it => `${+(it.fulfilled * 100).toFixed(2)}×${it.weight.toFixed(1)}`).join(" + ");
+  const denominator = active.map(it => it.weight.toFixed(1)).join("+");
+  formula.innerHTML = `<span class="lab">충족률 × 강도, 모두 더해 나누기</span><div class="equation gr">${w ? `(${numerator}) ÷ (${denominator})` : "활성 항목 없음"} = <b>${sat.toFixed(1)}%</b></div><small>꼭 1.0 · 보통 0.7 · 살짝 0.4${matches ? "" : " · 서버 계산값 표시"}</small>`;
 }
 
 /* ---------- step 3: what-if ---------- */
@@ -1163,18 +1342,11 @@ async function s3(v, t) {
   const choices = D.whatif.choices || [];
   const availabilityText = value => value === true ? "조회 시 2인 예약 가능" : value === false ? "2인 예약 불가" : "자리 확인 필요";
   const products = snapshot?.picked?.length ? snapshot.picked : D.places.filter(p => p.cat === "activity" && p.id === D.whatif.pick).map(p => ({ name: short(p.name), price: p.price, durationMin: p.duration, options: [], isSample: true }));
-  const productCards = products.map(p => `<div class="b prod"><span class="pill">마이리얼트립${p.isSample ? " · 예시 상품" : ""}</span>
-    <div style="font:600 22px/1.25 var(--kr);margin-top:14px">${escapeHTML(short(p.name))}</div>
-    <div class="pr gr">${p.price == null ? "가격 미확인" : won(p.price)}<small>${p.price == null ? "" : "원부터 / 1인"} · ${p.durationMin}분</small></div>
-    <div>${p.rating == null ? "평점·리뷰 미확인" : `⭐ ${Number(p.rating).toFixed(1)} (${p.reviews == null ? "리뷰 미확인" : p.reviews + "개 리뷰"})`}
-      ${p.coordSource === "approx" || p.durationSource === "default" ? '<span class="pill" title="좌표 또는 소요시간 추정">추정</span>' : ""}</div>
-    <div class="note">${escapeHTML(p.meetingText || "위치 미확인")}<br>${p.coordSource === "approx" ? "좌표 미확인: 성수역 대체 위치 · " : ""}${p.durationSource === "default" ? "소요시간 120분 추정 · " : ""}${escapeHTML(snapshot?.date || "예시 날짜")}</div>
-    <div class="note">${(p.options || []).map(o => `${escapeHTML(o.start)} · ${availabilityText(o.available)} · ${o.price == null ? "가격 미확인" : won(o.price) + "원"}`).join("<br>")}</div>
-    ${p.url ? `<a href="${escapeHTML(p.url)}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 보기 ↗</a>` : ""}
-    ${p.note ? `<div class="note">${escapeHTML(p.note)}</div>` : ""}</div>`).join("");
+  const productCards = products.map(p => productCard(p, snapshot)).join("");
   const base = D.series[D.defaultIdx];
-  v.innerHTML = `<div class="scr" id="sc">${topBlock("마이리얼트립 체험", `<span class="cap-up">넣어보기</span>`, "lime")}<div id="tray"></div><div id="tl"></div><div class="note" id="note"></div></div>`;
+  v.innerHTML = `<div class="scr" id="sc">${topBlock("마이리얼트립 체험", `<button class="pill" id="reopenProduct" style="height:28px;font-size:11px">상품·시각</button>`, "lime")}<div id="tray"></div><div id="tl"></div><div class="note" id="note"></div></div>`;
   rise($("#top", v), 60);
+  $("#reopenProduct", v).onclick = () => { if (!autoPlaying && !v._sheet) go(3); };
   setTitle($("#ttl", v), "체험을 넣으면\n뭐가 빠질까?", 120);
   const tl = new Timeline($("#tl", v));
   tl.render(base, { animate: false });
@@ -1184,18 +1356,19 @@ async function s3(v, t) {
   await sleep(600); if (!alive(t)) return;
   const sh = openSheet(v, `<span class="grab"></span>${productCards}
     <div class="note">${choices.length ? `시간창 안의 시작 시각 ${choices.length}개 · 넣고 조건 확인` : "이 일정에 넣을 수 있는 시작 시각이 없습니다."}</div>
-    <div class="slots">${choices.map((w, i) => {
+    <div class="slots ${choices.length === 1 ? "single" : ""}">${choices.map((w, i) => {
       const p = placeById[w.pick];
-      return `<button class="slot" data-k="${i}"><span class="cap-up">시작</span><b class="gr">${hhmm(p.fixedStart)}</b><small>${escapeHTML(short(p.name))}<br>${won(p.price)}원 · ${availabilityText(p.availability === "confirmed" ? true : p.availability === "unavailable" ? false : null)}</small></button>`;
+      return `<button class="slot" data-k="${i}"><div><span class="cap-up">시작</span><b class="gr">${hhmm(p.fixedStart)}</b></div><span class="slot-end">${p.duration}분 · ${hhmm(p.fixedStart + p.duration)} 종료</span></button>`;
     }).join("")}</div>
     <div class="b lime" style="padding:6px"><button class="btn navy" id="addBtn" disabled><span>시작 시간을 골라주세요</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
+  $$(".sheet-close", sh.el).forEach(b => b.onclick = sh.close);
   if (!choices.length) {
     next.disabled = false;
     next.setLabel("체험 없이 계속");
     v._run = async () => { await sh.close(); go(4); };
     return;
   }
-  let pick = null, ran = false, chooseRelaxation = null;
+  let pick = null, ran = false, chooseRelaxation = null, recommendationId = null;
   const addBtn = $("#addBtn", sh.el);
   $$(".slot", sh.el).forEach(btn => btn.addEventListener("click", () => {
     $$(".slot", sh.el).forEach(x => x.classList.remove("on"));
@@ -1215,7 +1388,7 @@ async function s3(v, t) {
       try {
         const result = await api("/api/what-if", { pick: W.pick }, 30000, true);
         if (!result.infeasible && !result.plan?.stops?.length) throw new Error("빈 일정");
-        W = { ...W, ...result };
+        W = { ...W, ...result, relaxations: result.relaxations?.map(r => ({...W.relaxations?.find(saved => saved.id === r.id), ...r})) || W.relaxations };
       } catch (_) { log("mip", "넣어보기 호출 실패 · demo 데이터로 재생"); }
     } else await sleep(800);
     if (!alive(t)) return;
@@ -1223,17 +1396,25 @@ async function s3(v, t) {
       island.show({ title: "지금 조건으론 못 넣어요", sub: "누가 무엇을 양보하면 되는지 계산했어요", hold: 3200 });
       setTitle($("#ttl", v), "숲체험을 넣으려면\n하나를 양보해야 해요");
       const tray = $("#tray", v);
-      tray.innerHTML = `<div class="note">꼭 지킬 조건도, 말한 사람이 양보하면 바꿀 수 있어요.</div>${W.relaxations.map((r, i) => {
-        const person = P.find(p => p.name === r.owner);
-        return `<button class="b ${person?.name === "서연" ? "sky" : "pink"} row between relax" data-i="${i}" style="width:100%;text-align:left;padding:18px;--c:${person?.color || "var(--navy)"}"><span class="pill"><i></i>${escapeHTML(r.label)}</span>${svg("arrow", 20, 2.4)}</button>`;
+      const recommended = recommendedFor(W);
+      recommendationId = recommended.id;
+      tray.innerHTML = `${ledgerLine()}${recommended.options.map(r => {
+        const person = P.find(p => p.name === r.owner), best = r.id === recommended.id, preview = r.preview;
+        return `<button class="b ${person?.name === "서연" ? "sky" : "pink"} relax ${best ? "recommended" : ""}" data-id="${escapeHTML(r.id)}"><div class="relax-title"><span>${escapeHTML(r.label)}</span>${best ? '<span class="pill recommended-pill">추천</span>' : svg("arrow",18)}</div>${best ? `<div class="reasons">${recommended.reasons.map(reason => `<span>${escapeHTML(reason)}</span>`).join("")}</div>` : ""}<div class="preview">${P.map(p => `${p.name} <b>${Math.round(preview.sat[p.name])}</b>`).join(" · ")}<br>빠지는 곳 ${preview.dropped.length}곳 · 도보 ${km(preview.walkM)}km</div></button>`;
       }).join("")}`;
+      const activity = placeById[W.pick];
+      tray.insertAdjacentHTML("beforeend", `<button class="b lilac activity-detail" style="width:100%;text-align:left"><span class="cap-up">넣고 싶은 체험 · 장소 정보</span><div class="sheet-title">${escapeHTML(short(activity.name))}</div><span class="pill">${hhmm(activity.fixedStart)} · ${activity.duration}분 ${svg("arrow",14)}</span></button>`);
+      $(".activity-detail", tray).onclick = () => openPOI(v, W.pick);
+      $("[data-ledger]", tray).onclick = () => openLedger(v);
+      const counts = concessionCounts();
+      log("mip", `MIP 양보안 ${W.relaxations.length}개 사전 계산 · 추천 ${recommended.id} (min ${recommended.options.map(r => r.preview.minSat.toFixed(1)).join(" vs ")}) · 장부 지민 ${counts["지민"]}/서연 ${counts["서연"]}`);
       $$(".relax", tray).forEach((b, i) => rise(b, 100 + i * 100));
       let selecting = false;
       chooseRelaxation = async id => {
         if (selecting || !alive(t)) return;
         selecting = true;
         $$(".relax", tray).forEach(b => { b.disabled = true; });
-        const saved = choices[Number(pick)];
+        const saved = W;
         const option = saved.relaxations.find(r => r.id === id);
         const replay = saved.chosen?.relaxationId === id ? saved.chosen : option;
         let selected = { ...W, ...replay, relaxationId: id, infeasible: false };
@@ -1246,9 +1427,12 @@ async function s3(v, t) {
           } catch (_) { log("mip", "양보 후 호출 실패 · demo 데이터로 재생"); }
         } else await sleep(700);
         if (!alive(t)) return;
+        const label = option.changes.map(c => c.kind === "category_min" ? `${({exhibit:"전시",cafe:"카페"})[c.key] || c.key} ${c.from}곳` : option.label).join(" + ");
+        if (option.owner) recordConcession("whatif", { person:option.owner, label, note:"체험을 넣기 위해 양보" });
+        selected.concession = {person:option.owner, label};
         showResult(selected);
       };
-      $$(".relax", tray).forEach(b => b.addEventListener("click", () => chooseRelaxation(W.relaxations[+b.dataset.i].id)));
+      $$(".relax", tray).forEach(b => b.addEventListener("click", () => chooseRelaxation(b.dataset.id)));
       log("mip", `what_if_add(체험 ${at}) · 불가능 → ${W.relaxations.map(r => r.label).join(" / ")}`);
       return;
     }
@@ -1284,9 +1468,8 @@ async function s3(v, t) {
     $$(".slot", sh.el)[Math.max(0, preferred)].click();
     await sleep(700); await run();
     if (chooseRelaxation && alive(t)) {
-      await sleep(1800);
-      const W = choices[Number(pick)];
-      await chooseRelaxation(W.chosen?.relaxationId || W.relaxations[0].id);
+      await sleep(1000);
+      await chooseRelaxation(recommendationId);
     }
   };
 }
@@ -1312,7 +1495,7 @@ async function s4(v, t) {
       <div class="apps">${P.map((p, i) => `<button class="app" data-i="${i}" style="--c:${p.color}">${p.name} 승인</button>`).join("")}</div>
     </div>
     <div class="b mint tab tl" id="pay" style="opacity:.35">
-      <div class="chain">${plan.stops.map((s, i) => `${i ? '<span class="ln"></span>' : ""}<span class="ico" style="${s.cat === "activity" ? "background:var(--violet);color:var(--cream)" : ""}">${svg(s.cat, 18, 2)}</span>`).join("")}</div>
+      <div class="chain">${plan.stops.map((s, i) => `${i ? '<span class="ln"></span>' : ""}<button class="ico" data-poi="${s.id}" aria-label="${escapeHTML(short(s.name))} 장소 정보" style="${s.cat === "activity" ? "background:var(--violet);color:var(--cream)" : ""}">${svg(s.cat, 18, 2)}</button>`).join("")}</div>
       <div class="rc" style="margin-top:12px"><span>${escapeHTML(pay.item)} × ${pay.people}</span><span class="gr">${won(pay.price * pay.people)}</span></div>
       <div class="rc"><span>나머지 ${plan.stops.length - 1}곳</span><span>현장 결제</span></div>
       <div class="rc t"><span>${plan.stops.some(s => s.availability === "unverified") ? "자리 확인되면 결제" : "지금 결제"}</span><span class="gr">${won(pay.price * pay.people)}원</span></div>
@@ -1320,6 +1503,9 @@ async function s4(v, t) {
     <div class="split" id="split">${P.map((p, i) => `<div class="b ${i ? "sky" : "pink"}"><div class="lab">${p.name} 부담</div><div class="gr">${won(pay.price)}<em>원</em></div></div>`).join("")}</div>
     <div class="mock">Agentic Pay 연동 지점 (데모 목업) · 결제 후 마이리얼트립 예약으로 연결</div>
   </div>`;
+  const concession = W.concession || (W.relaxationId ? sessionHistory.find(r => r.id === "whatif") : null);
+  if (concession) $("#vb", v).insertAdjacentHTML("beforeend", `<div class="concession-next">이번 양보: ${escapeHTML(concession.person)} ‘${escapeHTML(concession.label)}’ → 다음엔 ${nextPerson()} 차례</div>`);
+  $$("[data-poi]", v).forEach(b => b.onclick = () => openPOI(v, b.dataset.poi, plan.stops.find(s => s.id === b.dataset.poi)));
   setTitle($("#ttl", v), "이 일정으로\n둘 다 괜찮아?", 120);
   ["#top", "#vb"].forEach((s, i) => rise($(s, v), 60 + i * 90));
   A($("#pay", v), [{ opacity: 0, transform: "translateY(40px)" }, { opacity: .35, transform: "none" }], "pop", { delay: 240 });
@@ -1446,7 +1632,7 @@ async function s5(v, t) {
     $$(".pill", chg).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateX(-30px) scale(.7)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + i * 100 }));
     btn.setLabel("처음부터 다시 보기");
     btn.disabled = false;
-    btn.onclick = () => go(0);
+    btn.onclick = () => { resetConcessions(); go(0); };
   }
   v._run = replan;
 }
@@ -1495,6 +1681,7 @@ const STEPS = [s0, s1, s2, s3, s4, s5];
 function go(i) {
   if (i < 0 || i >= STEPS.length) return;
   const back = i < cur;
+  $("#capLogo").hidden = i !== 0;
   cur = i; token++;
   island.hide();
   [...view.children].forEach(o => {
@@ -1506,7 +1693,8 @@ function go(i) {
   view.appendChild(v);
   E(v, [{ transform: `translateX(${back ? -40 : 40}%)`, opacity: 0 }, { transform: "none", opacity: 1 }], 520);
   $("#screen").classList.remove("scrolled");
-  STEPS[i](v, token);
+  v._ready = STEPS[i](v, token);
+  fitNumbers();
   $$("#dots i").forEach((d, k) => d.classList.toggle("on", k === i));
   $$("#capP i").forEach((d, k) => { d.classList.toggle("on", k === i); d.classList.toggle("done", k < i); });
   $("#capN").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${String(STEPS.length).padStart(2, "0")}`;
@@ -1520,12 +1708,18 @@ $("#capP").innerHTML = STEPS.map(() => "<i></i>").join("");
 $$("#dots i").forEach(d => d.addEventListener("click", () => go(+d.dataset.k)));
 
 /* autoplay for the backup video */
-let autoId = 0;
+let autoId = 0, autoPlaying = false;
 async function autoplay() {
   const id = ++autoId, ok = () => id === autoId, cv = () => view.lastElementChild;
+  autoPlaying = true;
+  try {
   go(0); await sleep(5600); if (!ok()) return;
+  await cv()._ready; if (!ok()) return;
   go(1); await sleep(8200); if (!ok()) return;
+  await cv()._ready; if (!ok()) return;
   go(2); await sleep(2800); if (!ok()) return;
+  await cv()._ready; if (!ok()) return;
+  await cv()._run(); if (!ok()) return;
   cv()._scaleTo(D.series.length - 1); await sleep(2600); if (!ok()) return;
   cv()._scaleTo(0); await sleep(2600); if (!ok()) return;
   cv()._scaleTo(D.defaultIdx); await sleep(2200); if (!ok()) return;
@@ -1534,17 +1728,21 @@ async function autoplay() {
   cv()._sheet?.close(); await sleep(900); if (!ok()) return;
   cv()._hidden(false); await sleep(1600); if (!ok()) return;
   go(3); await sleep(1600); if (!ok()) return;
+  await cv()._ready; if (!ok()) return;
   await cv()._run(); await sleep(3800); if (!ok()) return;
   go(4); await sleep(1000); if (!ok()) return;
+  await cv()._ready; if (!ok()) return;
   await cv()._run(); await sleep(2600); if (!ok()) return;
   go(5); await sleep(3000); if (!ok()) return;
+  await cv()._ready; if (!ok()) return;
   await cv()._run();
+  } finally { if (id === autoId) autoPlaying = false; }
 }
 
 addEventListener("keydown", e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key, v = view.lastElementChild;
-  if (k !== "a" && k !== "A") autoId++;
+  if (k !== "a" && k !== "A") { autoId++; autoPlaying = false; }
   if (k === "ArrowRight" || k === " ") { e.preventDefault(); if (v?._sheet) v._sheet.close(); else go(cur + 1); }
   else if (k === "ArrowLeft") go(cur - 1);
   else if (/^[1-6]$/.test(k)) go(+k - 1);
@@ -1554,7 +1752,7 @@ addEventListener("keydown", e => {
   else if (k === "," && v?._scaleBy) v._scaleBy(-1);
   else if (k === "." && v?._scaleBy) v._scaleBy(1);
   else if (k === "e" || k === "E") { document.body.classList.toggle("no-eng"); fit(); }
-  else if (k === "r" || k === "R") { $$("#egLog .eg-row").forEach(r => r.remove()); log("mip", modeText); go(0); }
+  else if (k === "r" || k === "R") { $$("#egLog .eg-row").forEach(r => r.remove()); log("mip", modeText); resetConcessions(); go(0); }
 });
 
 /* ---------- mobile engine sheet (reuse the live engine, including its logs) ---------- */

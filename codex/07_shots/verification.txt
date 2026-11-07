@@ -1,0 +1,28 @@
+07 모바일 검증 기록
+
+수정 소스: web/index.html만. server/, solver/의 동시 작업은 수정하지 않음.
+
+통과:
+- 인라인 스크립트 추출 후 node --check.
+- jsdom에서 file: 프로토콜로 demo_data.js와 전체 인라인 스크립트 실행.
+- 폭 390, 360, coarse pointer 폭 900: body.mobile 적용.
+- fine pointer 폭 701, 1440: body.mobile 미적용.
+- CTA 클릭으로 채팅 → 조건 정리 → 저울 → 체험 선택 → 조건 양보 → 두 명 승인
+  → 결제 요청 목업 → 여행 중 → 재계산 → 처음부터 전 과정 진행.
+- 저울 좌우 버튼, touch pointerdown/move/up 드래그 및 스냅.
+- 조건 충돌 시트 열기/닫기, 숨은 한 곳 토글/이야기 시트.
+- 엔진 열기/닫기, 솔버 설명 문구, 배경 inert 복원.
+- 일반/축소 모션 모드에서 모바일 타이틀 blur 없음, 180ms 이하.
+- 위 DOM 실행에서 JavaScript 오류 없음.
+
+확인 불가 (스크린샷 미생성):
+- ../.venv/bin/python 없음.
+- 시스템 /opt/homebrew/bin/python3 및 /usr/bin/python3 모두 playwright 모듈 없음.
+- 추가로 기존 Node Playwright와 설치된 Chromium headless shell로 시도했으나,
+  macOS sandbox에서 MachPortRendezvousServer bootstrap_check_in이
+  Permission denied (1100)로 종료되어 브라우저 실행 불가.
+- 따라서 390×844, 360×780 단계별 및 1440×900 스크린샷을 생성하지 못함.
+- document.documentElement.scrollWidth <= innerWidth의 실제 렌더 검사 미실행.
+  jsdom은 레이아웃 엔진이 없으므로 이 수치를 통과로 처리하지 않음.
+- 데스크톱 픽셀 비교, 실제 기기 노치/브라우저 안전 영역, 실서버 연동 미확인.
+- og.png는 요청대로 상대경로만 지정. 파일은 총괄이 추가할 예정.

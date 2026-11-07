@@ -1,0 +1,16 @@
+{
+  "plan_id": "w",
+  "date": "2026-11-14",
+  "people": [{ "id": "jimin", "name": "지민" }, { "id": "seoyeon", "name": "서연" }],
+  "item": {
+    "gid": "3828508",
+    "url": "https://experiences.myrealtrip.com/products/3828508",
+    "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+    "short_name": "서울숲 힐링 숲체험",
+    "start": "15:00",
+    "price": 35000,
+    "merchant_id": "mrt:3828508",
+    "merchant_label": "마이리얼트립"
+  },
+  "snapshot": { "available": true, "price": 35000, "checked_at": "2026-11-07T03:46:06Z", "source": "snapshot" }
+}

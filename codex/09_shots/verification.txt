@@ -1,0 +1,47 @@
+09 검증 기록
+
+스크린샷: 미생성. 실제 레이아웃·픽셀 QA는 완료하지 못했습니다.
+
+Playwright 실행 시 설치된 Chromium 1243 headless shell이 macOS 샌드박스에서 종료:
+FATAL base/apple/mach_port_rendezvous_mac.cc:159
+bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer.*
+Permission denied (1100)
+
+브라우저 대체 경로: Computer Use inventory의 browser access host도 unavailable.
+로컬 서버 바인딩: uvicorn 127.0.0.1:8012가 operation not permitted로 종료.
+승인 정책 never를 지키며 권한 우회나 추가 승인을 요청하지 않음.
+
+playwright-status.json: 실제 Playwright 실행 실패 원문.
+09_browser_check.cjs: 1440×900/390×844에서 재실행할 렌더 검증·스크린샷 스크립트.
+  product-before(기본 HEAD:web/index.html), logo, number, formula-jimin/seoyeon,
+  poi-exh_daelim/cafe_onion, poi-map-marker, product-after, recommendation,
+  ledger, poi-mrt/link, agreement PNG를 이 폴더에 저장하도록 작성.
+
+실행 예(Playwright가 설치된 일반 환경):
+  node codex/09_browser_check.cjs
+  필요하면 PLAYWRIGHT_MODULE과 PLAYWRIGHT_EXECUTABLE 환경변수로 기존 설치 지정.
+
+DOM 검증:
+  node codex/09_dom_check.cjs
+  1440×900: mock API 계약·sessionId 전달·localStorage.
+  390×844: file:// 데모·localStorage 접근 불가 시 메모리 대체.
+  식 계산/슬라이더 동기화, POI 카드·지도·MRT 링크, 터치 닫기,
+  상품 시각 칩·1개 시각 전체 폭 클래스, 양보 추천·장부·취소·R 초기화,
+  합의 문구, 재계산, 전체 자동재생을 검증. JS 오류 0·경고 0.
+  dom-results.json에 결과 기록.
+
+jsdom에는 레이아웃 엔진이 없습니다.
+실제 scrollWidth<=clientWidth, 시각적 줄바꿈, 화면 대비·로고 애니메이션,
+브라우저 콘솔 오류 0, 스크린샷 전후 비교를 통과했다고 주장하지 않습니다.
+fitNumber의 축소 비율은 가상 폭을 사용한 계산 검사만 통과했습니다.
+상품의 작은 정보 글씨는 navy 배경/cream 글씨로 옮겼습니다.
+원래 violet/cream 대비는 3.86:1이며 navy/cream 대비는 13:1 이상입니다.
+
+기능 테스트 최종:
+  solver/test_solver.py: 8 passed.
+  pytest server -q: 75 passed, 2 failed, 1 skipped.
+  두 실패: 일반 및 sessionId /api/what-if에서 recommended 키 누락.
+  preview는 실제 응답에 포함됨: category_min:cafe min 58.8, exhibit min 20.6.
+  server/app.py 수정 금지로 반환문에 recommended를 추가하지 않음.
+  ../09_whatif_response.patch에 한 줄 수정안 준비, git apply --check 통과.
+  FastAPI TestClient의 GET /favicon.svg는 200.

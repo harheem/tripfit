@@ -36,7 +36,7 @@ TripFit은 각자의 말을 체크리스트로 바꾸고, MIP가 시간과 도�
 
 | 심사 항목 | 근거 | 확인 방법(파일 경로 또는 명령) |
 |---|---|---|
-| 기술적 완성도 | 솔버 8개 통과, 서버 35개 통과·1개 skip. CBC 계산 시간 실측(실행마다 조금 다름): 파레토 대안 전체 0.4~0.7초, 양보 후 재계산·여행 중 재계산 약 60~100ms | `solver/test_solver.py`, `server/test_api.py`, `server/test_mrt.py`; 아래 테스트 명령. `web/demo_data.js`의 `solveMs` |
+| 기술적 완성도 | 솔버 8개 통과, 서버 62개 통과·1개 skip. CBC 계산 시간 실측(실행마다 조금 다름): 파레토 대안 전체 0.4~0.7초, 양보 후 재계산·여행 중 재계산 약 60~100ms | `solver/test_solver.py`, `server/test_api.py`, `server/test_mrt.py`, `server/test_try.py`; 아래 테스트 명령. `web/demo_data.js`의 `solveMs` |
 | 상업적 가능성 | 동행 여행의 "어디 갈지 합의" 단계에서 실제 판매 상품(마이리얼트립 체험, 1인 35,000원)을 일정 안에 넣을 수 있는지까지 계산하고 상품으로 연결. 수익 모델은 일정에 들어간 체험·입장권의 예약 중개 수수료와 분담 결제(SKT 절). 매출·전환율은 아직 측정 전 | `web/demo_data.js`의 `mrt.picked`, `pay`; `solver/demo_builder.py` |
 | 팀 실행력 | CBC 엔진 → API → 화면 연결, 실상품 스냅숏과 불가능 판정·양보 선택까지 구현하고 작업 결과 기록 | `server/app.py`, `web/index.html`, `codex/03_mrt_live.result.md`, `codex/04_whatif_concession.result.md` |
 | 스폰서 리소스 활용 | OpenAI 문장 파싱 연결, 마이리얼트립 실상품·시각 조회. SKT·Vooy 제출 내용은 아래 통합 예정 절 | `server/parsing.py`, `scripts/fetch_mrt_snapshot.py`, `data/mrt_snapshot.json` |
@@ -76,8 +76,8 @@ Apple Silicon에서 CBC 로딩 오류가 나면 `brew install gcc` 후 다시 �
 첫 화면에서 `/api/demo`에 연결되면 `LIVE · 실시간 계산`, 실패하면 재생입니다.
 라이브에서는 체크리스트 양보·체험 추가·여행 중 재계산을 CBC가 실제로 풉니다. 재생 모드의 체크리스트 양보 토글은 서버 연결 안내만 표시합니다.
 
-**키가 있으면:** `OPENAI_API_KEY`와 `OPENAI_MODEL=gpt-6.1-sol`을 환경 변수로 설정하면 `/api/parse`가 OpenAI를 호출합니다. 키·모델이 없거나 실패하면 고정 데모 JSON을 반환합니다.
-A.X K2 제공자 설정도 지원하며 순서는 A.X K2 → OpenAI → 고정 JSON입니다. 실호출 모델명과 소요 시간은 응답·엔진 로그로 확인합니다.
+**키가 있으면:** `OPENAI_API_KEY`와 `OPENAI_MODEL=gpt-6.1-sol`을 환경 변수로 설정하면 `/api/parse`가 OpenAI를 호출합니다. 키·모델이 없거나 실패하면 규칙 파서를 사용합니다. `/api/parse`에 정확한 데모 문장을 보낸 경우에만 고정 데모 JSON을 반환합니다.
+`/api/parse`는 A.X K2 → OpenAI 순서도 지원합니다. `/api/try`는 OpenAI → 규칙 파서 순서입니다. 실호출 모델명과 소요 시간은 응답·엔진 로그로 확인합니다.
 MRT 공개 MCP 스냅숏 갱신에는 인증 키가 필요하지 않습니다.
 
 ```bash
@@ -102,7 +102,24 @@ RUN_NETWORK_TESTS=1 .venv/bin/python -m pytest server/test_mrt.py -k live_mcp -q
 ```
 
 **LLM은 숫자를 만들지 않는다.** 강도별 가중치·기준값은 서버 규칙, 만족도·거리·시각은 솔버가 계산합니다. 실상품 가격·평점·시각은 MCP 스냅숏에서 옵니다.
-현재 임의 문장의 파싱 결과를 일정 요청으로 이어 주는 세션은 없습니다. 일정 API는 기본 두 사람의 조건으로 계산합니다.
+`POST /api/try`는 지민·서연의 문장(각 1~200자)을 파싱하고 전체 데모 데이터를 계산합니다.
+규칙 파서는 전시·골목·소품샵·카페에서 쉬기·덜 걷기·느긋하게를 지원하며, 부정 표현은 제외합니다.
+조건이 없는 사람은 HTTP 200 `{needsMore: true, person, hint}`, 불가능한 요청은 `{infeasible: true, explanation}`을 반환합니다.
+
+```bash
+curl -X POST http://localhost:8000/api/try -H 'Content-Type: application/json' \
+  -d '{"people":[{"name":"지민","text":"전시 꼭 보고 싶어"},{"name":"서연","text":"많이 못 걸어 카페에서 쉬고 싶어"}]}'
+```
+
+성공 응답은 `/api/demo`의 전체 데이터에 `sessionId`, `source: {provider, model, parseMs, solveMs}`, `unmatched`를 더한 형태입니다.
+`people[].text`와 `marks`도 입력 문장과 실제 인용 구절로 바뀝니다. LLM이 이해하지 못한 구절은 `unmatched`에 담고 규칙 파서는 빈 배열을 반환합니다.
+`/api/plan`, `/api/what-if`, `/api/replan` 요청에 `sessionId`를 넣으면 해당 취향과 필수 조건으로 계산합니다.
+세션은 단일 프로세스 메모리에 최대 100개를 LRU로 보관하며 생성 후 30분에 만료됩니다. 서버 재시작 시 사라집니다.
+ID를 생략하면 기존 샘플을 사용하고, 찾을 수 없거나 만료된 ID면 샘플 응답에 `sessionExpired: true`를 더합니다.
+
+`/api/try`와 `/api/parse`는 IP당 분당 6개 토큰을 공유하고 초과 시 HTTP 429 `{"error":"잠시 후 다시"}`를 반환합니다.
+`TRY_RATE_PER_MIN`으로 용량과 분당 충전량을 조정합니다. IP는 `X-Forwarded-For` 첫 값을 우선하므로 공개 배포 프록시에서 이 헤더를 설정해야 합니다.
+LLM 호출 동시성은 2개, CBC 호출은 기존 잠금으로 직렬화합니다. 메모리 상태를 공유하도록 `--workers 1`로 실행합니다.
 
 ## 점수 로직
 
@@ -127,16 +144,36 @@ RUN_NETWORK_TESTS=1 .venv/bin/python -m pytest server/test_mrt.py -k live_mcp -q
 
 | 기능·데이터 | 현재 상태 | 근거 |
 |---|---|---|
-| OpenAI 파싱 | 실호출. `gpt-6.1-sol` JSON 모드로 두 문장에서 8개 항목 추출, 약 4~6초(라이브 화면 엔진 로그에 모델명·ms 표시). 키 미설정·실패 시 고정 JSON | `server/parsing.py`, `PRD.md` §6.5 |
+| OpenAI 파싱 | 실호출. `gpt-6.1-sol` JSON 모드로 두 문장에서 8개 항목 추출, 약 4~6초(라이브 화면 엔진 로그에 모델명·ms 표시). 키 미설정·실패 시 규칙 파서(정확한 데모 입력은 고정 JSON) | `server/parsing.py`, `PRD.md` §6.5 |
 | 일정 계산 | 라이브는 CBC 실제 계산, 재생은 저장된 계산 결과 | `server/app.py`, `solver/demo_builder.py` |
 | MRT 상품·날짜별 옵션 | 공개 MCP 실호출 스냅숏. `confirmed`는 조회 당시 상태 | `data/mrt_snapshot.json`, `codex/03_mrt_live.result.md` |
 | 성수 후보·영업시간·지점 수·혼잡도 | 샘플. `source: tmap`도 실조회 증거가 아님 | `solver/sample_seongsu.py`, `solver/demo_builder.py` |
 | 도보 | 직선 거리 × 1.3 추정, 실제 보행 경로 API 미연결 | `solver/tripfit_solver.py` |
 | 결제 | 메인 화면은 분담 결제 목업. 스폰서 통합 내용은 아래 SKT 절 | `web/index.html` |
 
-## SKT telecom 트랙 — 합의한 일정을 맡기고 결제까지 (agentic-pay/)
+## SKT telecom 트랙 — 같이 결제 (Agentic Pay, `agentic-pay/`)
 
-<!-- TODO(총괄): 데모 링크, 흐름, 실행법 -->
+TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 있는 유료 체험을 두 사람이 각자 범위를 정해 에이전트에게 맡기고, 에이전트는 예약 가능 여부와 가격을 다시 확인한 뒤 맡긴 범위 안에서만 나눠 결제합니다.
+
+- 데모 시나리오: 마이리얼트립 "서울숲 힐링 숲체험" 2026-11-14 15:00, 1인 35,000원 × 2명 = 70,000원, 지민 35,000원 / 서연 35,000원
+- 코드: [`agentic-pay/`](agentic-pay/) · 자세한 설명: [`agentic-pay/README.md`](agentic-pay/README.md)
+- 데모: [공개 링크 /pay/](https://harheem.github.io/tripfit/pay/)(저장된 조회 결과) · 로컬 서버 `http://localhost:8000/pay/`(실시간 재조회)
+
+| SKT 과제 | 구현 |
+|---|---|
+| 알려준다 → 대신한다 → 사람 승인 후 끝까지 | 결제 항목·재조회 결과 안내 → 재조회와 판매자 문의 초안 → 결제 전 확인 승인 후 분담 결제 |
+| 카드를 맡길 수 있게 하는 장치 | 사람별 위임(판매처·상품·옵션·1인 상한·만료·1회), 대표 승인 뒤에만 생기는 1회용 결제 권한, 에이전트 층·결제사 층 두 겹 검사 |
+| 지출 한도 | 재조회 가격이 상한을 넘으면 결제를 멈추고 새 금액으로 다시 맡기기를 요구 |
+| 영수증 | 결제 전 예상 영수증, 결제 후 확정 영수증(승인번호·기록 해시). 판매자에게도 같은 해시 |
+| 감사 | 해시 체인 감사 로그, 위조 검출 테스트 |
+| 데이터 조회 | 마이리얼트립 `getTnaOptions` 실호출(서버), 실패 시 저장된 조회 결과로 표기 |
+| 결제 | 모의 Agentic Pay(실제 결제 없음). 예약 확정은 마이리얼트립 링크 |
+
+테스트: 엔진 25개, 라우터 12개 통과. 2026-11-07 13:21 실시간 재조회에서 15:00 옵션 예약 가능·35,000원 확인.
+
+| 정상 결제 준비 | 가격이 오르면 멈춤 | 다른 판매처 결제 거절 |
+|---|---|---|
+| ![예상 영수증](agentic-pay/docs/screens/04_quote.png) | ![가격 인상 멈춤](agentic-pay/docs/screens/04b_price_stop.png) | ![확정 영수증과 거절](agentic-pay/docs/screens/05_paid_and_rejected.png) |
 
 ## Vooy 트랙 — 메신저에서 부르는 TripFit MCP 서버 (vooy-mcp/)
 
@@ -166,7 +203,7 @@ MRT_DATE=2026-11-14 .venv/bin/python scripts/fetch_mrt_snapshot.py
 - 좌표·소요시간·도보는 추정입니다. 체험 포함 일정도 이 가정에 따른 시뮬레이션입니다.
 - 장소 후보·혼잡도는 샘플입니다. 붐빔 알림은 실시간 측정이 아닙니다.
 - 현재 재계산 API는 현재 위치·완료 방문을 받지 않고 성수역 출발로 계산합니다.
-- 임의 문장 → 일정 세션, 실제 예약·결제, 두 폰 동기화는 메인 앱에서 지원하지 않습니다.
+- 실제 예약·결제와 두 폰 동기화는 메인 앱에서 지원하지 않습니다. 임의 문장의 조건은 위 6개 어휘 범위이며 장소 후보는 성수 샘플입니다.
 - 스냅숏이 없거나 손상되면 예시 상품 폴백을 씁니다. `isReal`과 조회 시각을 확인해야 합니다.
 - 화면 스크린샷은 로컬 라이브 모드(`uvicorn`)에서 자동재생으로 찍었습니다. 테스트는 외부 API 성공을 보장하지 않으므로 기본 실행에서 네트워크 테스트를 제외합니다.
 
@@ -187,7 +224,8 @@ tripfit/
 │  └─ test_solver.py                  # 솔버 검증
 ├─ server/
 │  ├─ app.py / parsing.py             # FastAPI·LLM 검증·폴백
-│  ├─ test_api.py / test_mrt.py        # API·MRT 검증
+│  ├─ state.py                        # 메모리 세션·IP 토큰 버킷
+│  ├─ test_api.py / test_mrt.py / test_try.py # API·MRT·임의 문장 검증
 │  └─ fixtures/mrt_snapshot.json       # 네트워크 없는 테스트 입력
 ├─ scripts/fetch_mrt_snapshot.py       # MCP 스냅숏 수집
 ├─ data/mrt_snapshot.json             # 실조회 상품·제외 사유

@@ -1,0 +1,16 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "mode": "mock API contract + sessionId",
+    "passed": "numbers arithmetic, formula/slider, POI cards/markers/MRT, finger dismissal, product chips/link, recommendation, ledger/undo/reset, agreement, replan, full autoplay; runtime errors 0; warnings 0",
+    "renderedLayout": "NOT VERIFIED: jsdom has no layout engine"
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "mode": "offline with memory storage fallback",
+    "passed": "numbers arithmetic, formula/slider, POI cards/markers/MRT, finger dismissal, product chips/link, recommendation, ledger/undo/reset, agreement, replan, full autoplay; runtime errors 0; warnings 0",
+    "renderedLayout": "NOT VERIFIED: jsdom has no layout engine"
+  }
+]
