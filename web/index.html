@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E2A3A">
+<meta property="og:title" content="TripFit">
+<meta property="og:description" content="둘이 한 말로, 둘 다 OK인 일정">
+<meta property="og:image" content="og.png">
 <title>TripFit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap">
@@ -298,13 +302,61 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .cf-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 10px; background: var(--navy); }
 .cf-bar b { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--red); }
 
-/* mobile: the browser is the phone */
-body.m { background: var(--navy); }
-body.m .cap, body.m .engine, body.m .dots { display: none !important; }
-body.m .stage { display: block; }
-body.m .rig { display: block; transform: none !important; }
-body.m .device { width: 100vw; height: 100dvh; padding: 0; border-radius: 0; box-shadow: none; background: var(--navy); }
-body.m .screen { width: 100vw; height: 100dvh; border-radius: 0; }
+/* mobile: the browser is the phone; presentation styles above stay intact */
+body.mobile { background: var(--navy); width: 100vw; height: 100dvh; overscroll-behavior: none; }
+body.mobile .cap, body.mobile .dots, body.mobile .sb,
+body.mobile .home-ind, body.mobile .eg-keys { display: none !important; }
+body.mobile .stage, body.mobile .rig, body.mobile .dev-wrap { display: block; width: 100vw; height: 100dvh; }
+body.mobile .rig { transform: none !important; }
+body.mobile .device, body.mobile .screen { width: 100vw; height: 100dvh; padding: 0; border-radius: 0; box-shadow: none; background: var(--navy); }
+body.mobile .scr { padding: env(safe-area-inset-top) max(4px, env(safe-area-inset-right)) calc(132px + env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left)); overscroll-behavior-y: contain; }
+body.mobile .scr[style*="padding-bottom"] { padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important; }
+body.mobile .top { border-radius: 30px; padding-top: 24px; }
+body.mobile .top > .row:first-child { padding-right: 48px; min-height: 44px; gap: 6px; flex-wrap: wrap; }
+body.mobile .cta-wrap { padding: 20px max(10px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
+body.mobile #island { position: fixed; top: calc(8px + env(safe-area-inset-top)); width: calc(100vw - 24px) !important; height: 70px !important; border-radius: 30px !important; background: var(--navy); visibility: hidden; pointer-events: none; }
+body.mobile #island.open { visibility: visible; }
+body.mobile .is-c { padding: 0 12px; gap: 8px; }
+body.mobile .is-tx b { font-size: 13px; }
+body.mobile .is-tx small { font-size: 11px; }
+body.mobile .is-r { font-size: 12px; }
+body.mobile .bn { font-size: clamp(64px, 20vw, 86px); min-width: 0; }
+body.mobile .bn em { font-size: clamp(16px, 4.8vw, 21px); }
+body.mobile .colon { font-size: clamp(40px, 13vw, 56px); }
+body.mobile .fn-n { font-size: clamp(48px, 15vw, 66px); }
+body.mobile .fn-n em { font-size: 16px; }
+body.mobile .split, body.mobile .slots, body.mobile .apps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+body.mobile .split > *, body.mobile .stats > *, body.mobile .stop > *, body.mobile .rc > *, body.mobile .eg-row > *, body.mobile .hid .t { min-width: 0; }
+body.mobile .ci { grid-template-columns: minmax(0, 1fr) 28px 28px; gap: 4px; min-height: 44px; font-size: 12px; }
+body.mobile .cl .b { padding: 14px 10px; }
+body.mobile .stats { padding: 18px 14px; }
+body.mobile .stats .v { font-size: clamp(25px, 8vw, 34px); }
+body.mobile .stop { gap: 10px; padding: 16px 12px; }
+body.mobile .stop .nm { overflow-wrap: anywhere; }
+body.mobile .stop .tm b { font-size: clamp(24px, 7.5vw, 30px); }
+body.mobile .endrow { flex-wrap: wrap; }
+body.mobile .hid { gap: 10px; padding: 18px 14px; }
+body.mobile .sheet { left: max(6px, env(safe-area-inset-left)); right: max(6px, env(safe-area-inset-right)); bottom: calc(6px + env(safe-area-inset-bottom)); max-height: calc(100% - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+body.mobile .slot { padding: 16px 12px; overflow-wrap: anywhere; }
+body.mobile .slot small { display: block; }
+body.mobile .prod .pr { font-size: clamp(42px, 15vw, 64px); }
+body.mobile .cf-big { font-size: clamp(48px, 15vw, 64px); gap: 8px; }
+body.mobile .venn { max-width: 100%; height: auto; }
+body.mobile .chain .ico { width: clamp(28px, 9vw, 40px); height: clamp(28px, 9vw, 40px); }
+body.mobile .chain .ln { min-width: 3px; }
+body.mobile .rc { gap: 10px; flex-wrap: wrap; }
+body.mobile .mobile-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+body.mobile .mobile-actions button { min-height: 44px; padding: 0 12px; font-size: 12px; }
+body.mobile .engine-toggle { position: fixed; z-index: 25; top: calc(12px + env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 44px; height: 44px; border-radius: 50%; background: var(--navy); color: var(--lime); border: 1.5px solid var(--lime); font-size: 11px; font-weight: 600; }
+body.mobile .engine { display: none !important; }
+body.mobile.engine-open .engine { display: flex !important; position: fixed; z-index: 61; left: max(6px, env(safe-area-inset-left)); right: max(6px, env(safe-area-inset-right)); bottom: calc(6px + env(safe-area-inset-bottom)); width: auto; height: min(720px, calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))); border-radius: 38px; }
+body.mobile .engine-dim { position: fixed; inset: 0; background: rgba(5, 14, 20, .6); z-index: 60; }
+body.mobile .engine-close { align-self: flex-end; min-height: 44px; padding: 0 20px; color: var(--cream); font-size: 14px; }
+body.mobile .eg-hero { border-radius: 30px; padding: 18px; }
+body.mobile .eg-big { font-size: 60px; margin-top: 10px; }
+body.mobile .eg-log { overflow-y: auto; min-height: 50px; }
+body.mobile .eg-row { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 6px; }
+body.mobile .eg-rule { flex: none; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 </style>
@@ -472,6 +524,10 @@ function setTitle(el, text, delay = 0) {
   if (el.dataset.text === text) return;
   el.dataset.text = text;
   el.innerHTML = text.split("\n").map(line => `<span class="tl-line">${line.split(" ").map(w => `<span class="w">${[...w].map(c => `<span class="c">${c}</span>`).join("")}</span>`).join(" ")}</span>`).join("");
+  if (document.body.classList.contains("mobile")) {
+    E(el, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], 180, { delay: reduce ? 0 : Math.min(delay, 60) });
+    return;
+  }
   $$(".c", el).forEach((c, i) => E(c, [{ opacity: 0, transform: "translateY(.45em)", filter: "blur(5px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], 520, { delay: delay + i * 18 }));
 }
 
@@ -729,7 +785,7 @@ function openSheet(v, html) {
   const close = async () => {
     if (closed) return; closed = true;
     if (v._sheet && v._sheet.el === sh) v._sheet = null;
-    dim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" });
+    dim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: reduce ? 1 : 260, fill: "forwards" });
     await sh.animate([{ transform: "none" }, { transform: "translateY(110%)" }], { duration: reduce ? 1 : 340, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }).finished;
     dim.remove(); sh.remove();
   };
@@ -934,6 +990,18 @@ async function s2(v, t) {
   const map = new TFMap($("#map", v));
   const tl = new Timeline($("#tl", v), { picks: true, stories: true });
   const thumb = $("#thumb", v), track = $("#track", v);
+  {
+    const actions = document.createElement("div");
+    actions.hidden = true;
+    actions.className = "mobile-actions";
+    actions.innerHTML = '<button class="pill" data-scale="-1">지민 쪽</button><button class="pill" data-scale="1">서연 쪽</button><button class="pill" id="conflictBtn">조건 충돌 보기</button>';
+    $("#top", v).appendChild(actions);
+    $$("[data-scale]", actions).forEach(b => b.onclick = () => v._scaleBy(+b.dataset.scale));
+    $("#conflictBtn", actions).onclick = showConflict;
+    $("#hid", v).setAttribute("role", "switch");
+    $("#hid", v).setAttribute("aria-checked", "false");
+    $("#hid", v).setAttribute("tabindex", "0");
+  }
   const paint = (p, first) => {
     setTitle($("#ttl", v), planTitle(p));
     $("#lbl", v).textContent = p.label;
@@ -966,7 +1034,7 @@ async function s2(v, t) {
   track.addEventListener("pointerdown", e => { if (busy || hiddenOn) return; drag = true; track.setPointerCapture(e.pointerId); thumb.classList.remove("snap"); const f = at(e); thumb.style.left = f * 100 + "%"; apply(Math.round(f * (n - 1))); });
   track.addEventListener("pointermove", e => { if (!drag) return; const f = at(e); thumb.style.left = f * 100 + "%"; apply(Math.round(f * (n - 1))); });
   const up = () => { if (!drag) return; drag = false; scaleTo(idx); };
-  track.addEventListener("pointerup", up); track.addEventListener("pointercancel", up);
+  track.addEventListener("pointerup", up); track.addEventListener("pointercancel", up); track.addEventListener("lostpointercapture", up);
   v._scaleTo = scaleTo;
   v._scaleBy = d => scaleTo(Math.min(n - 1, Math.max(0, idx + d)));
 
@@ -977,6 +1045,7 @@ async function s2(v, t) {
     if (busy || on === hiddenOn) return;
     hiddenOn = on;
     hidBlk.classList.toggle("on", on);
+    hidBlk.setAttribute("aria-checked", String(on));
     A(hidBlk, [{ transform: "scale(.97)" }, { transform: "none" }], "pop");
     const prev = plan;
     if (on) {
@@ -1043,6 +1112,9 @@ async function s2(v, t) {
     });
   });
   hidBlk.addEventListener("click", () => setHidden(!hiddenOn));
+  hidBlk.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setHidden(!hiddenOn); }
+  });
   $("#tl", v).addEventListener("click", e => { const b = e.target.closest("[data-story]"); if (b) openStory(v, b.dataset.story); });
   v._hidden = setHidden;
   v._toggleHidden = () => setHidden(!hiddenOn);
@@ -1485,11 +1557,59 @@ addEventListener("keydown", e => {
   else if (k === "r" || k === "R") { $$("#egLog .eg-row").forEach(r => r.remove()); log("mip", modeText); go(0); }
 });
 
+/* ---------- mobile engine sheet (reuse the live engine, including its logs) ---------- */
+const mobileQuery = matchMedia("(max-width: 700px), (pointer: coarse) and (max-width: 900px)");
+const engine = $("#engine");
+const engineToggle = document.createElement("button");
+engineToggle.className = "engine-toggle";
+engineToggle.textContent = "엔진";
+engineToggle.setAttribute("aria-controls", "engine");
+engineToggle.setAttribute("aria-expanded", "false");
+engineToggle.hidden = true;
+const engineDim = document.createElement("div");
+engineDim.className = "engine-dim";
+engineDim.hidden = true;
+const engineClose = document.createElement("button");
+engineClose.className = "engine-close";
+engineClose.textContent = "닫기 ×";
+engineClose.hidden = true;
+engine.prepend(engineClose);
+document.body.append(engineToggle, engineDim);
+function toggleEngine(open) {
+  document.body.classList.toggle("engine-open", open);
+  engineDim.hidden = !open;
+  engineToggle.setAttribute("aria-expanded", String(open));
+  view.inert = open;
+  if (open) {
+    engine.setAttribute("role", "dialog");
+    engine.setAttribute("aria-modal", "true");
+    engine.setAttribute("aria-label", "TripFit 계산 엔진");
+    A(engine, [{ transform: "translateY(105%)" }, { transform: "none" }], "soft");
+    engineClose.focus();
+  } else {
+    engine.removeAttribute("role");
+    engine.removeAttribute("aria-modal");
+    engine.removeAttribute("aria-label");
+    if (document.body.classList.contains("mobile")) engineToggle.focus();
+  }
+}
+engineToggle.onclick = () => toggleEngine(true);
+engineClose.onclick = engineDim.onclick = () => toggleEngine(false);
+engine.addEventListener("keydown", e => {
+  if (!document.body.classList.contains("engine-open")) return;
+  e.stopPropagation();
+  if (e.key === "Escape") { e.stopPropagation(); toggleEngine(false); }
+  if (e.key === "Tab") { e.preventDefault(); engineClose.focus(); }
+});
+mobileQuery.addEventListener("change", fit);
+
 /* ---------- fit to window ---------- */
 function fit() {
-  const vw = innerWidth, vh = innerHeight, m = vw <= 520;
-  document.body.classList.toggle("m", m);
-  if (m) { S = 1; return; }
+  const vw = innerWidth, vh = innerHeight, mobile = mobileQuery.matches;
+  document.body.classList.toggle("mobile", mobile);
+  engineToggle.hidden = engineClose.hidden = !mobile;
+  if (mobile) { S = 1; return; }
+  if (document.body.classList.contains("engine-open")) toggleEngine(false);
   const eng = vw >= 1100 && !document.body.classList.contains("no-eng"), cap = vw >= 1340;
   $("#engine").style.display = eng ? "" : "none";
   $("#cap").style.display = cap ? "" : "none";
