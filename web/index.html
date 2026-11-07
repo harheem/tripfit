@@ -1025,13 +1025,13 @@ function productCard(p, snapshot) {
 
 /* ---------- presenter caption (desktop only) ---------- */
 const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
-  ["결국 한 명이\n참는 여행", "“‘전시는 꼭 봐야 해’, ‘나 많이 못 걸어’. 같이 여행 가면 결국 한 명이 참죠.”"],
-  ["한 문장이면\n조건이 된다", `“각자 한 문장이면 꼭 지킬 것과 되면 좋은 것으로 나눠요. ${won(D.sources.orderings)}가지 순서 중 둘 다 OK인 일정 ${D.series.length}개.”`],
-  ["만족도는\n한 말의 체크리스트", `“만족도는 각자 한 말이 지켜진 비율이에요. 저울을 밀면 지민 ${Math.round(D.series[0].sat["지민"])}, 서연 ${Math.round(D.series[0].sat["서연"])}부터 지민 ${Math.round(D.series.at(-1).sat["지민"])}, 서연 ${Math.round(D.series.at(-1).sat["서연"])}까지. 가운데가 ${Math.round(D.series[D.defaultIdx].sat["지민"])} 대 ${Math.round(D.series[D.defaultIdx].sat["서연"])}.”`],
-  ["넣으면, 뭘\n빼야 하는지", "“숲체험을 넣으면? 지금 조건으론 안 된다고, 대신 누가 무엇을 이번만 빼면 되는지 바로 계산해요.”"],
-  ["둘 다 OK면\n결제까지", "“둘 다 승인하면 분담 결제 요청까지.”"],
-  ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 숲체험은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
-  ["둘 다 OK인 하루", "같은 엔진이 앱, 단톡방, 결제를 함께 움직여요. 투표 부탁드려요."],
+  ["아무거나 괜찮다는\n말 뒤에는", "전시를 꼭 보고 싶은 지민과 많이 못 걷는 서연. 같이 가면 둘 중 한 사람은 대개 말없이 맞춥니다."],
+  ["말을 조건으로\n옮깁니다", `두 사람이 한 말을 꼭 지킬 것과 되면 좋은 것으로 나눕니다. 가능한 순서 ${won(D.sources.orderings)}가지를 비교해 둘 다 OK인 일정 ${D.series.length}개를 찾았습니다.`],
+  ["각자 얼마나\n지켜졌는지", `만족도는 각자 한 말이 지켜진 비율입니다. 지민 쪽으로 기울면 ${Math.round(D.series[0].sat["지민"])} 대 ${Math.round(D.series[0].sat["서연"])}, 서연 쪽으로 기울면 ${Math.round(D.series.at(-1).sat["지민"])} 대 ${Math.round(D.series.at(-1).sat["서연"])}. 둘은 그 사이 ${Math.round(D.series[D.defaultIdx].sat["지민"])} 대 ${Math.round(D.series[D.defaultIdx].sat["서연"])}인 일정을 고릅니다.`],
+  ["안 들어갈 때는\n하나만 빼 봅니다", "숲체험은 지금 조건으로는 들어가지 않습니다. 누가 무엇을 이번만 빼면 되는지, 지난번엔 누가 뺐는지까지 함께 봅니다."],
+  ["결제는 맡기되,\n확인은 남깁니다", "각자 정한 금액 안에서 에이전트가 나눠 결제합니다. 그사이 가격이 오르면 Articul8 판단 모델이 결제를 멈춥니다."],
+  ["가서 붐비면\n나머지만 다시", "예약한 숲체험 시간은 그대로 두고, 붐비는 곳만 바꿔 일정을 다시 짭니다."],
+  ["둘 다 OK인 하루", "같은 계산이 앱과 vooy 단톡방, 결제 화면에서 함께 쓰입니다. 링크로 직접 해 보세요."],
 ];
 
 /* ---------- own words: commit a complete session only after a successful solve ---------- */
