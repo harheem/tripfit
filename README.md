@@ -12,6 +12,8 @@
 |---|---|
 | ![두 사람 승인](docs/screens/04-agree.png) | ![혼잡한 전시 교체](docs/screens/05-replan.png) |
 
+**1분 영상:** [docs/tripfit_demo.mp4](docs/tripfit_demo.mp4) (자동재생 녹화, 1단계부터 마지막 장까지)
+
 **바로 열어 보기**
 
 | 무엇 | 링크 | 비고 |
