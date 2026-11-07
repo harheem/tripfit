@@ -16,7 +16,7 @@
 
 | 무엇 | 링크 | 비고 |
 |---|---|---|
-| TripFit 데모(재생) | https://harheem.github.io/tripfit/ | 키, 서버 없이 1~5단계 재생. 휴대폰에서도 열림. 발표용 키: `→` `A`(자동재생) `1`~`6` |
+| TripFit 데모(재생) | https://harheem.github.io/tripfit/ | 키, 서버 없이 1～5단계 재생. 휴대폰에서도 열림. 발표용 키: `→` `A`(자동재생) `1`～`6` |
 | SKT 같이 결제 | https://harheem.github.io/tripfit/pay/ | 저장된 조회 결과로 위임 → 재조회 → 승인 근거 → 영수증 |
 | Vooy MCP 서버 | `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` | vooy에 사용자 지정 MCP로 등록 |
 | 우리 대화로 바꿔 보기(두 사람 문장 → 일정) | 로컬 서버 `http://localhost:8000/` | OpenAI 실호출 + CBC 실계산. 아래 실행법 |
@@ -43,18 +43,17 @@ TripFit은 각자의 말을 체크리스트로 바꾸고, MIP가 시간과 도�
 
 ## 심사 항목별 근거
 
-| 심사 항목 | 근거 | 확인 방법(파일 경로 또는 명령) |
+| 심사 항목 | 근거 | 확인 방법 |
 |---|---|---|
-| 기술적 완성도 | 솔버 8개 통과, 서버 62개 통과, 1개 skip. CBC 계산 시간 실측(실행마다 조금 다름): 파레토 대안 전체 0.4~0.7초, 하나 뺀 뒤 재계산, 여행 중 재계산 약 60~100ms | `solver/test_solver.py`, `server/test_api.py`, `server/test_mrt.py`, `server/test_try.py`; 아래 테스트 명령. `web/demo_data.js`의 `solveMs` |
-| 상업적 가능성 | 동행 여행의 "어디 갈지 합의" 단계에서 실제 판매 상품(마이리얼트립 체험, 1인 35,000원)을 일정 안에 넣을 수 있는지까지 계산하고 상품으로 연결. 수익 모델은 일정에 들어간 체험, 입장권의 예약 중개 수수료와 분담 결제(SKT 절). 매출, 전환율은 아직 측정 전 | `web/demo_data.js`의 `mrt.picked`, `pay`; `solver/demo_builder.py` |
-| 팀 실행력 | CBC 엔진 → API → 화면 연결, 실상품 스냅숏과 불가능 판정, 이번에 뺄 조건 선택까지 구현하고 작업 결과 기록 | `server/app.py`, `web/index.html`, `codex/03_mrt_live.result.md`, `codex/04_whatif_concession.result.md` |
-| 스폰서 리소스 활용 | 마이리얼트립 MCP 실상품과 시각 조회와 결제 직전 실시간 재조회, OpenAI 문장 파싱, SKT Agentic Pay 위임, 분담 결제(`agentic-pay/`), Articul8 Bivia 결제 직전 판단(`POST https://api.articul8.ai/bivia/choice`), vooy 원격 MCP 서버(`vooy-mcp/`, 공개 배포) | `server/parsing.py`, `server/bivia.py`, `server/pay_router.py`, `scripts/fetch_mrt_snapshot.py`, `data/mrt_snapshot.json` |
-| API 활용도 | OpenAI JSON 응답 검증, 폴백, MRT `tools/list`, `searchTnas`, `getTnaDetail`, `getTnaOptions`, 갱신 실패 시 캐시 보존 | `server/parsing.py`, `solver/mrt_live.py`, `server/app.py`; `GET /api/mrt` |
-| 창의성, 시도 | 한 말의 충족률을 저울로 비교하고, 체험이 불가능하면 사람별 이번에 뺄 조건을 계산. 카페를 이번만 뺀 뒤 기존 4곳 빠짐 | `solver/tripfit_solver.py`, `solver/demo_builder.py`; 화면 2, 3단계 |
-| 빌더 임팩트 | API 키 없이 전체 흐름 재생, 키 없이도 CBC 재계산 가능. 공개한 개인 알고리즘을 합의 앱으로 확장 | `web/index.html`, `web/demo_data.js`, `README_RUN.md`; `A` 자동재생 |
+| 기술적 완성도 | 테스트 솔버 8개, 서버 106개(네트워크 1개 제외), 결제 엔진 49개, vooy 60개 통과. CBC 실측 계산 시간은 일정 후보 전체 0.4초에서 0.7초, 조건 하나를 뺀 재계산과 여행 중 재계산은 0.1초 안팎(실행마다 조금 다름) | 아래 "3분 안에 직접 돌려 보기"의 테스트 명령, `web/demo_data.js`의 `solveMs` |
+| 상업적 가능성 | 두 사람이 합의한 일정 안에 실제로 들어가는 판매 상품(마이리얼트립 체험, 1인 35,000원)만 골라 보여 주고, 그 자리에서 각자 몫을 결제하게 합니다. 수익 모델은 예약 중개 수수료. 매출과 전환율은 아직 측정 전 | 화면 3단계와 4단계, `agentic-pay/README.md` |
+| 팀 실행력 | 하루 동안 엔진, API, 화면, 실상품 연동, 같이 결제, vooy MCP 서버, 공개 배포까지 연결. 작업 지시와 결과를 모두 기록 | `codex/` 폴더(브리프와 결과 16건), 아래 "어떻게 만들었나" |
+| 스폰서 리소스 활용 | 마이리얼트립 MCP(실상품 시작 시각 조회, 결제 직전 재조회), SKT Agentic Pay 과제(위임서, 1회용 결제 권한, 지출 한도, 해시 영수증, 위임 철회), vooy 원격 MCP 서버(공개 배포), Articul8 Bivia(결제 직전 진행 또는 멈춤 판단), OpenAI(문장 파싱, 판매자 문의 작성) | `solver/mrt_live.py`, `agentic-pay/`, `vooy-mcp/`, `server/bivia.py`, `server/parsing.py` |
+| API 활용도 | 다섯 개 외부 API를 실제로 호출하고, 실패하면 저장된 조회 결과나 규칙 판단으로 돌아가며 화면에 출처를 표시. Bivia가 확신이 없을 때 판단을 보류하는 기능도 결제 잠금에 사용 | `GET /api/mrt`, `POST /api/pay/recheck`, `POST /api/pay/decide`, `POST /api/pay/inquiry`, `POST /api/try` |
+| 창의성, 시도 | 각자 한 말이 얼마나 지켜졌는지를 숫자로 비교하고, 원하는 체험이 안 들어가면 누가 무엇을 이번만 빼면 되는지 계산. 이번에 뺀 사람은 다음엔 먼저 고르도록 기록 | 화면 2단계(만족도 계산식), 3단계(빼면 59 대 60, 다음엔 먼저) |
+| 빌더 임팩트 | 키나 서버 없이도 공개 링크에서 전체 흐름이 재생되고, 같은 엔진을 앱, 단톡방(vooy), 결제(SKT)에서 그대로 씀. 행사 전에 공개한 개인 최적화 알고리즘을 합의 앱으로 확장 | 공개 데모, `vooy-mcp/README.md` |
 
-계산 시간은 저장된 실행의 기록입니다. API 전체 응답 시간이나 성능 보장이 아닙니다.
-테스트 수는 이번 문서 갱신 때 실제 실행한 결과입니다. 외부 네트워크 테스트는 기본 제외됩니다.
+계산 시간은 로컬 실행의 실측값이며 성능 보장은 아닙니다. 외부 네트워크 테스트는 기본 실행에서 제외합니다.
 
 ## 3분 안에 직접 돌려 보기
 
@@ -64,7 +63,7 @@ TripFit은 각자의 말을 체크리스트로 바꾸고, MIP가 시간과 도�
 | 키 | 동작 |
 |---|---|
 | `→` / `Space`, `←` | 다음 / 이전 |
-| `1`~`6` | 단계 이동 |
+| `1`～`6` | 단계 이동 |
 | `A` | 자동재생 |
 | `C` | 조건 충돌 설명 |
 | `H` | 숨은 한 곳 |
@@ -111,7 +110,7 @@ RUN_NETWORK_TESTS=1 .venv/bin/python -m pytest server/test_mrt.py -k live_mcp -q
 ```
 
 **LLM은 숫자를 만들지 않는다.** 강도별 가중치, 기준값은 서버 규칙, 만족도, 거리, 시각은 솔버가 계산합니다. 실상품 가격, 평점, 시각은 MCP 스냅숏에서 옵니다.
-`POST /api/try`는 지민, 서연의 문장(각 1~200자)을 파싱하고 전체 데모 데이터를 계산합니다.
+`POST /api/try`는 지민, 서연의 문장(각 1～200자)을 파싱하고 전체 데모 데이터를 계산합니다.
 규칙 파서는 전시, 골목, 소품샵, 카페에서 쉬기, 덜 걷기, 느긋하게를 지원하며, 부정 표현은 제외합니다.
 조건이 없는 사람은 HTTP 200 `{needsMore: true, person, hint}`, 불가능한 요청은 `{infeasible: true, explanation}`을 반환합니다.
 
@@ -135,7 +134,7 @@ LLM 호출 동시성은 2개, CBC 호출은 기존 잠금으로 직렬화합니�
 `만족도 = 100 × Σ(가중치 × 항목 충족률) / Σ가중치`.
 강도는 `strong 1.0 / normal 0.7 / weak 0.4`입니다.
 
-| 종류 | 충족률(0~1) |
+| 종류 | 충족률(0～1) |
 |---|---|
 | visit | 맞는 장소의 일치도 합 / 원하는 수 |
 | dwell | 맞는 장소에서 머문 분 / 기준 분 |
@@ -153,7 +152,7 @@ LLM 호출 동시성은 2개, CBC 호출은 기존 잠금으로 직렬화합니�
 
 | 기능, 데이터 | 현재 상태 | 근거 |
 |---|---|---|
-| OpenAI 파싱 | 실호출. `gpt-6.1-sol` JSON 모드로 두 문장에서 8개 항목 추출, 약 4~6초(라이브 화면 엔진 로그에 모델명, ms 표시). 키 미설정, 실패 시 규칙 파서(정확한 데모 입력은 고정 JSON) | `server/parsing.py`, `PRD.md` §6.5 |
+| OpenAI 파싱 | 실호출. `gpt-6.1-sol` JSON 모드로 두 문장에서 8개 항목 추출, 약 4～6초(라이브 화면 엔진 로그에 모델명, ms 표시). 키 미설정, 실패 시 규칙 파서(정확한 데모 입력은 고정 JSON) | `server/parsing.py`, `PRD.md` §6.5 |
 | 일정 계산 | 라이브는 CBC 실제 계산, 재생은 저장된 계산 결과 | `server/app.py`, `solver/demo_builder.py` |
 | MRT 상품, 날짜별 옵션 | 공개 MCP 실호출 스냅숏. `confirmed`는 조회 당시 상태 | `data/mrt_snapshot.json`, `codex/03_mrt_live.result.md` |
 | 성수 후보, 영업시간, 지점 수, 혼잡도 | 샘플. `source: tmap`도 실조회 증거가 아님 | `solver/sample_seongsu.py`, `solver/demo_builder.py` |
@@ -183,9 +182,13 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 | 대신한다 | 예약 재조회와 판매자 문의 LLM 초안. A.X K2 우선, OpenAI `OPENAI_MODEL` 다음, 12초 제한과 공통 IP 레이트 리밋. API가 없거나 실패하면 고정 문안. 작성자, 소요 시간, 보내지 않음 표시 |
 | 사람 승인 후 끝까지 해낸다 | 각자 위임과 대표 승인 후 모의 결제, 영수증과 부모 화면 결과 반환. 실제 예약 확정은 마이리얼트립 링크에서 마무리 |
 
-카드를 맡길 수 있게 하는 장치는 사람별 위임 범위, 한 번만 쓰는 결제 권한, 독립 검사와 감사 해시입니다. 가격 인상, 예약 불가, 판매처 거절, 위임 철회 시에는 멈춤 사유를 부모 화면에도 반환합니다. 2~4단계에서 맡긴 것 취소로 철회하면 `REVOKED`가 기록되고, 이후 권한 발급과 결제는 `MANDATE_REVOKED`로 거절합니다. 새 승인을 받아 다시 맡길 수 있습니다. 결제와 판매자 기록은 모의이며, 문의 초안은 전송하지 않습니다.
+카드를 맡길 수 있게 하는 장치는 사람별 위임 범위, 한 번만 쓰는 결제 권한, 독립 검사와 감사 해시입니다. 가격 인상, 예약 불가, 판매처 거절, 위임 철회 시에는 멈춤 사유를 부모 화면에도 반환합니다. 2～4단계에서 맡긴 것 취소로 철회하면 `REVOKED`가 기록되고, 이후 권한 발급과 결제는 `MANDATE_REVOKED`로 거절합니다. 새 승인을 받아 다시 맡길 수 있습니다. 결제와 판매자 기록은 모의이며, 문의 초안은 전송하지 않습니다.
 
-테스트: Node 49개 통과, 서버 전체 106개 통과와 1개 건너뜀. Bivia는 실제 네트워크 없이 응답 파싱, 판단 보류, 실패와 시간 초과, 엔진 거절 우선, 부모 결과와 감사 기록을 확인합니다. 문법 검사와 변경 파일 금지 기호 검사 통과. 이번 브라우저 검사는 macOS 프로세스 권한 제한으로 실행하지 못했습니다. 실제 Bivia 호출과 배포 화면은 확인하지 않았습니다.
+테스트: Node 49개 통과, 서버 전체 106개 통과와 1개 건너뜀. Bivia는 실제 네트워크 없이 응답 파싱, 판단 보류, 실패와 시간 초과, 엔진 거절 우선, 부모 결과와 감사 기록을 확인합니다. 문법 검사와 변경 파일 금지 기호 검사 통과. 실제 Bivia 호출 확인(2026-11-07 16:10, 로컬 서버): 정상 상황은 "결제 진행" 확률 0.99999(1.6초), 가격이 38,000원으로 오른 상황은 "결제 멈추고 다시 묻기" 확률 0.99999(1.4초), 모델 `dec-1`. 공개 재생본(GitHub Pages)에는 서버가 없어 규칙 판단으로 표시됩니다.
+
+| Bivia 통과 | Bivia 거절 |
+|---|---|
+| ![Bivia 통과와 거절](agentic-pay/docs/screens/06_bivia_pass_stop.png) | 왼쪽이 통과, 오른쪽이 가격 인상 시 거절입니다 |
 
 | 결제 맡기기(위임) | 에이전트의 예약 재조회 | 이대로 승인해도 되는 이유 | 영수증 |
 |---|---|---|---|
@@ -211,7 +214,7 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 |---|---|
 | ![대화 속 결과 카드](vooy-mcp/docs/chat_card.jpg) | ![하나 뺀 뒤 카드](vooy-mcp/docs/chat_card_yield.jpg) |
 
-검증: `pytest` 54개 통과(`cd vooy-mcp && python -m pytest -q`), 공개 서버 스모크 9회 호출 모두 통과(initialize → tools/list → 3인 제안 → 이번만 빼기 → 불가능 → 이상 입력 6종, [결과 원문](vooy-mcp/scripts/smoke_result_remote.json)). MCP 프로토콜 2024-11-05 ~ 2025-11-25 네 버전의 initialize에 모두 응답합니다. 장소 데이터는 메인과 같은 성수 샘플입니다.
+검증: `pytest` 54개 통과(`cd vooy-mcp && python -m pytest -q`), 공개 서버 스모크 9회 호출 모두 통과(initialize → tools/list → 3인 제안 → 이번만 빼기 → 불가능 → 이상 입력 6종, [결과 원문](vooy-mcp/scripts/smoke_result_remote.json)). MCP 프로토콜 2024-11-05 ～ 2025-11-25 네 버전의 initialize에 모두 응답합니다. 장소 데이터는 메인과 같은 성수 샘플입니다.
 
 ## 마이리얼트립: 실제 체험을 일정에 넣을 수 있는지 계산
 
@@ -266,6 +269,18 @@ tripfit/
 ├─ docs/screens/                      # 제출용 화면 이미지
 └─ codex/                             # 작업 지시, 결과 기록
 ```
+
+## 어떻게 만들었나
+
+한 사람이 하루 동안 AI 두 종류와 함께 만들었습니다.
+
+| 역할 | 맡은 일 |
+|---|---|
+| 사람(김하림) | 문제 정의, 화면과 문구 결정, 매 단계 승인 |
+| Claude(Anthropic) | 기획서와 작업 지시서 작성, 결과 리뷰, 브라우저 검증, 통합과 커밋 |
+| Codex(OpenAI, `gpt-6-astra`, `gpt-6.1-sol`) | 지시서에 따른 구현. 엔진과 서버 같은 핵심 로직은 astra, 화면과 테스트, 문서는 sol |
+
+작업 지시서와 Codex의 결과 보고는 `codex/` 폴더에 번호순으로 남아 있습니다(예: `codex/04_whatif_concession.md`와 `.result.md`). 커밋의 공동 작성자 표기는 Claude와 Codex입니다.
 
 ## 문서 링크
 
