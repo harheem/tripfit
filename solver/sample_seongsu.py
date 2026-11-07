@@ -1,7 +1,7 @@
 """Sample half-day in Seongsu for two companions (coordinates approximate).
 
-Stands in for what TMAP POI search + MyRealTrip searchTnas/getTnaOptions return.
-Replace with live API results on event day.
+TMAP places remain samples. MyRealTrip activities load the saved MCP snapshot;
+only a missing/invalid snapshot uses the explicitly marked sample activities.
 """
 
 if __package__:
@@ -42,13 +42,13 @@ PLACES = [
           {"지민": 3, "서연": 7}, source="tmap"),
     Place("park_seoulforest", "서울숲 산책", 37.5444, 127.0374, "park", 40, 0, 24 * 60,
           {"지민": 5, "서연": 2}, source="tmap"),
-    # MyRealTrip product with bookable start times (getTnaOptions -> options[].name)
-    Place("mrt_leather_1400", "가죽공방 원데이클래스 14:00", 37.5440, 127.0548, "activity", 120,
-          scores={"지민": 6, "서연": 9}, group="mrt_leather", fixed_start_min=hm("14:00"),
-          price=55000, source="mrt", availability="confirmed"),
-    Place("mrt_leather_1600", "가죽공방 원데이클래스 16:00", 37.5440, 127.0548, "activity", 120,
-          scores={"지민": 6, "서연": 9}, group="mrt_leather", fixed_start_min=hm("16:00"),
-          price=55000, source="mrt", availability="unverified"),
+    # Offline sample fallback; never presented as confirmed inventory.
+    Place("mrt_sample_1400", "가죽공방 원데이클래스 14:00", 37.5440, 127.0548, "activity", 120,
+          scores={"지민": 6, "서연": 9}, group="mrt_sample", fixed_start_min=hm("14:00"),
+          price=55000, source="sample", availability="unverified"),
+    Place("mrt_sample_1600", "가죽공방 원데이클래스 16:00", 37.5440, 127.0548, "activity", 120,
+          scores={"지민": 6, "서연": 9}, group="mrt_sample", fixed_start_min=hm("16:00"),
+          price=55000, source="sample", availability="unverified"),
 ]
 
 # "숨은 한 곳 +1": Seoul Future Heritage (서울미래유산) spots near Seongsu. They join the
@@ -78,10 +78,41 @@ PLACE_FACTS = {
     "shop_understand": dict(branches=1, crowd=2),
     "shop_atelier": dict(branches=1, crowd=2),
     "park_seoulforest": dict(branches=1, crowd=2),
-    "mrt_leather_1400": dict(branches=1, rating=4.8, reviews=120),
-    "mrt_leather_1600": dict(branches=1, rating=4.8, reviews=120),
+    "mrt_sample_1400": dict(branches=1, rating=4.8, reviews=120),
+    "mrt_sample_1600": dict(branches=1, rating=4.8, reviews=120),
     "heritage_gongs": dict(branches=1, crowd=1, heritage=True),
 }
+if __package__:
+    from .mrt_places import read_snapshot, snapshot_places
+else:
+    from mrt_places import read_snapshot, snapshot_places
+
+SAMPLE_ACTIVITIES = [p for p in PLACES if p.category == "activity"]
+MRT_META = {}
+MRT_SNAPSHOT = {}
+
+
+def reload_mrt(path=None):
+    """Update shared lists in place so the server and builder see one generation."""
+    snapshot = read_snapshot(path)
+    MRT_SNAPSHOT.clear()
+    MRT_META.clear()
+    if snapshot:
+        MRT_SNAPSHOT.update(snapshot)
+        activities, facts, metadata = snapshot_places(snapshot)
+        PLACE_FACTS.update(facts)
+        MRT_META.update(metadata)
+    else:
+        activities = SAMPLE_ACTIVITIES
+        for p in activities:
+            MRT_META[p.id] = {"isReal": False, "name": "가죽공방 원데이클래스", "rating": None,
+                              "reviews": None, "coordSource": "approx", "durationSource": "default"}
+    PLACES[:] = [p for p in PLACES if p.category != "activity"] + activities
+    for p in activities:
+        p.quality, p.quality_parts = place_quality(**PLACE_FACTS[p.id])
+
+
+reload_mrt()
 for _p in PLACES + HIDDEN:
     _p.quality, _p.quality_parts = place_quality(**PLACE_FACTS[_p.id])
 

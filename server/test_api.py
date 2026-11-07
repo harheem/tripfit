@@ -26,8 +26,14 @@ def without_ms(value):
 
 @pytest.fixture(scope="module")
 def client():
+    from server import app as module
+    from solver.sample_seongsu import reload_mrt
+    reload_mrt(ROOT / "server/fixtures/mrt_snapshot.json")
+    module._demo_cache = None
     with TestClient(app) as client:
         yield client
+    reload_mrt()
+    module._demo_cache = None
 
 
 @pytest.fixture
@@ -51,7 +57,7 @@ def test_demo_shape_content_cache_and_static(client):
     first = client.get("/api/demo").json()
     assert set(first) - {"live", "computedAt"} == set(sample)
     assert first["live"] is True
-    assert without_ms({k: first[k] for k in sample}) == without_ms(sample)
+    assert without_ms({k: first[k] for k in sample}) == without_ms(build_demo())
     assert client.get("/api/demo").json() == first
     response = client.get("/api/demo?fresh=1")
     assert response.status_code == 200
@@ -99,7 +105,7 @@ def test_all_prefs_can_be_conceded(client):
 def test_builder_muted_checklist_and_prefs():
     result = build_demo(muted=[("서연", "덜 걷기")])
     assert next(p for p in result["prefs"]["서연"] if p["label"] == "덜 걷기")["muted"]
-    for plan in result["series"] + [result["whatif"]["plan"], result["replan"]["plan"], result["hidden"]["plan"]]:
+    for plan in result["series"] + [(result["whatif"].get("chosen") or result["whatif"])["plan"], result["replan"]["plan"], result["hidden"]["plan"]]:
         assert next(p for p in plan["checklist"]["서연"] if p["label"] == "덜 걷기")["weight"] == 0
 
 
@@ -118,7 +124,7 @@ def test_hidden_tag_adds_candidate(client):
     assert all(any("heritage" in s["tags"] for s in p["stops"]) for p in result["series"])
 
 
-@pytest.mark.parametrize("pick", ["mrt_leather_1600", "mrt_leather_1400"])
+@pytest.mark.parametrize("pick", ["mrt_9000001_1600", "mrt_9000001_1400"])
 def test_what_if_returns_booked_plan_and_balanced_diff(client, pick):
     result = client.post("/api/what-if", json={"pick": pick}).json()
     assert any(s["id"] == pick for s in result["plan"]["stops"])
@@ -130,15 +136,15 @@ def test_what_if_returns_booked_plan_and_balanced_diff(client, pick):
 
 def test_replan_excludes_crowd_and_keeps_booking(client):
     result = client.post("/api/replan", json={"now_min": 785, "exclude": ["cafe_onion"],
-                                             "keep": {"mrt_leather_1600": 960}}).json()
+                                             "keep": {"mrt_9000001_1600": 960}}).json()
     stops = result["plan"]["stops"]
     assert all(s["id"] != "cafe_onion" and s["start"] >= 785 for s in stops)
-    assert any(s["id"] == "mrt_leather_1600" and s["start"] == 960 for s in stops)
+    assert any(s["id"] == "mrt_9000001_1600" and s["start"] == 960 for s in stops)
 
 
 def test_replan_impossible_has_explanation(client):
-    result = client.post("/api/replan", json={"now_min": 785, "exclude": ["mrt_leather_1600"],
-                                             "keep": {"mrt_leather_1600": 960}}).json()
+    result = client.post("/api/replan", json={"now_min": 785, "exclude": ["mrt_9000001_1600"],
+                                             "keep": {"mrt_9000001_1600": 960}}).json()
     assert result["infeasible"] and result["relaxations"]
 
 
@@ -283,3 +289,39 @@ def test_concurrent_solves_are_serialized(client, monkeypatch):
 ])
 def test_invalid_inputs(client, url, body):
     assert client.post(url, json=body).status_code == 422
+
+
+def test_real_whatif_requires_named_concession_and_preserves_it_in_replan(client):
+    from server import app as module
+    from solver.sample_seongsu import reload_mrt, REQUEST
+    try:
+        reload_mrt(ROOT / "data/mrt_snapshot.json")
+        pick = "mrt_3828508_1500"
+        first = client.post("/api/what-if", json={"pick": pick})
+        assert first.status_code == 200
+        data = first.json()
+        assert data["infeasible"] and "plan" not in data
+        assert {o["owner"] for o in data["relaxations"]} == {"서연", "지민"}
+        assert all(o["kind"] == "category_min" for o in data["relaxations"])
+        assert not any(c["kind"] == "must_include" for o in data["relaxations"] for c in o["changes"])
+        for option in data["relaxations"]:
+            selected = client.post("/api/what-if", json={"pick": pick, "relax": option["id"]}).json()
+            assert selected["infeasible"] is False
+            plan = selected["plan"]
+            assert next(s for s in plan["stops"] if s["id"] == pick)["start"] == 900
+            assert plan["walkM"] <= REQUEST.max_walk_m + 1
+            assert plan["finish"] <= REQUEST.deadline_min
+            kept_category = "exhibit" if option["id"] == "category_min:cafe" else "cafe"
+            assert any(s["cat"] == kept_category for s in plan["stops"])
+            saved = selected["replan"]
+            after = client.post("/api/replan", json={"now_min": saved["now"],
+                "exclude": [saved["crowded"]], "keep": {pick: 900}, "pick": pick,
+                "relax": option["id"]}).json()["plan"]
+            assert all(s["id"] != saved["crowded"] for s in after["stops"])
+            assert next(s for s in after["stops"] if s["id"] == pick)["start"] == 900
+            assert any(s["cat"] == kept_category for s in after["stops"])
+        assert client.post("/api/what-if", json={"pick": pick, "relax": "must_include:" + pick}).status_code == 422
+        assert client.post("/api/replan", json={"now_min": 785, "relax": "category_min:cafe"}).status_code == 422
+    finally:
+        reload_mrt(ROOT / "server/fixtures/mrt_snapshot.json")
+        module._demo_cache = None

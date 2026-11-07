@@ -1,0 +1,36 @@
+{
+  "fetchedAt": "2026-11-07T03:00:00+00:00",
+  "date": "2026-11-14",
+  "queriesTried": [
+    "fixture only"
+  ],
+  "picked": [
+    {
+      "gid": "9000001",
+      "url": "https://experiences.myrealtrip.com/products/9000001",
+      "name": "테스트 전용 성수 체험",
+      "rating": 4.8,
+      "reviews": 120,
+      "price": 55000,
+      "durationMin": 120,
+      "durationSource": "default",
+      "meetingText": "테스트 성수 집결지",
+      "lat": 37.544,
+      "lng": 127.0548,
+      "coordSource": "approx",
+      "options": [
+        {
+          "start": "14:00",
+          "available": true,
+          "price": 55000
+        },
+        {
+          "start": "16:00",
+          "available": null,
+          "price": 55000
+        }
+      ]
+    }
+  ],
+  "rejected": []
+}

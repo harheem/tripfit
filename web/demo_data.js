@@ -162,7 +162,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.83
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "exh_dmuseum",
@@ -187,7 +189,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.83
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "alley_yeonmu",
@@ -212,7 +216,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.67
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "alley_shoe",
@@ -239,7 +245,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 1.0
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "cafe_onion",
@@ -264,7 +272,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.67
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "cafe_bluebottle",
@@ -289,7 +299,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.83
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "cafe_grandpa",
@@ -314,7 +326,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.83
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "shop_understand",
@@ -339,7 +353,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.83
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "shop_atelier",
@@ -364,7 +380,9 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.83
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
    "id": "park_seoulforest",
@@ -389,57 +407,201 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 0.83
    },
-   "hidden": false
+   "hidden": false,
+   "url": null,
+   "mrt": null
   },
   {
-   "id": "mrt_leather_1400",
-   "name": "가죽공방 원데이클래스 14:00",
-   "lat": 37.544,
-   "lng": 127.0548,
+   "id": "mrt_3828508_1000",
+   "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 10:00",
+   "lat": 37.5437,
+   "lng": 127.0397,
    "cat": "activity",
    "catKo": "체험",
    "source": "mrt",
-   "group": "mrt_leather",
-   "fixedStart": 840,
-   "price": 55000,
+   "group": "mrt_3828508",
+   "fixedStart": 600,
+   "price": 35000,
    "availability": "confirmed",
    "duration": 120,
    "crowd": null,
    "tags": [],
    "story": null,
    "credit": null,
-   "quality": 0.964,
+   "quality": 0.958,
    "q": {
     "uniqueness": 1.0,
-    "reputation": 0.88,
+    "reputation": 0.86,
     "timing": 1.0
    },
-   "hidden": false
+   "hidden": false,
+   "url": "https://experiences.myrealtrip.com/products/3828508",
+   "mrt": {
+    "gid": "3828508",
+    "url": "https://experiences.myrealtrip.com/products/3828508",
+    "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+    "rating": 5.0,
+    "reviews": 16,
+    "price": 35000,
+    "durationMin": 120,
+    "durationSource": "default",
+    "meetingText": "서울숲 방문자센터 앞(오소정원)",
+    "lat": 37.5437,
+    "lng": 127.0397,
+    "coordSource": "approx:서울숲 방문자센터",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "locationEvidence": "제목/집결지 지명: 서울숲",
+    "options": null,
+    "isReal": true,
+    "start": "10:00",
+    "available": true,
+    "priceSource": "option",
+    "priceKnown": true
+   }
   },
   {
-   "id": "mrt_leather_1600",
-   "name": "가죽공방 원데이클래스 16:00",
-   "lat": 37.544,
-   "lng": 127.0548,
+   "id": "mrt_3828508_1230",
+   "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 12:30",
+   "lat": 37.5437,
+   "lng": 127.0397,
    "cat": "activity",
    "catKo": "체험",
    "source": "mrt",
-   "group": "mrt_leather",
-   "fixedStart": 960,
-   "price": 55000,
-   "availability": "unverified",
+   "group": "mrt_3828508",
+   "fixedStart": 750,
+   "price": 35000,
+   "availability": "confirmed",
    "duration": 120,
    "crowd": null,
    "tags": [],
    "story": null,
    "credit": null,
-   "quality": 0.964,
+   "quality": 0.958,
    "q": {
     "uniqueness": 1.0,
-    "reputation": 0.88,
+    "reputation": 0.86,
     "timing": 1.0
    },
-   "hidden": false
+   "hidden": false,
+   "url": "https://experiences.myrealtrip.com/products/3828508",
+   "mrt": {
+    "gid": "3828508",
+    "url": "https://experiences.myrealtrip.com/products/3828508",
+    "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+    "rating": 5.0,
+    "reviews": 16,
+    "price": 35000,
+    "durationMin": 120,
+    "durationSource": "default",
+    "meetingText": "서울숲 방문자센터 앞(오소정원)",
+    "lat": 37.5437,
+    "lng": 127.0397,
+    "coordSource": "approx:서울숲 방문자센터",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "locationEvidence": "제목/집결지 지명: 서울숲",
+    "options": null,
+    "isReal": true,
+    "start": "12:30",
+    "available": true,
+    "priceSource": "option",
+    "priceKnown": true
+   }
+  },
+  {
+   "id": "mrt_3828508_1500",
+   "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+   "lat": 37.5437,
+   "lng": 127.0397,
+   "cat": "activity",
+   "catKo": "체험",
+   "source": "mrt",
+   "group": "mrt_3828508",
+   "fixedStart": 900,
+   "price": 35000,
+   "availability": "confirmed",
+   "duration": 120,
+   "crowd": null,
+   "tags": [],
+   "story": null,
+   "credit": null,
+   "quality": 0.958,
+   "q": {
+    "uniqueness": 1.0,
+    "reputation": 0.86,
+    "timing": 1.0
+   },
+   "hidden": false,
+   "url": "https://experiences.myrealtrip.com/products/3828508",
+   "mrt": {
+    "gid": "3828508",
+    "url": "https://experiences.myrealtrip.com/products/3828508",
+    "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+    "rating": 5.0,
+    "reviews": 16,
+    "price": 35000,
+    "durationMin": 120,
+    "durationSource": "default",
+    "meetingText": "서울숲 방문자센터 앞(오소정원)",
+    "lat": 37.5437,
+    "lng": 127.0397,
+    "coordSource": "approx:서울숲 방문자센터",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "locationEvidence": "제목/집결지 지명: 서울숲",
+    "options": null,
+    "isReal": true,
+    "start": "15:00",
+    "available": true,
+    "priceSource": "option",
+    "priceKnown": true
+   }
+  },
+  {
+   "id": "mrt_3828508_1900",
+   "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 19:00",
+   "lat": 37.5437,
+   "lng": 127.0397,
+   "cat": "activity",
+   "catKo": "체험",
+   "source": "mrt",
+   "group": "mrt_3828508",
+   "fixedStart": 1140,
+   "price": 35000,
+   "availability": "confirmed",
+   "duration": 120,
+   "crowd": null,
+   "tags": [],
+   "story": null,
+   "credit": null,
+   "quality": 0.958,
+   "q": {
+    "uniqueness": 1.0,
+    "reputation": 0.86,
+    "timing": 1.0
+   },
+   "hidden": false,
+   "url": "https://experiences.myrealtrip.com/products/3828508",
+   "mrt": {
+    "gid": "3828508",
+    "url": "https://experiences.myrealtrip.com/products/3828508",
+    "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+    "rating": 5.0,
+    "reviews": 16,
+    "price": 35000,
+    "durationMin": 120,
+    "durationSource": "default",
+    "meetingText": "서울숲 방문자센터 앞(오소정원)",
+    "lat": 37.5437,
+    "lng": 127.0397,
+    "coordSource": "approx:서울숲 방문자센터",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "locationEvidence": "제목/집결지 지명: 서울숲",
+    "options": null,
+    "isReal": true,
+    "start": "19:00",
+    "available": true,
+    "priceSource": "option",
+    "priceKnown": true
+   }
   },
   {
    "id": "heritage_gongs",
@@ -466,14 +628,16 @@ window.DEMO = {
     "reputation": 0.75,
     "timing": 1.0
    },
-   "hidden": true
+   "hidden": true,
+   "url": null,
+   "mrt": null
   }
  ],
  "sources": {
   "tmap": 10,
   "mrt": 1,
-  "pairs": 182,
-  "orderings": 773665
+  "pairs": 240,
+  "orderings": 2428805
  },
  "series": [
   {
@@ -494,6 +658,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [],
@@ -518,6 +684,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": "붐빔",
      "tags": [],
@@ -542,6 +710,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [],
@@ -566,6 +736,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": "보통",
      "tags": [],
@@ -590,6 +762,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [
@@ -610,7 +784,7 @@ window.DEMO = {
     "지민": 100.0,
     "서연": 74.8
    },
-   "solveMs": 705,
+   "solveMs": 708,
    "checklist": {
     "지민": [
      {
@@ -672,6 +846,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [],
@@ -696,6 +872,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": "붐빔",
      "tags": [],
@@ -720,6 +898,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [],
@@ -744,6 +924,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": "보통",
      "tags": [],
@@ -762,7 +944,7 @@ window.DEMO = {
     "지민": 79.4,
     "서연": 83.1
    },
-   "solveMs": 705,
+   "solveMs": 708,
    "checklist": {
     "지민": [
      {
@@ -824,6 +1006,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [],
@@ -848,6 +1032,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": "붐빔",
      "tags": [],
@@ -872,6 +1058,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": "보통",
      "tags": [],
@@ -890,7 +1078,7 @@ window.DEMO = {
     "지민": 58.8,
     "서연": 88.7
    },
-   "solveMs": 705,
+   "solveMs": 708,
    "checklist": {
     "지민": [
      {
@@ -964,276 +1152,1108 @@ window.DEMO = {
    }
   }
  ],
- "whatif": {
-  "product": "mrt_leather",
-  "pick": "mrt_leather_1600",
-  "plan": {
-   "id": "w",
-   "label": "+mrt_leather_1600",
-   "stops": [
-    {
-     "id": "cafe_onion",
-     "name": "어니언 성수",
-     "cat": "cafe",
-     "catKo": "카페",
-     "arrive": 784,
-     "start": 784,
-     "end": 834,
-     "wait": 0,
-     "walkM": 298,
-     "walkMin": 4.3,
-     "source": "tmap",
-     "availability": "n/a",
-     "price": 0,
-     "fixed": false,
-     "crowd": "붐빔",
-     "tags": [],
-     "quality": 0.625,
-     "q": {
-      "uniqueness": 0.5,
-      "reputation": 0.75,
-      "timing": 0.67
-     }
-    },
-    {
-     "id": "exh_daelim",
-     "name": "대림창고 전시",
-     "cat": "exhibit",
-     "catKo": "전시",
-     "arrive": 841,
-     "start": 841,
-     "end": 901,
-     "wait": 0,
-     "walkM": 467,
-     "walkMin": 6.7,
-     "source": "tmap",
-     "availability": "n/a",
-     "price": 0,
-     "fixed": false,
-     "crowd": "보통",
-     "tags": [],
-     "quality": 0.875,
-     "q": {
-      "uniqueness": 1.0,
-      "reputation": 0.75,
-      "timing": 0.83
-     }
-    },
-    {
-     "id": "alley_shoe",
-     "name": "성수 수제화거리",
-     "cat": "alley",
-     "catKo": "골목",
-     "arrive": 909,
-     "start": 909,
-     "end": 939,
-     "wait": 0,
-     "walkM": 570,
-     "walkMin": 8.1,
-     "source": "tmap",
-     "availability": "n/a",
-     "price": 0,
-     "fixed": false,
-     "crowd": null,
-     "tags": [
-      "heritage"
-     ],
-     "quality": 0.925,
-     "q": {
-      "uniqueness": 1.0,
-      "reputation": 0.75,
-      "timing": 1.0
-     }
-    },
-    {
-     "id": "mrt_leather_1600",
-     "name": "가죽공방 원데이클래스 16:00",
-     "cat": "activity",
-     "catKo": "체험",
-     "arrive": 942,
-     "start": 960,
-     "end": 1080,
-     "wait": 18,
-     "walkM": 224,
-     "walkMin": 3.2,
-     "source": "mrt",
-     "availability": "unverified",
-     "price": 55000,
-     "fixed": true,
-     "crowd": null,
-     "tags": [],
-     "quality": 0.964,
-     "q": {
-      "uniqueness": 1.0,
-      "reputation": 0.88,
-      "timing": 1.0
-     }
-    }
-   ],
-   "walkM": 2730,
-   "walkMin": 39.0,
-   "finish": 1097,
-   "sat": {
-    "지민": 79.4,
-    "서연": 74.7
-   },
-   "solveMs": 82,
-   "checklist": {
-    "지민": [
+ "mrt": {
+  "fetchedAt": "2026-11-07T03:46:06.614798+00:00",
+  "date": "2026-11-14",
+  "queriesTried": [
+   "서울숲"
+  ],
+  "queriesFailed": [],
+  "picked": [
+   {
+    "gid": "3828508",
+    "url": "https://experiences.myrealtrip.com/products/3828508",
+    "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+    "rating": 5.0,
+    "reviews": 16,
+    "price": 35000,
+    "durationMin": 120,
+    "durationSource": "default",
+    "meetingText": "서울숲 방문자센터 앞(오소정원)",
+    "lat": 37.5437,
+    "lng": 127.0397,
+    "coordSource": "approx:서울숲 방문자센터",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "locationEvidence": "제목/집결지 지명: 서울숲",
+    "options": [
      {
-      "label": "전시",
-      "weight": 1.0,
-      "quote": "전시는 꼭 보고 싶어",
-      "fulfilled": 1.0
+      "start": "10:00",
+      "available": true,
+      "price": 35000,
+      "optionName": "10:00",
+      "stock": 999
      },
      {
-      "label": "골목 2곳",
-      "weight": 0.7,
-      "quote": "골목도 여기저기 구경하고 싶어",
-      "fulfilled": 0.5
-     }
-    ],
-    "서연": [
-     {
-      "label": "덜 걷기",
-      "weight": 1.0,
-      "quote": "나 오늘 많이 못 걸어",
-      "fulfilled": 0.39
+      "start": "12:30",
+      "available": true,
+      "price": 35000,
+      "optionName": "12:30",
+      "stock": 999
      },
      {
-      "label": "카페에서 쉬기",
-      "weight": 0.7,
-      "quote": "카페에서 좀 쉬고 싶어",
-      "fulfilled": 1.0
+      "start": "15:00",
+      "available": true,
+      "price": 35000,
+      "optionName": "15:00",
+      "stock": 999
      },
      {
-      "label": "느긋하게",
-      "weight": 0.7,
-      "quote": "좀 쉬고 싶어",
-      "fulfilled": 0.75
-     },
-     {
-      "label": "소품샵",
-      "weight": 0.7,
-      "quote": "소품샵은 좋아",
-      "fulfilled": 1.0
+      "start": "19:00",
+      "available": true,
+      "price": 35000,
+      "optionName": "19:00(9월 18:30,10월 18:00)",
+      "stock": 999
      }
     ]
    }
-  },
-  "diff": {
-   "added": [
-    "성수 수제화거리",
-    "가죽공방 원데이클래스 16:00"
-   ],
-   "dropped": [
-    "성수역 소품샵 골목",
-    "연무장길 골목 산책"
-   ],
-   "walk_m_delta": 528,
-   "cafe_rest_min_delta": 0,
-   "finish_delta_min": 106,
-   "satisfaction_delta": {
-    "지민": 0.0,
-    "서연": -8.4
+  ],
+  "rejected": [
+   {
+    "name": "AI 체형분석부터 호텔식 컨디션 맞춤 관리 [당산/성수건대]",
+    "reason": "날짜별 시작 시각 미반환/조회 제한: 예약 시각을 만들지 않음"
+   },
+   {
+    "name": "[서울/성수] 성수동에서 즐기는 취미 통기타 클래스",
+    "reason": "날짜별 시작 시각 미반환/조회 제한: 예약 시각을 만들지 않음"
+   },
+   {
+    "name": "[서울 성수] 물감으로 뒤덮힌 스튜디오에서의 액션페인팅 체험",
+    "reason": "날짜별 시작 시각 미반환/조회 제한: 예약 시각을 만들지 않음"
+   },
+   {
+    "name": "[오픈특가] 성수 옵틱라이프 / 안경 30% 할인권",
+    "reason": "상세 조회 실패: 위치 확인 불가"
+   },
+   {
+    "name": "[서울/서울숲][키즈] 뮤지컬 〈AI세계에서 살아남기〉 ",
+    "reason": "날짜별 시작 시각 미반환/조회 제한: 예약 시각을 만들지 않음"
+   },
+   {
+    "name": "서울숲 + 한강 5km 러닝 투어 (러닝화 대여 포함)",
+    "reason": "날짜별 시작 시각 미반환/조회 제한: 예약 시각을 만들지 않음"
+   },
+   {
+    "name": "원데이 쿠킹클래스 한식 (대한민국/서울)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "푸꾸옥 즈엉동 초콜릿 원데이 클래스 초콜릿농장",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[서울/문래] 달콤한 꽃 피우기, 앙금플라워 컵케이크 원데이클래스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "발리 우붓 쿠킹 클래스 (무료 픽업샌딩 인도네시아 전통 음식 원데이 체험)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[경기/하남] 반려동물 수제 간식 만들기 원데이 클래스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[전북/전주] 뚝딱 만드는 강아지 볶음밥 만들기 원데이클래스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[기업/단체 맞춤] 강남역 스페셜티 핸드드립 원데이 클래스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "호치민 베트남 커피 원데이 클래스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "라떼아트 원데이 클래스 (싱가포르)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[호치민] 원데이 바리스타 체험 클래스 :: 에스프레소부터 라떼 아트까지",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[만족도 최고] 쾌적한 호텔런치 / 치즈공방/ 스스키노 하차OK / 비에이 후라노 버스투어",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[키즈][인천/강화] 톰아저씨 트리하우스 숲체험&공방체험 (4인 기준)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "파두 라이브 콘서트 + 포트 와인 (포르투갈 기타 제작 공방)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[프라하/공방체험] 나만의 에나멜 머그컵 만들기 ",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[프라하/공방체험] 나만의 마리오네트 인형 만들기 ",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[서울 성북] 빚다 도예공방 도자기만들기/물레체험/핸드빌딩/핸드페인팅(전화예약 필수)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[애월] 귤밭에댕댕이 공방, 귤밭 속 단 하나뿐인 원데이클래스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "K-Healing Signature Tour",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "K-POP 어드벤처 투어 2",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "Glow & Luxury- 한국 미용 & K-POP 스타일 체험",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "서울 셀프가이드 미션 키트 C.O.V.E.R.T 여권형 미션북 15개 구역 45개 임무",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "K-Pop 걸그룹 스타일링 포토 체험(의상+헤어+메이크업+포토)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[오픈특가] 강남 옵틱라이프 / 안경 30% 할인권   ",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[서울/잠실] 소가죽으로 만드는 명함지갑, 카드지갑 가죽공예 원데이클래스 가죽공방",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[잠실,송파] 소가죽으로 만드는 심플 1칸 카드지갑 가죽공예 가죽공방 원데이클래스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "수입가죽으로 여권지갑 여권케이스 만들기 가죽공예 원데이클래스 잠실 송파 가죽공방",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "수입가죽으로 만드는 갤럭시워치 애플워치 스트랩 잠실 가죽공예 원데이클래스 가죽공방",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[잠실,송파]수입가죽으로 만드는 에어팟 버즈3 케이스 가죽공예 원데이클래스 가죽공방",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "수입가죽으로 만드는 플랩 명함지갑, 카드지갑 가죽공예 원데이클래스 잠실 송파 가죽공방",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[잠실, 송파] 80가지 수입가죽으로 만드는 심플카드지갑 가죽공예 원데이클래스 가죽공방",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[잠실,송파]수입가죽으로 만드는 다용도 파우치 가죽공예 원데이클래스 가죽공방 ",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[잠실,송파]수입가죽으로 만드는 위빙 명함지갑, 카드지갑 가죽공예 원데이클래스 가죽공방",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[잠실,송파] 수입가죽으로 만드는 아코디언 지갑 가죽공예 원데이클래스, 서울 가죽공방",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[키즈][서울/경기] 숲파티포레와 숲탐험대가 되어보는 시간, 숲체험교실",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[서울스냅/수원스냅] '주연' 작가와 함께하는 내 인생 속 '주연'을 기록하기",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "자기 돌봄 티타임_ 차 한 잔으로 연습하는 마음챙김",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "깊은 내면으로의 여행, 아나타명상 - 나를 넘어 존재의 본질을 만나는 명상",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "초월의식의 그곳, 낙원으로 가는 여정 ㅡ 싱잉볼 연주",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "BREATHE SEOUL : 숨으로 여행하는 서울",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "모브플렉스, 저강도 회복 운동 클래스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[마이힐링코타] 해양구조대&한국인 가이드와 안전하게 물 속으로! 사피섬& 마누칸 호핑투어 ",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "(11월이벤트요금)코타키나발루 사피섬 호핑투어 +호텔픽업드랍포함+짐보관 서비스",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[픽업샌딩 포함] 즉시 확정/특가 ⭐ 누사페니다 조인 스노클링 (서부 섬투어 옵션 포함) ",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[⭐️픽업샌딩 포함] 발리 누사페니다 스노쿨링 조인투어 (만타포인트/베이+섬투어 옵션)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[다온스트립* 베네치아  섬 3개 투어 ] 본섬 *부라노*무라노 * 베니스 무지개를 담다",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[하와이] [단독] 오아후 쓰리고 섬투어-호놀룰루(보고.먹고.찍고) (미국/하와이)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[단 한가족만! YJ투어]알짜배기 오아후 일일 섬투어! 지상낙원 하와이를 천천히~여유롭게~",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[한국인가이드] 칸쿤 여인의 섬 반일투어",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "[특가★][파타야 출발]니모섬 스노쿨링(1일 정원제한)(수중촬영)",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
+   },
+   {
+    "name": "🎁특별 이벤트- KK라운지 무료🎁 사피섬 호핑투어+입도세 포함+수중촬영 가능",
+    "reason": "제목의 지역이 성수 인근 아님 또는 위치 근거 부족; 성수 실옵션 상품 우선"
    }
-  },
-  "alt": {
-   "pick": "mrt_leather_1400",
+  ],
+  "discoveryQueries": [
+   "성수 원데이클래스",
+   "성수 공방",
+   "서울 성수 체험",
+   "서울 가죽공방",
+   "서울 원데이클래스",
+   "서울숲",
+   "뚝섬"
+  ],
+  "rejectedAsOf": "2026-11-07T03:10:27.792409+00:00"
+ },
+ "whatif": {
+  "pick": "mrt_3828508_1500",
+  "product": "mrt_3828508",
+  "infeasible": true,
+  "relaxations": [
+   {
+    "id": "category_min:exhibit",
+    "label": "지민의 '전시 1곳'을 양보",
+    "owner": "지민",
+    "kind": "category_min",
+    "changes": [
+     {
+      "kind": "category_min",
+      "key": "exhibit",
+      "from": 1,
+      "to": 0
+     }
+    ],
+    "plan": {
+     "id": "w",
+     "label": "양보 후",
+     "stops": [
+      {
+       "id": "alley_shoe",
+       "name": "성수 수제화거리",
+       "cat": "alley",
+       "catKo": "골목",
+       "arrive": 784,
+       "start": 784,
+       "end": 814,
+       "wait": 0,
+       "walkM": 309,
+       "walkMin": 4.4,
+       "source": "tmap",
+       "availability": "n/a",
+       "price": 0,
+       "url": null,
+       "mrt": null,
+       "fixed": false,
+       "crowd": null,
+       "tags": [
+        "heritage"
+       ],
+       "quality": 0.925,
+       "q": {
+        "uniqueness": 1.0,
+        "reputation": 0.75,
+        "timing": 1.0
+       }
+      },
+      {
+       "id": "cafe_bluebottle",
+       "name": "블루보틀 성수",
+       "cat": "cafe",
+       "catKo": "카페",
+       "arrive": 829,
+       "start": 829,
+       "end": 879,
+       "wait": 0,
+       "walkM": 993,
+       "walkMin": 14.2,
+       "source": "tmap",
+       "availability": "n/a",
+       "price": 0,
+       "url": null,
+       "mrt": null,
+       "fixed": false,
+       "crowd": "여유",
+       "tags": [],
+       "quality": 0.475,
+       "q": {
+        "uniqueness": 0.0,
+        "reputation": 0.75,
+        "timing": 0.83
+       }
+      },
+      {
+       "id": "mrt_3828508_1500",
+       "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+       "cat": "activity",
+       "catKo": "체험",
+       "arrive": 892,
+       "start": 900,
+       "end": 1020,
+       "wait": 8,
+       "walkM": 957,
+       "walkMin": 13.7,
+       "source": "mrt",
+       "availability": "confirmed",
+       "price": 35000,
+       "url": "https://experiences.myrealtrip.com/products/3828508",
+       "mrt": {
+        "gid": "3828508",
+        "url": "https://experiences.myrealtrip.com/products/3828508",
+        "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+        "rating": 5.0,
+        "reviews": 16,
+        "price": 35000,
+        "durationMin": 120,
+        "durationSource": "default",
+        "meetingText": "서울숲 방문자센터 앞(오소정원)",
+        "lat": 37.5437,
+        "lng": 127.0397,
+        "coordSource": "approx:서울숲 방문자센터",
+        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+        "locationEvidence": "제목/집결지 지명: 서울숲",
+        "options": null,
+        "isReal": true,
+        "start": "15:00",
+        "available": true,
+        "priceSource": "option",
+        "priceKnown": true
+       },
+       "fixed": true,
+       "crowd": null,
+       "tags": [],
+       "quality": 0.958,
+       "q": {
+        "uniqueness": 1.0,
+        "reputation": 0.86,
+        "timing": 1.0
+       }
+      }
+     ],
+     "walkM": 2821,
+     "walkMin": 40.3,
+     "finish": 1028,
+     "sat": {
+      "지민": 20.6,
+      "서연": 78.7
+     },
+     "solveMs": 480,
+     "checklist": {
+      "지민": [
+       {
+        "label": "전시",
+        "weight": 1.0,
+        "quote": "전시는 꼭 보고 싶어",
+        "fulfilled": 0.0
+       },
+       {
+        "label": "골목 2곳",
+        "weight": 0.7,
+        "quote": "골목도 여기저기 구경하고 싶어",
+        "fulfilled": 0.5
+       }
+      ],
+      "서연": [
+       {
+        "label": "덜 걷기",
+        "weight": 1.0,
+        "quote": "나 오늘 많이 못 걸어",
+        "fulfilled": 0.34
+       },
+       {
+        "label": "카페에서 쉬기",
+        "weight": 0.7,
+        "quote": "카페에서 좀 쉬고 싶어",
+        "fulfilled": 1.0
+       },
+       {
+        "label": "느긋하게",
+        "weight": 0.7,
+        "quote": "좀 쉬고 싶어",
+        "fulfilled": 1.0
+       },
+       {
+        "label": "소품샵",
+        "weight": 0.7,
+        "quote": "소품샵은 좋아",
+        "fulfilled": 1.0
+       }
+      ]
+     }
+    },
+    "diff": {
+     "added": [
+      "성수 수제화거리",
+      "블루보틀 성수",
+      "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00"
+     ],
+     "dropped": [
+      "성수역 소품샵 골목",
+      "어니언 성수",
+      "연무장길 골목 산책",
+      "대림창고 전시"
+     ],
+     "walk_m_delta": 619,
+     "cafe_rest_min_delta": 0,
+     "finish_delta_min": 37,
+     "satisfaction_delta": {
+      "지민": -58.8,
+      "서연": -4.4
+     }
+    },
+    "replan": {
+     "now": 785,
+     "crowded": "cafe_bluebottle",
+     "reason": "블루보틀 성수 지금 붐빔(샘플)",
+     "done": [],
+     "keep": "mrt_3828508_1500",
+     "plan": {
+      "id": "r",
+      "label": "재계산",
+      "stops": [
+       {
+        "id": "cafe_onion",
+        "name": "어니언 성수",
+        "cat": "cafe",
+        "catKo": "카페",
+        "arrive": 789,
+        "start": 789,
+        "end": 839,
+        "wait": 0,
+        "walkM": 298,
+        "walkMin": 4.3,
+        "source": "tmap",
+        "availability": "n/a",
+        "price": 0,
+        "url": null,
+        "mrt": null,
+        "fixed": false,
+        "crowd": "붐빔",
+        "tags": [],
+        "quality": 0.625,
+        "q": {
+         "uniqueness": 0.5,
+         "reputation": 0.75,
+         "timing": 0.67
+        }
+       },
+       {
+        "id": "alley_shoe",
+        "name": "성수 수제화거리",
+        "cat": "alley",
+        "catKo": "골목",
+        "arrive": 848,
+        "start": 848,
+        "end": 878,
+        "wait": 0,
+        "walkM": 608,
+        "walkMin": 8.7,
+        "source": "tmap",
+        "availability": "n/a",
+        "price": 0,
+        "url": null,
+        "mrt": null,
+        "fixed": false,
+        "crowd": null,
+        "tags": [
+         "heritage"
+        ],
+        "quality": 0.925,
+        "q": {
+         "uniqueness": 1.0,
+         "reputation": 0.75,
+         "timing": 1.0
+        }
+       },
+       {
+        "id": "mrt_3828508_1500",
+        "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+        "cat": "activity",
+        "catKo": "체험",
+        "arrive": 900,
+        "start": 900,
+        "end": 1020,
+        "wait": 0,
+        "walkM": 1530,
+        "walkMin": 21.9,
+        "source": "mrt",
+        "availability": "confirmed",
+        "price": 35000,
+        "url": "https://experiences.myrealtrip.com/products/3828508",
+        "mrt": {
+         "gid": "3828508",
+         "url": "https://experiences.myrealtrip.com/products/3828508",
+         "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+         "rating": 5.0,
+         "reviews": 16,
+         "price": 35000,
+         "durationMin": 120,
+         "durationSource": "default",
+         "meetingText": "서울숲 방문자센터 앞(오소정원)",
+         "lat": 37.5437,
+         "lng": 127.0397,
+         "coordSource": "approx:서울숲 방문자센터",
+         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+         "locationEvidence": "제목/집결지 지명: 서울숲",
+         "options": null,
+         "isReal": true,
+         "start": "15:00",
+         "available": true,
+         "priceSource": "option",
+         "priceKnown": true
+        },
+        "fixed": true,
+        "crowd": null,
+        "tags": [],
+        "quality": 0.958,
+        "q": {
+         "uniqueness": 1.0,
+         "reputation": 0.86,
+         "timing": 1.0
+        }
+       }
+      ],
+      "walkM": 2998,
+      "walkMin": 42.8,
+      "finish": 1028,
+      "sat": {
+       "지민": 20.6,
+       "서연": 75.8
+      },
+      "solveMs": 103,
+      "checklist": {
+       "지민": [
+        {
+         "label": "전시",
+         "weight": 1.0,
+         "quote": "전시는 꼭 보고 싶어",
+         "fulfilled": 0.0
+        },
+        {
+         "label": "골목 2곳",
+         "weight": 0.7,
+         "quote": "골목도 여기저기 구경하고 싶어",
+         "fulfilled": 0.5
+        }
+       ],
+       "서연": [
+        {
+         "label": "덜 걷기",
+         "weight": 1.0,
+         "quote": "나 오늘 많이 못 걸어",
+         "fulfilled": 0.25
+        },
+        {
+         "label": "카페에서 쉬기",
+         "weight": 0.7,
+         "quote": "카페에서 좀 쉬고 싶어",
+         "fulfilled": 1.0
+        },
+        {
+         "label": "느긋하게",
+         "weight": 0.7,
+         "quote": "좀 쉬고 싶어",
+         "fulfilled": 1.0
+        },
+        {
+         "label": "소품샵",
+         "weight": 0.7,
+         "quote": "소품샵은 좋아",
+         "fulfilled": 1.0
+        }
+       ]
+      }
+     }
+    }
+   },
+   {
+    "id": "category_min:cafe",
+    "label": "서연의 '카페 1곳'을 양보",
+    "owner": "서연",
+    "kind": "category_min",
+    "changes": [
+     {
+      "kind": "category_min",
+      "key": "cafe",
+      "from": 1,
+      "to": 0
+     }
+    ],
+    "plan": {
+     "id": "w",
+     "label": "양보 후",
+     "stops": [
+      {
+       "id": "exh_dmuseum",
+       "name": "디뮤지엄 기획전",
+       "cat": "exhibit",
+       "catKo": "전시",
+       "arrive": 800,
+       "start": 800,
+       "end": 890,
+       "wait": 0,
+       "walkM": 1417,
+       "walkMin": 20.2,
+       "source": "tmap",
+       "availability": "n/a",
+       "price": 15000,
+       "url": null,
+       "mrt": null,
+       "fixed": false,
+       "crowd": null,
+       "tags": [],
+       "quality": 0.875,
+       "q": {
+        "uniqueness": 1.0,
+        "reputation": 0.75,
+        "timing": 0.83
+       }
+      },
+      {
+       "id": "mrt_3828508_1500",
+       "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+       "cat": "activity",
+       "catKo": "체험",
+       "arrive": 899,
+       "start": 900,
+       "end": 1020,
+       "wait": 1,
+       "walkM": 613,
+       "walkMin": 8.8,
+       "source": "mrt",
+       "availability": "confirmed",
+       "price": 35000,
+       "url": "https://experiences.myrealtrip.com/products/3828508",
+       "mrt": {
+        "gid": "3828508",
+        "url": "https://experiences.myrealtrip.com/products/3828508",
+        "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+        "rating": 5.0,
+        "reviews": 16,
+        "price": 35000,
+        "durationMin": 120,
+        "durationSource": "default",
+        "meetingText": "서울숲 방문자센터 앞(오소정원)",
+        "lat": 37.5437,
+        "lng": 127.0397,
+        "coordSource": "approx:서울숲 방문자센터",
+        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+        "locationEvidence": "제목/집결지 지명: 서울숲",
+        "options": null,
+        "isReal": true,
+        "start": "15:00",
+        "available": true,
+        "priceSource": "option",
+        "priceKnown": true
+       },
+       "fixed": true,
+       "crowd": null,
+       "tags": [],
+       "quality": 0.958,
+       "q": {
+        "uniqueness": 1.0,
+        "reputation": 0.86,
+        "timing": 1.0
+       }
+      },
+      {
+       "id": "shop_understand",
+       "name": "언더스탠드에비뉴 소품샵",
+       "cat": "shop",
+       "catKo": "소품샵",
+       "arrive": 1024,
+       "start": 1024,
+       "end": 1064,
+       "wait": 0,
+       "walkM": 278,
+       "walkMin": 4.0,
+       "source": "tmap",
+       "availability": "n/a",
+       "price": 0,
+       "url": null,
+       "mrt": null,
+       "fixed": false,
+       "crowd": null,
+       "tags": [],
+       "quality": 0.875,
+       "q": {
+        "uniqueness": 1.0,
+        "reputation": 0.75,
+        "timing": 0.83
+       }
+      }
+     ],
+     "walkM": 2596,
+     "walkMin": 37.1,
+     "finish": 1068,
+     "sat": {
+      "지민": 58.8,
+      "서연": 59.7
+     },
+     "solveMs": 95,
+     "checklist": {
+      "지민": [
+       {
+        "label": "전시",
+        "weight": 1.0,
+        "quote": "전시는 꼭 보고 싶어",
+        "fulfilled": 1.0
+       },
+       {
+        "label": "골목 2곳",
+        "weight": 0.7,
+        "quote": "골목도 여기저기 구경하고 싶어",
+        "fulfilled": 0.0
+       }
+      ],
+      "서연": [
+       {
+        "label": "덜 걷기",
+        "weight": 1.0,
+        "quote": "나 오늘 많이 못 걸어",
+        "fulfilled": 0.45
+       },
+       {
+        "label": "카페에서 쉬기",
+        "weight": 0.7,
+        "quote": "카페에서 좀 쉬고 싶어",
+        "fulfilled": 0.0
+       },
+       {
+        "label": "느긋하게",
+        "weight": 0.7,
+        "quote": "좀 쉬고 싶어",
+        "fulfilled": 1.0
+       },
+       {
+        "label": "소품샵",
+        "weight": 0.7,
+        "quote": "소품샵은 좋아",
+        "fulfilled": 1.0
+       }
+      ]
+     }
+    },
+    "diff": {
+     "added": [
+      "디뮤지엄 기획전",
+      "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+      "언더스탠드에비뉴 소품샵"
+     ],
+     "dropped": [
+      "성수역 소품샵 골목",
+      "어니언 성수",
+      "연무장길 골목 산책",
+      "대림창고 전시"
+     ],
+     "walk_m_delta": 394,
+     "cafe_rest_min_delta": -50,
+     "finish_delta_min": 77,
+     "satisfaction_delta": {
+      "지민": -20.6,
+      "서연": -23.4
+     }
+    },
+    "replan": {
+     "now": 785,
+     "crowded": "exh_dmuseum",
+     "reason": "디뮤지엄 기획전 지금 붐빔(샘플)",
+     "done": [],
+     "keep": "mrt_3828508_1500",
+     "plan": {
+      "id": "r",
+      "label": "재계산",
+      "stops": [
+       {
+        "id": "exh_daelim",
+        "name": "대림창고 전시",
+        "cat": "exhibit",
+        "catKo": "전시",
+        "arrive": 791,
+        "start": 791,
+        "end": 851,
+        "wait": 0,
+        "walkM": 415,
+        "walkMin": 5.9,
+        "source": "tmap",
+        "availability": "n/a",
+        "price": 0,
+        "url": null,
+        "mrt": null,
+        "fixed": false,
+        "crowd": "보통",
+        "tags": [],
+        "quality": 0.875,
+        "q": {
+         "uniqueness": 1.0,
+         "reputation": 0.75,
+         "timing": 0.83
+        }
+       },
+       {
+        "id": "mrt_3828508_1500",
+        "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+        "cat": "activity",
+        "catKo": "체험",
+        "arrive": 879,
+        "start": 900,
+        "end": 1020,
+        "wait": 21,
+        "walkM": 1945,
+        "walkMin": 27.8,
+        "source": "mrt",
+        "availability": "confirmed",
+        "price": 35000,
+        "url": "https://experiences.myrealtrip.com/products/3828508",
+        "mrt": {
+         "gid": "3828508",
+         "url": "https://experiences.myrealtrip.com/products/3828508",
+         "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+         "rating": 5.0,
+         "reviews": 16,
+         "price": 35000,
+         "durationMin": 120,
+         "durationSource": "default",
+         "meetingText": "서울숲 방문자센터 앞(오소정원)",
+         "lat": 37.5437,
+         "lng": 127.0397,
+         "coordSource": "approx:서울숲 방문자센터",
+         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+         "locationEvidence": "제목/집결지 지명: 서울숲",
+         "options": null,
+         "isReal": true,
+         "start": "15:00",
+         "available": true,
+         "priceSource": "option",
+         "priceKnown": true
+        },
+        "fixed": true,
+        "crowd": null,
+        "tags": [],
+        "quality": 0.958,
+        "q": {
+         "uniqueness": 1.0,
+         "reputation": 0.86,
+         "timing": 1.0
+        }
+       },
+       {
+        "id": "shop_understand",
+        "name": "언더스탠드에비뉴 소품샵",
+        "cat": "shop",
+        "catKo": "소품샵",
+        "arrive": 1024,
+        "start": 1024,
+        "end": 1064,
+        "wait": 0,
+        "walkM": 278,
+        "walkMin": 4.0,
+        "source": "tmap",
+        "availability": "n/a",
+        "price": 0,
+        "url": null,
+        "mrt": null,
+        "fixed": false,
+        "crowd": null,
+        "tags": [],
+        "quality": 0.875,
+        "q": {
+         "uniqueness": 1.0,
+         "reputation": 0.75,
+         "timing": 0.83
+        }
+       }
+      ],
+      "walkM": 2927,
+      "walkMin": 41.8,
+      "finish": 1068,
+      "sat": {
+       "지민": 58.8,
+       "서연": 54.5
+      },
+      "solveMs": 71,
+      "checklist": {
+       "지민": [
+        {
+         "label": "전시",
+         "weight": 1.0,
+         "quote": "전시는 꼭 보고 싶어",
+         "fulfilled": 1.0
+        },
+        {
+         "label": "골목 2곳",
+         "weight": 0.7,
+         "quote": "골목도 여기저기 구경하고 싶어",
+         "fulfilled": 0.0
+        }
+       ],
+       "서연": [
+        {
+         "label": "덜 걷기",
+         "weight": 1.0,
+         "quote": "나 오늘 많이 못 걸어",
+         "fulfilled": 0.29
+        },
+        {
+         "label": "카페에서 쉬기",
+         "weight": 0.7,
+         "quote": "카페에서 좀 쉬고 싶어",
+         "fulfilled": 0.0
+        },
+        {
+         "label": "느긋하게",
+         "weight": 0.7,
+         "quote": "좀 쉬고 싶어",
+         "fulfilled": 1.0
+        },
+        {
+         "label": "소품샵",
+         "weight": 0.7,
+         "quote": "소품샵은 좋아",
+         "fulfilled": 1.0
+        }
+       ]
+      }
+     }
+    }
+   }
+  ],
+  "reason": "INFEASIBLE",
+  "chosen": {
+   "relaxationId": "category_min:cafe",
    "plan": {
-    "id": "w14",
-    "label": "+mrt_leather_1400",
+    "id": "w",
+    "label": "양보 후",
     "stops": [
      {
-      "id": "alley_shoe",
-      "name": "성수 수제화거리",
-      "cat": "alley",
-      "catKo": "골목",
-      "arrive": 784,
-      "start": 784,
-      "end": 814,
+      "id": "exh_dmuseum",
+      "name": "디뮤지엄 기획전",
+      "cat": "exhibit",
+      "catKo": "전시",
+      "arrive": 800,
+      "start": 800,
+      "end": 890,
       "wait": 0,
-      "walkM": 309,
-      "walkMin": 4.4,
+      "walkM": 1417,
+      "walkMin": 20.2,
       "source": "tmap",
       "availability": "n/a",
-      "price": 0,
+      "price": 15000,
+      "url": null,
+      "mrt": null,
       "fixed": false,
       "crowd": null,
-      "tags": [
-       "heritage"
-      ],
-      "quality": 0.925,
+      "tags": [],
+      "quality": 0.875,
       "q": {
        "uniqueness": 1.0,
        "reputation": 0.75,
-       "timing": 1.0
+       "timing": 0.83
       }
      },
      {
-      "id": "mrt_leather_1400",
-      "name": "가죽공방 원데이클래스 14:00",
+      "id": "mrt_3828508_1500",
+      "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
       "cat": "activity",
       "catKo": "체험",
-      "arrive": 818,
-      "start": 840,
-      "end": 960,
-      "wait": 22,
-      "walkM": 224,
-      "walkMin": 3.2,
+      "arrive": 899,
+      "start": 900,
+      "end": 1020,
+      "wait": 1,
+      "walkM": 613,
+      "walkMin": 8.8,
       "source": "mrt",
       "availability": "confirmed",
-      "price": 55000,
+      "price": 35000,
+      "url": "https://experiences.myrealtrip.com/products/3828508",
+      "mrt": {
+       "gid": "3828508",
+       "url": "https://experiences.myrealtrip.com/products/3828508",
+       "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+       "rating": 5.0,
+       "reviews": 16,
+       "price": 35000,
+       "durationMin": 120,
+       "durationSource": "default",
+       "meetingText": "서울숲 방문자센터 앞(오소정원)",
+       "lat": 37.5437,
+       "lng": 127.0397,
+       "coordSource": "approx:서울숲 방문자센터",
+       "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+       "locationEvidence": "제목/집결지 지명: 서울숲",
+       "options": null,
+       "isReal": true,
+       "start": "15:00",
+       "available": true,
+       "priceSource": "option",
+       "priceKnown": true
+      },
       "fixed": true,
       "crowd": null,
       "tags": [],
-      "quality": 0.964,
+      "quality": 0.958,
       "q": {
        "uniqueness": 1.0,
-       "reputation": 0.88,
+       "reputation": 0.86,
        "timing": 1.0
       }
      },
      {
-      "id": "cafe_onion",
-      "name": "어니언 성수",
-      "cat": "cafe",
-      "catKo": "카페",
-      "arrive": 966,
-      "start": 966,
-      "end": 1016,
+      "id": "shop_understand",
+      "name": "언더스탠드에비뉴 소품샵",
+      "cat": "shop",
+      "catKo": "소품샵",
+      "arrive": 1024,
+      "start": 1024,
+      "end": 1064,
       "wait": 0,
-      "walkM": 414,
-      "walkMin": 5.9,
+      "walkM": 278,
+      "walkMin": 4.0,
       "source": "tmap",
       "availability": "n/a",
       "price": 0,
+      "url": null,
+      "mrt": null,
       "fixed": false,
-      "crowd": "붐빔",
-      "tags": [],
-      "quality": 0.625,
-      "q": {
-       "uniqueness": 0.5,
-       "reputation": 0.75,
-       "timing": 0.67
-      }
-     },
-     {
-      "id": "exh_daelim",
-      "name": "대림창고 전시",
-      "cat": "exhibit",
-      "catKo": "전시",
-      "arrive": 1023,
-      "start": 1023,
-      "end": 1083,
-      "wait": 0,
-      "walkM": 467,
-      "walkMin": 6.7,
-      "source": "tmap",
-      "availability": "n/a",
-      "price": 0,
-      "fixed": false,
-      "crowd": "보통",
+      "crowd": null,
       "tags": [],
       "quality": 0.875,
       "q": {
@@ -1243,14 +2263,14 @@ window.DEMO = {
       }
      }
     ],
-    "walkM": 2803,
-    "walkMin": 40.0,
-    "finish": 1102,
+    "walkM": 2596,
+    "walkMin": 37.1,
+    "finish": 1068,
     "sat": {
-     "지민": 79.4,
-     "서연": 73.4
+     "지민": 58.8,
+     "서연": 59.7
     },
-    "solveMs": null,
+    "solveMs": 95,
     "checklist": {
      "지민": [
       {
@@ -1263,7 +2283,7 @@ window.DEMO = {
        "label": "골목 2곳",
        "weight": 0.7,
        "quote": "골목도 여기저기 구경하고 싶어",
-       "fulfilled": 0.5
+       "fulfilled": 0.0
       }
      ],
      "서연": [
@@ -1271,19 +2291,19 @@ window.DEMO = {
        "label": "덜 걷기",
        "weight": 1.0,
        "quote": "나 오늘 많이 못 걸어",
-       "fulfilled": 0.35
+       "fulfilled": 0.45
       },
       {
        "label": "카페에서 쉬기",
        "weight": 0.7,
        "quote": "카페에서 좀 쉬고 싶어",
-       "fulfilled": 1.0
+       "fulfilled": 0.0
       },
       {
        "label": "느긋하게",
        "weight": 0.7,
        "quote": "좀 쉬고 싶어",
-       "fulfilled": 0.75
+       "fulfilled": 1.0
       },
       {
        "label": "소품샵",
@@ -1296,71 +2316,1271 @@ window.DEMO = {
    },
    "diff": {
     "added": [
-     "성수 수제화거리",
-     "가죽공방 원데이클래스 14:00"
+     "디뮤지엄 기획전",
+     "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+     "언더스탠드에비뉴 소품샵"
     ],
     "dropped": [
      "성수역 소품샵 골목",
-     "연무장길 골목 산책"
+     "어니언 성수",
+     "연무장길 골목 산책",
+     "대림창고 전시"
     ],
-    "walk_m_delta": 601,
-    "cafe_rest_min_delta": 0,
-    "finish_delta_min": 111,
+    "walk_m_delta": 394,
+    "cafe_rest_min_delta": -50,
+    "finish_delta_min": 77,
     "satisfaction_delta": {
-     "지민": 0.0,
-     "서연": -9.7
+     "지민": -20.6,
+     "서연": -23.4
+    }
+   },
+   "replan": {
+    "now": 785,
+    "crowded": "exh_dmuseum",
+    "reason": "디뮤지엄 기획전 지금 붐빔(샘플)",
+    "done": [],
+    "keep": "mrt_3828508_1500",
+    "plan": {
+     "id": "r",
+     "label": "재계산",
+     "stops": [
+      {
+       "id": "exh_daelim",
+       "name": "대림창고 전시",
+       "cat": "exhibit",
+       "catKo": "전시",
+       "arrive": 791,
+       "start": 791,
+       "end": 851,
+       "wait": 0,
+       "walkM": 415,
+       "walkMin": 5.9,
+       "source": "tmap",
+       "availability": "n/a",
+       "price": 0,
+       "url": null,
+       "mrt": null,
+       "fixed": false,
+       "crowd": "보통",
+       "tags": [],
+       "quality": 0.875,
+       "q": {
+        "uniqueness": 1.0,
+        "reputation": 0.75,
+        "timing": 0.83
+       }
+      },
+      {
+       "id": "mrt_3828508_1500",
+       "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+       "cat": "activity",
+       "catKo": "체험",
+       "arrive": 879,
+       "start": 900,
+       "end": 1020,
+       "wait": 21,
+       "walkM": 1945,
+       "walkMin": 27.8,
+       "source": "mrt",
+       "availability": "confirmed",
+       "price": 35000,
+       "url": "https://experiences.myrealtrip.com/products/3828508",
+       "mrt": {
+        "gid": "3828508",
+        "url": "https://experiences.myrealtrip.com/products/3828508",
+        "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+        "rating": 5.0,
+        "reviews": 16,
+        "price": 35000,
+        "durationMin": 120,
+        "durationSource": "default",
+        "meetingText": "서울숲 방문자센터 앞(오소정원)",
+        "lat": 37.5437,
+        "lng": 127.0397,
+        "coordSource": "approx:서울숲 방문자센터",
+        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+        "locationEvidence": "제목/집결지 지명: 서울숲",
+        "options": null,
+        "isReal": true,
+        "start": "15:00",
+        "available": true,
+        "priceSource": "option",
+        "priceKnown": true
+       },
+       "fixed": true,
+       "crowd": null,
+       "tags": [],
+       "quality": 0.958,
+       "q": {
+        "uniqueness": 1.0,
+        "reputation": 0.86,
+        "timing": 1.0
+       }
+      },
+      {
+       "id": "shop_understand",
+       "name": "언더스탠드에비뉴 소품샵",
+       "cat": "shop",
+       "catKo": "소품샵",
+       "arrive": 1024,
+       "start": 1024,
+       "end": 1064,
+       "wait": 0,
+       "walkM": 278,
+       "walkMin": 4.0,
+       "source": "tmap",
+       "availability": "n/a",
+       "price": 0,
+       "url": null,
+       "mrt": null,
+       "fixed": false,
+       "crowd": null,
+       "tags": [],
+       "quality": 0.875,
+       "q": {
+        "uniqueness": 1.0,
+        "reputation": 0.75,
+        "timing": 0.83
+       }
+      }
+     ],
+     "walkM": 2927,
+     "walkMin": 41.8,
+     "finish": 1068,
+     "sat": {
+      "지민": 58.8,
+      "서연": 54.5
+     },
+     "solveMs": 71,
+     "checklist": {
+      "지민": [
+       {
+        "label": "전시",
+        "weight": 1.0,
+        "quote": "전시는 꼭 보고 싶어",
+        "fulfilled": 1.0
+       },
+       {
+        "label": "골목 2곳",
+        "weight": 0.7,
+        "quote": "골목도 여기저기 구경하고 싶어",
+        "fulfilled": 0.0
+       }
+      ],
+      "서연": [
+       {
+        "label": "덜 걷기",
+        "weight": 1.0,
+        "quote": "나 오늘 많이 못 걸어",
+        "fulfilled": 0.29
+       },
+       {
+        "label": "카페에서 쉬기",
+        "weight": 0.7,
+        "quote": "카페에서 좀 쉬고 싶어",
+        "fulfilled": 0.0
+       },
+       {
+        "label": "느긋하게",
+        "weight": 0.7,
+        "quote": "좀 쉬고 싶어",
+        "fulfilled": 1.0
+       },
+       {
+        "label": "소품샵",
+        "weight": 0.7,
+        "quote": "소품샵은 좋아",
+        "fulfilled": 1.0
+       }
+      ]
+     }
     }
    }
-  }
+  },
+  "choices": [
+   {
+    "pick": "mrt_3828508_1500",
+    "product": "mrt_3828508",
+    "infeasible": true,
+    "relaxations": [
+     {
+      "id": "category_min:exhibit",
+      "label": "지민의 '전시 1곳'을 양보",
+      "owner": "지민",
+      "kind": "category_min",
+      "changes": [
+       {
+        "kind": "category_min",
+        "key": "exhibit",
+        "from": 1,
+        "to": 0
+       }
+      ],
+      "plan": {
+       "id": "w",
+       "label": "양보 후",
+       "stops": [
+        {
+         "id": "alley_shoe",
+         "name": "성수 수제화거리",
+         "cat": "alley",
+         "catKo": "골목",
+         "arrive": 784,
+         "start": 784,
+         "end": 814,
+         "wait": 0,
+         "walkM": 309,
+         "walkMin": 4.4,
+         "source": "tmap",
+         "availability": "n/a",
+         "price": 0,
+         "url": null,
+         "mrt": null,
+         "fixed": false,
+         "crowd": null,
+         "tags": [
+          "heritage"
+         ],
+         "quality": 0.925,
+         "q": {
+          "uniqueness": 1.0,
+          "reputation": 0.75,
+          "timing": 1.0
+         }
+        },
+        {
+         "id": "cafe_bluebottle",
+         "name": "블루보틀 성수",
+         "cat": "cafe",
+         "catKo": "카페",
+         "arrive": 829,
+         "start": 829,
+         "end": 879,
+         "wait": 0,
+         "walkM": 993,
+         "walkMin": 14.2,
+         "source": "tmap",
+         "availability": "n/a",
+         "price": 0,
+         "url": null,
+         "mrt": null,
+         "fixed": false,
+         "crowd": "여유",
+         "tags": [],
+         "quality": 0.475,
+         "q": {
+          "uniqueness": 0.0,
+          "reputation": 0.75,
+          "timing": 0.83
+         }
+        },
+        {
+         "id": "mrt_3828508_1500",
+         "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+         "cat": "activity",
+         "catKo": "체험",
+         "arrive": 892,
+         "start": 900,
+         "end": 1020,
+         "wait": 8,
+         "walkM": 957,
+         "walkMin": 13.7,
+         "source": "mrt",
+         "availability": "confirmed",
+         "price": 35000,
+         "url": "https://experiences.myrealtrip.com/products/3828508",
+         "mrt": {
+          "gid": "3828508",
+          "url": "https://experiences.myrealtrip.com/products/3828508",
+          "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+          "rating": 5.0,
+          "reviews": 16,
+          "price": 35000,
+          "durationMin": 120,
+          "durationSource": "default",
+          "meetingText": "서울숲 방문자센터 앞(오소정원)",
+          "lat": 37.5437,
+          "lng": 127.0397,
+          "coordSource": "approx:서울숲 방문자센터",
+          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+          "locationEvidence": "제목/집결지 지명: 서울숲",
+          "options": null,
+          "isReal": true,
+          "start": "15:00",
+          "available": true,
+          "priceSource": "option",
+          "priceKnown": true
+         },
+         "fixed": true,
+         "crowd": null,
+         "tags": [],
+         "quality": 0.958,
+         "q": {
+          "uniqueness": 1.0,
+          "reputation": 0.86,
+          "timing": 1.0
+         }
+        }
+       ],
+       "walkM": 2821,
+       "walkMin": 40.3,
+       "finish": 1028,
+       "sat": {
+        "지민": 20.6,
+        "서연": 78.7
+       },
+       "solveMs": 480,
+       "checklist": {
+        "지민": [
+         {
+          "label": "전시",
+          "weight": 1.0,
+          "quote": "전시는 꼭 보고 싶어",
+          "fulfilled": 0.0
+         },
+         {
+          "label": "골목 2곳",
+          "weight": 0.7,
+          "quote": "골목도 여기저기 구경하고 싶어",
+          "fulfilled": 0.5
+         }
+        ],
+        "서연": [
+         {
+          "label": "덜 걷기",
+          "weight": 1.0,
+          "quote": "나 오늘 많이 못 걸어",
+          "fulfilled": 0.34
+         },
+         {
+          "label": "카페에서 쉬기",
+          "weight": 0.7,
+          "quote": "카페에서 좀 쉬고 싶어",
+          "fulfilled": 1.0
+         },
+         {
+          "label": "느긋하게",
+          "weight": 0.7,
+          "quote": "좀 쉬고 싶어",
+          "fulfilled": 1.0
+         },
+         {
+          "label": "소품샵",
+          "weight": 0.7,
+          "quote": "소품샵은 좋아",
+          "fulfilled": 1.0
+         }
+        ]
+       }
+      },
+      "diff": {
+       "added": [
+        "성수 수제화거리",
+        "블루보틀 성수",
+        "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00"
+       ],
+       "dropped": [
+        "성수역 소품샵 골목",
+        "어니언 성수",
+        "연무장길 골목 산책",
+        "대림창고 전시"
+       ],
+       "walk_m_delta": 619,
+       "cafe_rest_min_delta": 0,
+       "finish_delta_min": 37,
+       "satisfaction_delta": {
+        "지민": -58.8,
+        "서연": -4.4
+       }
+      },
+      "replan": {
+       "now": 785,
+       "crowded": "cafe_bluebottle",
+       "reason": "블루보틀 성수 지금 붐빔(샘플)",
+       "done": [],
+       "keep": "mrt_3828508_1500",
+       "plan": {
+        "id": "r",
+        "label": "재계산",
+        "stops": [
+         {
+          "id": "cafe_onion",
+          "name": "어니언 성수",
+          "cat": "cafe",
+          "catKo": "카페",
+          "arrive": 789,
+          "start": 789,
+          "end": 839,
+          "wait": 0,
+          "walkM": 298,
+          "walkMin": 4.3,
+          "source": "tmap",
+          "availability": "n/a",
+          "price": 0,
+          "url": null,
+          "mrt": null,
+          "fixed": false,
+          "crowd": "붐빔",
+          "tags": [],
+          "quality": 0.625,
+          "q": {
+           "uniqueness": 0.5,
+           "reputation": 0.75,
+           "timing": 0.67
+          }
+         },
+         {
+          "id": "alley_shoe",
+          "name": "성수 수제화거리",
+          "cat": "alley",
+          "catKo": "골목",
+          "arrive": 848,
+          "start": 848,
+          "end": 878,
+          "wait": 0,
+          "walkM": 608,
+          "walkMin": 8.7,
+          "source": "tmap",
+          "availability": "n/a",
+          "price": 0,
+          "url": null,
+          "mrt": null,
+          "fixed": false,
+          "crowd": null,
+          "tags": [
+           "heritage"
+          ],
+          "quality": 0.925,
+          "q": {
+           "uniqueness": 1.0,
+           "reputation": 0.75,
+           "timing": 1.0
+          }
+         },
+         {
+          "id": "mrt_3828508_1500",
+          "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+          "cat": "activity",
+          "catKo": "체험",
+          "arrive": 900,
+          "start": 900,
+          "end": 1020,
+          "wait": 0,
+          "walkM": 1530,
+          "walkMin": 21.9,
+          "source": "mrt",
+          "availability": "confirmed",
+          "price": 35000,
+          "url": "https://experiences.myrealtrip.com/products/3828508",
+          "mrt": {
+           "gid": "3828508",
+           "url": "https://experiences.myrealtrip.com/products/3828508",
+           "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+           "rating": 5.0,
+           "reviews": 16,
+           "price": 35000,
+           "durationMin": 120,
+           "durationSource": "default",
+           "meetingText": "서울숲 방문자센터 앞(오소정원)",
+           "lat": 37.5437,
+           "lng": 127.0397,
+           "coordSource": "approx:서울숲 방문자센터",
+           "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+           "locationEvidence": "제목/집결지 지명: 서울숲",
+           "options": null,
+           "isReal": true,
+           "start": "15:00",
+           "available": true,
+           "priceSource": "option",
+           "priceKnown": true
+          },
+          "fixed": true,
+          "crowd": null,
+          "tags": [],
+          "quality": 0.958,
+          "q": {
+           "uniqueness": 1.0,
+           "reputation": 0.86,
+           "timing": 1.0
+          }
+         }
+        ],
+        "walkM": 2998,
+        "walkMin": 42.8,
+        "finish": 1028,
+        "sat": {
+         "지민": 20.6,
+         "서연": 75.8
+        },
+        "solveMs": 103,
+        "checklist": {
+         "지민": [
+          {
+           "label": "전시",
+           "weight": 1.0,
+           "quote": "전시는 꼭 보고 싶어",
+           "fulfilled": 0.0
+          },
+          {
+           "label": "골목 2곳",
+           "weight": 0.7,
+           "quote": "골목도 여기저기 구경하고 싶어",
+           "fulfilled": 0.5
+          }
+         ],
+         "서연": [
+          {
+           "label": "덜 걷기",
+           "weight": 1.0,
+           "quote": "나 오늘 많이 못 걸어",
+           "fulfilled": 0.25
+          },
+          {
+           "label": "카페에서 쉬기",
+           "weight": 0.7,
+           "quote": "카페에서 좀 쉬고 싶어",
+           "fulfilled": 1.0
+          },
+          {
+           "label": "느긋하게",
+           "weight": 0.7,
+           "quote": "좀 쉬고 싶어",
+           "fulfilled": 1.0
+          },
+          {
+           "label": "소품샵",
+           "weight": 0.7,
+           "quote": "소품샵은 좋아",
+           "fulfilled": 1.0
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "id": "category_min:cafe",
+      "label": "서연의 '카페 1곳'을 양보",
+      "owner": "서연",
+      "kind": "category_min",
+      "changes": [
+       {
+        "kind": "category_min",
+        "key": "cafe",
+        "from": 1,
+        "to": 0
+       }
+      ],
+      "plan": {
+       "id": "w",
+       "label": "양보 후",
+       "stops": [
+        {
+         "id": "exh_dmuseum",
+         "name": "디뮤지엄 기획전",
+         "cat": "exhibit",
+         "catKo": "전시",
+         "arrive": 800,
+         "start": 800,
+         "end": 890,
+         "wait": 0,
+         "walkM": 1417,
+         "walkMin": 20.2,
+         "source": "tmap",
+         "availability": "n/a",
+         "price": 15000,
+         "url": null,
+         "mrt": null,
+         "fixed": false,
+         "crowd": null,
+         "tags": [],
+         "quality": 0.875,
+         "q": {
+          "uniqueness": 1.0,
+          "reputation": 0.75,
+          "timing": 0.83
+         }
+        },
+        {
+         "id": "mrt_3828508_1500",
+         "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+         "cat": "activity",
+         "catKo": "체험",
+         "arrive": 899,
+         "start": 900,
+         "end": 1020,
+         "wait": 1,
+         "walkM": 613,
+         "walkMin": 8.8,
+         "source": "mrt",
+         "availability": "confirmed",
+         "price": 35000,
+         "url": "https://experiences.myrealtrip.com/products/3828508",
+         "mrt": {
+          "gid": "3828508",
+          "url": "https://experiences.myrealtrip.com/products/3828508",
+          "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+          "rating": 5.0,
+          "reviews": 16,
+          "price": 35000,
+          "durationMin": 120,
+          "durationSource": "default",
+          "meetingText": "서울숲 방문자센터 앞(오소정원)",
+          "lat": 37.5437,
+          "lng": 127.0397,
+          "coordSource": "approx:서울숲 방문자센터",
+          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+          "locationEvidence": "제목/집결지 지명: 서울숲",
+          "options": null,
+          "isReal": true,
+          "start": "15:00",
+          "available": true,
+          "priceSource": "option",
+          "priceKnown": true
+         },
+         "fixed": true,
+         "crowd": null,
+         "tags": [],
+         "quality": 0.958,
+         "q": {
+          "uniqueness": 1.0,
+          "reputation": 0.86,
+          "timing": 1.0
+         }
+        },
+        {
+         "id": "shop_understand",
+         "name": "언더스탠드에비뉴 소품샵",
+         "cat": "shop",
+         "catKo": "소품샵",
+         "arrive": 1024,
+         "start": 1024,
+         "end": 1064,
+         "wait": 0,
+         "walkM": 278,
+         "walkMin": 4.0,
+         "source": "tmap",
+         "availability": "n/a",
+         "price": 0,
+         "url": null,
+         "mrt": null,
+         "fixed": false,
+         "crowd": null,
+         "tags": [],
+         "quality": 0.875,
+         "q": {
+          "uniqueness": 1.0,
+          "reputation": 0.75,
+          "timing": 0.83
+         }
+        }
+       ],
+       "walkM": 2596,
+       "walkMin": 37.1,
+       "finish": 1068,
+       "sat": {
+        "지민": 58.8,
+        "서연": 59.7
+       },
+       "solveMs": 95,
+       "checklist": {
+        "지민": [
+         {
+          "label": "전시",
+          "weight": 1.0,
+          "quote": "전시는 꼭 보고 싶어",
+          "fulfilled": 1.0
+         },
+         {
+          "label": "골목 2곳",
+          "weight": 0.7,
+          "quote": "골목도 여기저기 구경하고 싶어",
+          "fulfilled": 0.0
+         }
+        ],
+        "서연": [
+         {
+          "label": "덜 걷기",
+          "weight": 1.0,
+          "quote": "나 오늘 많이 못 걸어",
+          "fulfilled": 0.45
+         },
+         {
+          "label": "카페에서 쉬기",
+          "weight": 0.7,
+          "quote": "카페에서 좀 쉬고 싶어",
+          "fulfilled": 0.0
+         },
+         {
+          "label": "느긋하게",
+          "weight": 0.7,
+          "quote": "좀 쉬고 싶어",
+          "fulfilled": 1.0
+         },
+         {
+          "label": "소품샵",
+          "weight": 0.7,
+          "quote": "소품샵은 좋아",
+          "fulfilled": 1.0
+         }
+        ]
+       }
+      },
+      "diff": {
+       "added": [
+        "디뮤지엄 기획전",
+        "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+        "언더스탠드에비뉴 소품샵"
+       ],
+       "dropped": [
+        "성수역 소품샵 골목",
+        "어니언 성수",
+        "연무장길 골목 산책",
+        "대림창고 전시"
+       ],
+       "walk_m_delta": 394,
+       "cafe_rest_min_delta": -50,
+       "finish_delta_min": 77,
+       "satisfaction_delta": {
+        "지민": -20.6,
+        "서연": -23.4
+       }
+      },
+      "replan": {
+       "now": 785,
+       "crowded": "exh_dmuseum",
+       "reason": "디뮤지엄 기획전 지금 붐빔(샘플)",
+       "done": [],
+       "keep": "mrt_3828508_1500",
+       "plan": {
+        "id": "r",
+        "label": "재계산",
+        "stops": [
+         {
+          "id": "exh_daelim",
+          "name": "대림창고 전시",
+          "cat": "exhibit",
+          "catKo": "전시",
+          "arrive": 791,
+          "start": 791,
+          "end": 851,
+          "wait": 0,
+          "walkM": 415,
+          "walkMin": 5.9,
+          "source": "tmap",
+          "availability": "n/a",
+          "price": 0,
+          "url": null,
+          "mrt": null,
+          "fixed": false,
+          "crowd": "보통",
+          "tags": [],
+          "quality": 0.875,
+          "q": {
+           "uniqueness": 1.0,
+           "reputation": 0.75,
+           "timing": 0.83
+          }
+         },
+         {
+          "id": "mrt_3828508_1500",
+          "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+          "cat": "activity",
+          "catKo": "체험",
+          "arrive": 879,
+          "start": 900,
+          "end": 1020,
+          "wait": 21,
+          "walkM": 1945,
+          "walkMin": 27.8,
+          "source": "mrt",
+          "availability": "confirmed",
+          "price": 35000,
+          "url": "https://experiences.myrealtrip.com/products/3828508",
+          "mrt": {
+           "gid": "3828508",
+           "url": "https://experiences.myrealtrip.com/products/3828508",
+           "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+           "rating": 5.0,
+           "reviews": 16,
+           "price": 35000,
+           "durationMin": 120,
+           "durationSource": "default",
+           "meetingText": "서울숲 방문자센터 앞(오소정원)",
+           "lat": 37.5437,
+           "lng": 127.0397,
+           "coordSource": "approx:서울숲 방문자센터",
+           "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+           "locationEvidence": "제목/집결지 지명: 서울숲",
+           "options": null,
+           "isReal": true,
+           "start": "15:00",
+           "available": true,
+           "priceSource": "option",
+           "priceKnown": true
+          },
+          "fixed": true,
+          "crowd": null,
+          "tags": [],
+          "quality": 0.958,
+          "q": {
+           "uniqueness": 1.0,
+           "reputation": 0.86,
+           "timing": 1.0
+          }
+         },
+         {
+          "id": "shop_understand",
+          "name": "언더스탠드에비뉴 소품샵",
+          "cat": "shop",
+          "catKo": "소품샵",
+          "arrive": 1024,
+          "start": 1024,
+          "end": 1064,
+          "wait": 0,
+          "walkM": 278,
+          "walkMin": 4.0,
+          "source": "tmap",
+          "availability": "n/a",
+          "price": 0,
+          "url": null,
+          "mrt": null,
+          "fixed": false,
+          "crowd": null,
+          "tags": [],
+          "quality": 0.875,
+          "q": {
+           "uniqueness": 1.0,
+           "reputation": 0.75,
+           "timing": 0.83
+          }
+         }
+        ],
+        "walkM": 2927,
+        "walkMin": 41.8,
+        "finish": 1068,
+        "sat": {
+         "지민": 58.8,
+         "서연": 54.5
+        },
+        "solveMs": 71,
+        "checklist": {
+         "지민": [
+          {
+           "label": "전시",
+           "weight": 1.0,
+           "quote": "전시는 꼭 보고 싶어",
+           "fulfilled": 1.0
+          },
+          {
+           "label": "골목 2곳",
+           "weight": 0.7,
+           "quote": "골목도 여기저기 구경하고 싶어",
+           "fulfilled": 0.0
+          }
+         ],
+         "서연": [
+          {
+           "label": "덜 걷기",
+           "weight": 1.0,
+           "quote": "나 오늘 많이 못 걸어",
+           "fulfilled": 0.29
+          },
+          {
+           "label": "카페에서 쉬기",
+           "weight": 0.7,
+           "quote": "카페에서 좀 쉬고 싶어",
+           "fulfilled": 0.0
+          },
+          {
+           "label": "느긋하게",
+           "weight": 0.7,
+           "quote": "좀 쉬고 싶어",
+           "fulfilled": 1.0
+          },
+          {
+           "label": "소품샵",
+           "weight": 0.7,
+           "quote": "소품샵은 좋아",
+           "fulfilled": 1.0
+          }
+         ]
+        }
+       }
+      }
+     }
+    ],
+    "reason": "INFEASIBLE",
+    "chosen": {
+     "relaxationId": "category_min:cafe",
+     "plan": {
+      "id": "w",
+      "label": "양보 후",
+      "stops": [
+       {
+        "id": "exh_dmuseum",
+        "name": "디뮤지엄 기획전",
+        "cat": "exhibit",
+        "catKo": "전시",
+        "arrive": 800,
+        "start": 800,
+        "end": 890,
+        "wait": 0,
+        "walkM": 1417,
+        "walkMin": 20.2,
+        "source": "tmap",
+        "availability": "n/a",
+        "price": 15000,
+        "url": null,
+        "mrt": null,
+        "fixed": false,
+        "crowd": null,
+        "tags": [],
+        "quality": 0.875,
+        "q": {
+         "uniqueness": 1.0,
+         "reputation": 0.75,
+         "timing": 0.83
+        }
+       },
+       {
+        "id": "mrt_3828508_1500",
+        "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+        "cat": "activity",
+        "catKo": "체험",
+        "arrive": 899,
+        "start": 900,
+        "end": 1020,
+        "wait": 1,
+        "walkM": 613,
+        "walkMin": 8.8,
+        "source": "mrt",
+        "availability": "confirmed",
+        "price": 35000,
+        "url": "https://experiences.myrealtrip.com/products/3828508",
+        "mrt": {
+         "gid": "3828508",
+         "url": "https://experiences.myrealtrip.com/products/3828508",
+         "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+         "rating": 5.0,
+         "reviews": 16,
+         "price": 35000,
+         "durationMin": 120,
+         "durationSource": "default",
+         "meetingText": "서울숲 방문자센터 앞(오소정원)",
+         "lat": 37.5437,
+         "lng": 127.0397,
+         "coordSource": "approx:서울숲 방문자센터",
+         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+         "locationEvidence": "제목/집결지 지명: 서울숲",
+         "options": null,
+         "isReal": true,
+         "start": "15:00",
+         "available": true,
+         "priceSource": "option",
+         "priceKnown": true
+        },
+        "fixed": true,
+        "crowd": null,
+        "tags": [],
+        "quality": 0.958,
+        "q": {
+         "uniqueness": 1.0,
+         "reputation": 0.86,
+         "timing": 1.0
+        }
+       },
+       {
+        "id": "shop_understand",
+        "name": "언더스탠드에비뉴 소품샵",
+        "cat": "shop",
+        "catKo": "소품샵",
+        "arrive": 1024,
+        "start": 1024,
+        "end": 1064,
+        "wait": 0,
+        "walkM": 278,
+        "walkMin": 4.0,
+        "source": "tmap",
+        "availability": "n/a",
+        "price": 0,
+        "url": null,
+        "mrt": null,
+        "fixed": false,
+        "crowd": null,
+        "tags": [],
+        "quality": 0.875,
+        "q": {
+         "uniqueness": 1.0,
+         "reputation": 0.75,
+         "timing": 0.83
+        }
+       }
+      ],
+      "walkM": 2596,
+      "walkMin": 37.1,
+      "finish": 1068,
+      "sat": {
+       "지민": 58.8,
+       "서연": 59.7
+      },
+      "solveMs": 95,
+      "checklist": {
+       "지민": [
+        {
+         "label": "전시",
+         "weight": 1.0,
+         "quote": "전시는 꼭 보고 싶어",
+         "fulfilled": 1.0
+        },
+        {
+         "label": "골목 2곳",
+         "weight": 0.7,
+         "quote": "골목도 여기저기 구경하고 싶어",
+         "fulfilled": 0.0
+        }
+       ],
+       "서연": [
+        {
+         "label": "덜 걷기",
+         "weight": 1.0,
+         "quote": "나 오늘 많이 못 걸어",
+         "fulfilled": 0.45
+        },
+        {
+         "label": "카페에서 쉬기",
+         "weight": 0.7,
+         "quote": "카페에서 좀 쉬고 싶어",
+         "fulfilled": 0.0
+        },
+        {
+         "label": "느긋하게",
+         "weight": 0.7,
+         "quote": "좀 쉬고 싶어",
+         "fulfilled": 1.0
+        },
+        {
+         "label": "소품샵",
+         "weight": 0.7,
+         "quote": "소품샵은 좋아",
+         "fulfilled": 1.0
+        }
+       ]
+      }
+     },
+     "diff": {
+      "added": [
+       "디뮤지엄 기획전",
+       "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+       "언더스탠드에비뉴 소품샵"
+      ],
+      "dropped": [
+       "성수역 소품샵 골목",
+       "어니언 성수",
+       "연무장길 골목 산책",
+       "대림창고 전시"
+      ],
+      "walk_m_delta": 394,
+      "cafe_rest_min_delta": -50,
+      "finish_delta_min": 77,
+      "satisfaction_delta": {
+       "지민": -20.6,
+       "서연": -23.4
+      }
+     },
+     "replan": {
+      "now": 785,
+      "crowded": "exh_dmuseum",
+      "reason": "디뮤지엄 기획전 지금 붐빔(샘플)",
+      "done": [],
+      "keep": "mrt_3828508_1500",
+      "plan": {
+       "id": "r",
+       "label": "재계산",
+       "stops": [
+        {
+         "id": "exh_daelim",
+         "name": "대림창고 전시",
+         "cat": "exhibit",
+         "catKo": "전시",
+         "arrive": 791,
+         "start": 791,
+         "end": 851,
+         "wait": 0,
+         "walkM": 415,
+         "walkMin": 5.9,
+         "source": "tmap",
+         "availability": "n/a",
+         "price": 0,
+         "url": null,
+         "mrt": null,
+         "fixed": false,
+         "crowd": "보통",
+         "tags": [],
+         "quality": 0.875,
+         "q": {
+          "uniqueness": 1.0,
+          "reputation": 0.75,
+          "timing": 0.83
+         }
+        },
+        {
+         "id": "mrt_3828508_1500",
+         "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+         "cat": "activity",
+         "catKo": "체험",
+         "arrive": 879,
+         "start": 900,
+         "end": 1020,
+         "wait": 21,
+         "walkM": 1945,
+         "walkMin": 27.8,
+         "source": "mrt",
+         "availability": "confirmed",
+         "price": 35000,
+         "url": "https://experiences.myrealtrip.com/products/3828508",
+         "mrt": {
+          "gid": "3828508",
+          "url": "https://experiences.myrealtrip.com/products/3828508",
+          "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+          "rating": 5.0,
+          "reviews": 16,
+          "price": 35000,
+          "durationMin": 120,
+          "durationSource": "default",
+          "meetingText": "서울숲 방문자센터 앞(오소정원)",
+          "lat": 37.5437,
+          "lng": 127.0397,
+          "coordSource": "approx:서울숲 방문자센터",
+          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+          "locationEvidence": "제목/집결지 지명: 서울숲",
+          "options": null,
+          "isReal": true,
+          "start": "15:00",
+          "available": true,
+          "priceSource": "option",
+          "priceKnown": true
+         },
+         "fixed": true,
+         "crowd": null,
+         "tags": [],
+         "quality": 0.958,
+         "q": {
+          "uniqueness": 1.0,
+          "reputation": 0.86,
+          "timing": 1.0
+         }
+        },
+        {
+         "id": "shop_understand",
+         "name": "언더스탠드에비뉴 소품샵",
+         "cat": "shop",
+         "catKo": "소품샵",
+         "arrive": 1024,
+         "start": 1024,
+         "end": 1064,
+         "wait": 0,
+         "walkM": 278,
+         "walkMin": 4.0,
+         "source": "tmap",
+         "availability": "n/a",
+         "price": 0,
+         "url": null,
+         "mrt": null,
+         "fixed": false,
+         "crowd": null,
+         "tags": [],
+         "quality": 0.875,
+         "q": {
+          "uniqueness": 1.0,
+          "reputation": 0.75,
+          "timing": 0.83
+         }
+        }
+       ],
+       "walkM": 2927,
+       "walkMin": 41.8,
+       "finish": 1068,
+       "sat": {
+        "지민": 58.8,
+        "서연": 54.5
+       },
+       "solveMs": 71,
+       "checklist": {
+        "지민": [
+         {
+          "label": "전시",
+          "weight": 1.0,
+          "quote": "전시는 꼭 보고 싶어",
+          "fulfilled": 1.0
+         },
+         {
+          "label": "골목 2곳",
+          "weight": 0.7,
+          "quote": "골목도 여기저기 구경하고 싶어",
+          "fulfilled": 0.0
+         }
+        ],
+        "서연": [
+         {
+          "label": "덜 걷기",
+          "weight": 1.0,
+          "quote": "나 오늘 많이 못 걸어",
+          "fulfilled": 0.29
+         },
+         {
+          "label": "카페에서 쉬기",
+          "weight": 0.7,
+          "quote": "카페에서 좀 쉬고 싶어",
+          "fulfilled": 0.0
+         },
+         {
+          "label": "느긋하게",
+          "weight": 0.7,
+          "quote": "좀 쉬고 싶어",
+          "fulfilled": 1.0
+         },
+         {
+          "label": "소품샵",
+          "weight": 0.7,
+          "quote": "소품샵은 좋아",
+          "fulfilled": 1.0
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  ],
+  "alt": null
  },
  "replan": {
   "now": 785,
-  "crowded": "cafe_onion",
-  "reason": "어니언 성수 지금 붐빔 · 웨이팅 약 40분",
+  "crowded": "exh_dmuseum",
+  "reason": "디뮤지엄 기획전 지금 붐빔(샘플)",
   "done": [],
-  "keep": "mrt_leather_1600",
+  "keep": "mrt_3828508_1500",
   "plan": {
    "id": "r",
    "label": "재계산",
    "stops": [
     {
-     "id": "cafe_grandpa",
-     "name": "할아버지공장",
-     "cat": "cafe",
-     "catKo": "카페",
-     "arrive": 792,
-     "start": 792,
-     "end": 842,
-     "wait": 0,
-     "walkM": 464,
-     "walkMin": 6.6,
-     "source": "tmap",
-     "availability": "n/a",
-     "price": 0,
-     "fixed": false,
-     "crowd": "여유",
-     "tags": [],
-     "quality": 0.875,
-     "q": {
-      "uniqueness": 1.0,
-      "reputation": 0.75,
-      "timing": 0.83
-     }
-    },
-    {
      "id": "exh_daelim",
      "name": "대림창고 전시",
      "cat": "exhibit",
      "catKo": "전시",
-     "arrive": 847,
-     "start": 847,
-     "end": 907,
+     "arrive": 791,
+     "start": 791,
+     "end": 851,
      "wait": 0,
-     "walkM": 397,
-     "walkMin": 5.7,
+     "walkM": 415,
+     "walkMin": 5.9,
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": "보통",
      "tags": [],
@@ -1372,64 +3592,87 @@ window.DEMO = {
      }
     },
     {
-     "id": "alley_shoe",
-     "name": "성수 수제화거리",
-     "cat": "alley",
-     "catKo": "골목",
-     "arrive": 915,
-     "start": 915,
-     "end": 945,
-     "wait": 0,
-     "walkM": 570,
-     "walkMin": 8.1,
-     "source": "tmap",
-     "availability": "n/a",
-     "price": 0,
-     "fixed": false,
+     "id": "mrt_3828508_1500",
+     "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+     "cat": "activity",
+     "catKo": "체험",
+     "arrive": 879,
+     "start": 900,
+     "end": 1020,
+     "wait": 21,
+     "walkM": 1945,
+     "walkMin": 27.8,
+     "source": "mrt",
+     "availability": "confirmed",
+     "price": 35000,
+     "url": "https://experiences.myrealtrip.com/products/3828508",
+     "mrt": {
+      "gid": "3828508",
+      "url": "https://experiences.myrealtrip.com/products/3828508",
+      "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+      "rating": 5.0,
+      "reviews": 16,
+      "price": 35000,
+      "durationMin": 120,
+      "durationSource": "default",
+      "meetingText": "서울숲 방문자센터 앞(오소정원)",
+      "lat": 37.5437,
+      "lng": 127.0397,
+      "coordSource": "approx:서울숲 방문자센터",
+      "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+      "locationEvidence": "제목/집결지 지명: 서울숲",
+      "options": null,
+      "isReal": true,
+      "start": "15:00",
+      "available": true,
+      "priceSource": "option",
+      "priceKnown": true
+     },
+     "fixed": true,
      "crowd": null,
-     "tags": [
-      "heritage"
-     ],
-     "quality": 0.925,
+     "tags": [],
+     "quality": 0.958,
      "q": {
       "uniqueness": 1.0,
-      "reputation": 0.75,
+      "reputation": 0.86,
       "timing": 1.0
      }
     },
     {
-     "id": "mrt_leather_1600",
-     "name": "가죽공방 원데이클래스 16:00",
-     "cat": "activity",
-     "catKo": "체험",
-     "arrive": 949,
-     "start": 960,
-     "end": 1080,
-     "wait": 11,
-     "walkM": 224,
-     "walkMin": 3.2,
-     "source": "mrt",
-     "availability": "unverified",
-     "price": 55000,
-     "fixed": true,
+     "id": "shop_understand",
+     "name": "언더스탠드에비뉴 소품샵",
+     "cat": "shop",
+     "catKo": "소품샵",
+     "arrive": 1024,
+     "start": 1024,
+     "end": 1064,
+     "wait": 0,
+     "walkM": 278,
+     "walkMin": 4.0,
+     "source": "tmap",
+     "availability": "n/a",
+     "price": 0,
+     "url": null,
+     "mrt": null,
+     "fixed": false,
      "crowd": null,
      "tags": [],
-     "quality": 0.964,
+     "quality": 0.875,
      "q": {
       "uniqueness": 1.0,
-      "reputation": 0.88,
-      "timing": 1.0
+      "reputation": 0.75,
+      "timing": 0.83
      }
     }
    ],
-   "walkM": 2825,
-   "walkMin": 40.4,
-   "finish": 1097,
+   "walkM": 2927,
+   "walkMin": 41.8,
+   "finish": 1068,
    "sat": {
-    "지민": 79.4,
-    "서연": 73.1
+    "지민": 58.8,
+    "서연": 54.5
    },
-   "solveMs": 35,
+   "solveMs": 71,
    "checklist": {
     "지민": [
      {
@@ -1442,7 +3685,7 @@ window.DEMO = {
       "label": "골목 2곳",
       "weight": 0.7,
       "quote": "골목도 여기저기 구경하고 싶어",
-      "fulfilled": 0.5
+      "fulfilled": 0.0
      }
     ],
     "서연": [
@@ -1450,19 +3693,19 @@ window.DEMO = {
       "label": "덜 걷기",
       "weight": 1.0,
       "quote": "나 오늘 많이 못 걸어",
-      "fulfilled": 0.34
+      "fulfilled": 0.29
      },
      {
       "label": "카페에서 쉬기",
       "weight": 0.7,
       "quote": "카페에서 좀 쉬고 싶어",
-      "fulfilled": 1.0
+      "fulfilled": 0.0
      },
      {
       "label": "느긋하게",
       "weight": 0.7,
       "quote": "좀 쉬고 싶어",
-      "fulfilled": 0.75
+      "fulfilled": 1.0
      },
      {
       "label": "소품샵",
@@ -1500,6 +3743,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [
@@ -1526,6 +3771,8 @@ window.DEMO = {
      "source": "heritage",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [
@@ -1552,6 +3799,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 0,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": "여유",
      "tags": [],
@@ -1576,6 +3825,8 @@ window.DEMO = {
      "source": "tmap",
      "availability": "n/a",
      "price": 15000,
+     "url": null,
+     "mrt": null,
      "fixed": false,
      "crowd": null,
      "tags": [],
@@ -1594,7 +3845,7 @@ window.DEMO = {
     "지민": 89.7,
     "서연": 84.4
    },
-   "solveMs": 109,
+   "solveMs": 94,
    "checklist": {
     "지민": [
      {
@@ -1665,11 +3916,11 @@ window.DEMO = {
   "relaxations": [
    "도보 한도 1.5km → 2.4km로 늘리기"
   ],
-  "ms": 120
+  "ms": 116
  },
  "pay": {
-  "item": "가죽공방 원데이클래스",
-  "price": 55000,
+  "item": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",
+  "price": 35000,
   "people": 2
  }
 };

@@ -1,12 +1,16 @@
 """TripFit live CBC API. Run with one uvicorn worker."""
 import copy
+import json
+import subprocess
+import sys
+import tempfile
 import threading
 import time
 from contextlib import asynccontextmanager
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated
 import os
 
 from dotenv import load_dotenv
@@ -19,9 +23,12 @@ ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT.parent / ".env", override=False)
 
 from solver.demo_builder import (DemoSolver, build_demo, label_for, mark_muted,
-                                 mute_request, pareto_series, plan_json)
-from solver.sample_seongsu import HIDDEN, PLACES, REQUEST
+                                 mute_request, pareto_series, plan_json, build_whatif,
+                                 infeasible_json, apply_relaxation)
+from solver.sample_seongsu import HIDDEN, PLACES, REQUEST, MRT_SNAPSHOT, reload_mrt
 from solver.tripfit_solver import CATEGORY_KO, TAG_KO, Infeasible, diff_plans
+from solver.mrt_places import SNAPSHOT_PATH, read_snapshot
+from scripts.fetch_mrt_snapshot import save_snapshot
 from server.parsing import ParseInput, StrictModel, parse_messages
 
 SOLVE_LOCK = threading.Lock()
@@ -59,51 +66,16 @@ class PlanInput(StrictModel):
 
 
 class WhatIfInput(StrictModel):
-    pick: Literal["mrt_leather_1600", "mrt_leather_1400"]
+    pick: str = Field(min_length=1, max_length=100)
+    relax: str | None = Field(default=None, min_length=1, max_length=300)
 
 
 class ReplanInput(StrictModel):
+    pick: str | None = Field(default=None, min_length=1, max_length=100)
+    relax: str | None = Field(default=None, min_length=1, max_length=300)
     now_min: Annotated[int, Field(ge=REQUEST.start_min, le=REQUEST.deadline_min)]
     exclude: list[str] = Field(default_factory=list, max_length=20)
     keep: dict[str, Annotated[int, Field(ge=0, le=1440)]] = Field(default_factory=dict, max_length=20)
-
-
-def infeasible_json(result, request, places):
-    """Structure the engine's labels without changing its diagnostic search.
-
-    Walking diagnostics round distances to 0.1 km. Use removal of the hard
-    limit (the actual tested diagnostic change), not that rounded distance.
-    """
-    by_id = {p.id: p.name for p in places}
-    by_id.update({p.group: p.name for p in places if p.group})
-    options = {}
-    for category, count in request.category_min.items():
-        options[f"{CATEGORY_KO.get(category, category)} 최소 {count}곳 조건 해제"] = {
-            "kind": "category_min", "key": category, "from": count, "to": 0}
-    for tag, count in request.tag_min.items():
-        options[f"{TAG_KO.get(tag, tag)} {count}곳 조건 해제"] = {
-            "kind": "tag_min", "key": tag, "from": count, "to": 0}
-    for pid, start in request.locks.items():
-        options[f"'{by_id.get(pid, pid)}' 시간 고정 해제"] = {
-            "kind": "locks", "key": pid, "from": start, "to": None}
-    for pid in request.must_include:
-        options[f"'{by_id.get(pid, pid)}' 필수 방문 해제"] = {
-            "kind": "must_include", "key": pid, "from": True, "to": False}
-    options["종료 시간 1시간 늦추기"] = {
-        "kind": "deadline_min", "from": request.deadline_min, "to": request.deadline_min + 60}
-    relaxations = []
-    for label in result.relaxations:
-        changes, labels = [], []
-        for part in label.split(" + "):
-            if part.startswith("도보 한도 "):
-                changes.append({"kind": "max_walk_m", "from": request.max_walk_m, "to": None})
-                labels.append("도보 한도 조건 해제")
-            else:
-                changes.append(options[part])
-                labels.append(part)
-        relaxations.append({"label": " + ".join(labels), "changes": changes})
-    return {"infeasible": True, "relaxations": relaxations,
-            "reason": result.reason, "live": True}
 
 
 @app.get("/api/health")
@@ -124,8 +96,8 @@ def plan(body: PlanInput):
         request = replace(mute_request(REQUEST, muted), tag_min=body.tag_min)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from None
-    places = PLACES + HIDDEN if body.tag_min.get("heritage", 0) else PLACES
     with SOLVE_LOCK:
+        places = PLACES + HIDDEN if body.tag_min.get("heritage", 0) else PLACES
         started = time.perf_counter()
         solver = DemoSolver(places)
         result = solver.solve_or_explain(request)
@@ -149,6 +121,8 @@ def plan(body: PlanInput):
 @app.post("/api/what-if")
 def what_if(body: WhatIfInput):
     with SOLVE_LOCK:
+        if body.pick not in {p.id for p in PLACES if p.category == "activity" and p.availability != "unavailable"}:
+            raise HTTPException(status_code=422, detail="Unknown or unavailable experience")
         solver = DemoSolver(PLACES)
         front, _ = pareto_series(solver)
         if not front:
@@ -157,23 +131,40 @@ def what_if(body: WhatIfInput):
                 return infeasible_json(result, REQUEST, PLACES)
             front = [result]
         base = min(front, key=lambda p: abs(p.satisfaction_pct["지민"] - p.satisfaction_pct["서연"]))
-        started = time.perf_counter()
-        result, diff = solver.what_if_add(REQUEST, body.pick, base)
-        if isinstance(result, Infeasible):
-            return infeasible_json(result, replace(REQUEST, must_include=[body.pick]), PLACES)
-        return {"plan": plan_json(result, "w" if body.pick.endswith("1600") else "w14",
-                                  round((time.perf_counter() - started) * 1000)), "diff": diff}
+        result = build_whatif(solver, REQUEST, body.pick, base)
+        if body.relax:
+            option = next((o for o in result.get("relaxations", []) if o["id"] == body.relax), None)
+            if option is None:
+                raise HTTPException(status_code=422, detail="Unknown relaxation for this experience")
+            return {"pick": body.pick, "infeasible": False, "relaxationId": option["id"],
+                    **{k: option[k] for k in ("plan", "diff", "replan")}}
+        if result["infeasible"]:
+            return {"pick": body.pick, "infeasible": True, "reason": result["reason"],
+                    "relaxations": [{k: v for k, v in o.items() if k not in ("plan", "diff", "replan")}
+                                    for o in result["relaxations"]]}
+        return result
 
 
 @app.post("/api/replan")
 def replan(body: ReplanInput):
-    known = {p.id for p in PLACES}
-    if (set(body.exclude) | set(body.keep)) - known:
-        raise HTTPException(status_code=422, detail="Unknown place id")
-    request = replace(REQUEST, exclude=body.exclude)
+    request = REQUEST
     with SOLVE_LOCK:
+        known = {p.id for p in PLACES}
+        if (set(body.exclude) | set(body.keep)) - known:
+            raise HTTPException(status_code=422, detail="Unknown place id")
+        solver = DemoSolver(PLACES)
+        if body.relax:
+            if body.pick not in body.keep:
+                raise HTTPException(status_code=422, detail="Concession needs the booked experience")
+            base = solver.solve(REQUEST)
+            whatif = build_whatif(solver, REQUEST, body.pick, base)
+            option = next((o for o in whatif.get("relaxations", []) if o["id"] == body.relax), None)
+            if option is None:
+                raise HTTPException(status_code=422, detail="Unknown relaxation for this experience")
+            request = apply_relaxation(request, option)
+        request = replace(request, exclude=body.exclude)
         started = time.perf_counter()
-        result = DemoSolver(PLACES).reoptimize(request, body.now_min, REQUEST.start, [], body.keep)
+        result = solver.reoptimize(request, body.now_min, REQUEST.start, [], body.keep)
         if isinstance(result, Infeasible):
             return infeasible_json(result, replace(request, start_min=body.now_min, locks=body.keep), PLACES)
         return {"plan": plan_json(result, "r", round((time.perf_counter() - started) * 1000))}
@@ -184,6 +175,54 @@ async def parse(body: ParseInput):
     if len({m.name for m in body.messages}) != len(body.messages):
         raise HTTPException(status_code=422, detail="Names must be unique")
     return await parse_messages(body.messages)
+
+
+REFRESH_LOCK = threading.Lock()
+
+
+def mrt_summary():
+    with SOLVE_LOCK:
+        return {"snapshot": copy.deepcopy(MRT_SNAPSHOT) or None,
+                "isReal": bool(MRT_SNAPSHOT), "fetchedAt": MRT_SNAPSHOT.get("fetchedAt"),
+                "date": MRT_SNAPSHOT.get("date"), "picked": copy.deepcopy(MRT_SNAPSHOT.get("picked", []))}
+
+
+@app.get("/api/mrt")
+def get_mrt():
+    return mrt_summary()
+
+
+def fetch_mrt_refresh():
+    # A process deadline covers the entire refresh, not just an individual HTTP call.
+    # The child only prints JSON, so a timeout can never overwrite a good snapshot.
+    result = subprocess.run([sys.executable, str(ROOT / "scripts/fetch_mrt_snapshot.py"), "--stdout", "--refresh"],
+                            cwd=ROOT, capture_output=True, text=True, timeout=10, check=True)
+    return json.loads(result.stdout)
+
+
+@app.post("/api/mrt/refresh")
+def refresh_mrt():
+    global _demo_cache
+    if not REFRESH_LOCK.acquire(blocking=False):
+        return {**mrt_summary(), "refreshed": False, "reason": "이미 갱신 중"}
+    try:
+        try:
+            snapshot = fetch_mrt_refresh()
+            with tempfile.TemporaryDirectory() as directory:
+                staging = Path(directory) / "snapshot.json"
+                save_snapshot(snapshot, staging)
+                if read_snapshot(staging) is None:
+                    raise ValueError("Invalid snapshot")
+            with SOLVE_LOCK:
+                save_snapshot(snapshot, SNAPSHOT_PATH)
+                reload_mrt(SNAPSHOT_PATH)
+                _demo_cache = None
+            return {**mrt_summary(), "refreshed": True}
+        except (subprocess.SubprocessError, OSError, ValueError, TypeError):
+            return {**mrt_summary(), "refreshed": False,
+                    "reason": "MCP 갱신 실패 또는 10초 초과: 기존 스냅숏 유지"}
+    finally:
+        REFRESH_LOCK.release()
 
 
 # Last: API routes must win over the static mount.

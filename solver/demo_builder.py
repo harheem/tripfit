@@ -9,11 +9,11 @@ import time
 from dataclasses import replace
 
 if __package__:
-    from .sample_seongsu import HIDDEN, PLACES, REQUEST, hm
-    from .tripfit_solver import CATEGORY_KO, Infeasible, Plan, TripFitSolver, diff_plans
+    from .sample_seongsu import HIDDEN, PLACES, REQUEST, MRT_META, MRT_SNAPSHOT, hm
+    from .tripfit_solver import CATEGORY_KO, TAG_KO, Infeasible, Plan, TripFitSolver, diff_plans
 else:
-    from sample_seongsu import HIDDEN, PLACES, REQUEST, hm
-    from tripfit_solver import CATEGORY_KO, Infeasible, Plan, TripFitSolver, diff_plans
+    from sample_seongsu import HIDDEN, PLACES, REQUEST, MRT_META, MRT_SNAPSHOT, hm
+    from tripfit_solver import CATEGORY_KO, TAG_KO, Infeasible, Plan, TripFitSolver, diff_plans
 
 
 MESSAGES = {
@@ -89,6 +89,7 @@ def stop_json(s):
         "arrive": s.arrive_min, "start": s.start_min, "end": s.end_min, "wait": s.wait_min,
         "walkM": s.walk_m_from_prev, "walkMin": s.walk_min_from_prev,
         "source": p.source, "availability": p.availability, "price": p.price,
+        "url": p.url, "mrt": MRT_META.get(p.id),
         "fixed": p.fixed_start_min is not None, "crowd": CROWD.get(p.id), "tags": p.tags,
         "quality": p.quality, "q": p.quality_parts,
     }
@@ -137,6 +138,119 @@ def label_for(plan):
     return "지민 쪽" if j > s else "서연 쪽"
 
 
+def infeasible_json(result, request, places, messages=MESSAGES):
+    """Translate tested engine diagnostics; attribution comes from hard message marks."""
+    by_id = {p.id: p.name for p in places}
+    by_id.update({p.group: p.name for p in places if p.group})
+
+    def owner_for(prefix):
+        return next((person for person, msg in messages.items()
+                     if any(m["kind"] == "hard" and m["chip"].startswith(prefix)
+                            for m in msg["marks"])), None)
+
+    options = {}
+    for category, count in request.category_min.items():
+        name = CATEGORY_KO.get(category, category)
+        options[f"{name} 최소 {count}곳 조건 해제"] = (
+            "category_min", owner_for(name), f"{name} {count}곳",
+            {"kind": "category_min", "key": category, "from": count, "to": 0})
+    for tag, count in request.tag_min.items():
+        options[f"{TAG_KO.get(tag, tag)} {count}곳 조건 해제"] = (
+            "tag_min", None, f"{TAG_KO.get(tag, tag)} {count}곳",
+            {"kind": "tag_min", "key": tag, "from": count, "to": 0})
+    for pid, start in request.locks.items():
+        options[f"'{by_id.get(pid, pid)}' 시간 고정 해제"] = (
+            "locks", None, "시간 고정", {"kind": "locks", "key": pid, "from": start, "to": None})
+    for pid in request.must_include:
+        options[f"'{by_id.get(pid, pid)}' 필수 방문 해제"] = (
+            "must", None, by_id.get(pid, pid),
+            {"kind": "must_include", "key": pid, "from": True, "to": False})
+    options["종료 시간 1시간 늦추기"] = (
+        "deadline", owner_for("종료"), "종료 시각 1시간",
+        {"kind": "deadline_min", "from": request.deadline_min, "to": request.deadline_min + 60})
+    relaxations = []
+    for label in result.relaxations:
+        parts = []
+        for part in label.split(" + "):
+            if part.startswith("도보 한도 "):
+                parts.append(("walk", owner_for("도보"), "도보 한도",
+                              {"kind": "max_walk_m", "from": request.max_walk_m, "to": None}))
+            else:
+                parts.append(options[part])
+        owners = {p[1] for p in parts}
+        changes = [p[3] for p in parts]
+        rid = "+".join(c["kind"] + (":" + c["key"] if "key" in c else "") for c in changes)
+        owner = next(iter(owners)) if len(owners) == 1 else None
+        text = " + ".join(p[2] for p in parts)
+        relaxations.append({"id": rid, "label": f"{owner}의 '{text}'을 양보" if owner else f"{text} 양보",
+                            "owner": owner, "kind": parts[0][0], "changes": changes})
+    return {"infeasible": True, "relaxations": relaxations, "reason": result.reason}
+
+
+def apply_relaxation(request, relaxation):
+    """Apply only server-generated changes, without mutating the original request."""
+    for change in relaxation["changes"]:
+        kind, key, value = change["kind"], change.get("key"), change["to"]
+        if kind in ("category_min", "tag_min", "locks"):
+            values = dict(getattr(request, kind))
+            if value is None or value == 0:
+                values.pop(key, None)
+            else:
+                values[key] = value
+            request = replace(request, **{kind: values})
+        elif kind == "must_include":
+            request = replace(request, must_include=[p for p in request.must_include if p != key])
+        else:
+            request = replace(request, **{kind: value})
+    return request
+
+
+def replan_for(solver, request, pick, plan):
+    """Try flexible stops in itinerary order, with cafes first; keep the booking."""
+    activity = next(p for p in solver.places if p.id == pick)
+    now = request.start_min + 5
+    for stop in sorted((s for s in plan["stops"] if not s["fixed"]), key=lambda s: s["cat"] != "cafe"):
+        started = time.perf_counter()
+        result = solver.reoptimize(replace(request, exclude=[*request.exclude, stop["id"]]),
+                                   now, request.start, [], {pick: activity.fixed_start_min})
+        if not isinstance(result, Infeasible):
+            return {"now": now, "crowded": stop["id"],
+                    "reason": f"{stop['name']} 지금 붐빔(샘플)", "done": [], "keep": pick,
+                    "plan": plan_json(result, "r", round((time.perf_counter() - started) * 1000))}
+    return None
+
+
+def build_whatif(solver, request, pick, base, messages=MESSAGES):
+    started = time.perf_counter()
+    result, diff = solver.what_if_add(request, pick, base)
+    required = replace(request, must_include=[*request.must_include, pick])
+    payload = {"pick": pick, "product": next(p.group for p in solver.places if p.id == pick)}
+    if not isinstance(result, Infeasible):
+        plan = plan_json(result, "w", round((time.perf_counter() - started) * 1000))
+        return {**payload, "infeasible": False, "plan": plan, "diff": diff,
+                "replan": replan_for(solver, required, pick, plan)}
+    diagnostic = infeasible_json(result, required, solver.places, messages)
+    options = []
+    activity = next(p for p in solver.places if p.id == pick)
+    for option in diagnostic["relaxations"]:
+        # Adding the experience is the purpose: never offer removal of that commitment.
+        if any(c["kind"] == "must_include" and c["key"] in (pick, activity.group)
+               for c in option["changes"]):
+            continue
+        relaxed = apply_relaxation(required, option)
+        started = time.perf_counter()
+        plan = solver.solve(relaxed, label="양보 후")
+        if plan is None:
+            continue
+        saved = plan_json(plan, "w", round((time.perf_counter() - started) * 1000))
+        options.append({**option, "plan": saved, "diff": diff_plans(base, plan, request.people),
+                        "replan": replan_for(solver, relaxed, pick, saved)})
+    default = next((o for o in options if o["id"] == "category_min:cafe"), options[0] if options else None)
+    chosen = ({"relaxationId": default["id"], **{k: default[k] for k in ("plan", "diff", "replan")}}
+              if default else None)
+    return {**payload, **diagnostic, "relaxations": options, "chosen": chosen}
+
+
 def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES, muted=()):
     """Compute the offline demo payload. Callers must serialize native solver calls."""
     request = mute_request(request, muted)
@@ -153,29 +267,20 @@ def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES,
     diffs = [diff_plans(front[i], front[i + 1], request.people) for i in range(len(front) - 1)]
 
     base = front[default_idx]
-    t0 = time.time()
-    whatif, wdiff = solver.what_if_add(request, "mrt_leather_1600", base)
-    whatif_ms = round((time.time() - t0) * 1000)
-    assert not isinstance(whatif, Infeasible)
-    if not request.prefs:
-        whatif.satisfaction_pct = {p: round(100 * whatif.satisfaction[p] / max(1e-6, base.satisfaction[p] / base.satisfaction_pct[p] * 100), 1)
-                               for p in request.people}
-
-    # the other bookable slot, so the time picker on the what-if sheet is real both ways
-    alt, altdiff = solver.what_if_add(request, "mrt_leather_1400", base)
-    assert not isinstance(alt, Infeasible)
-    if not request.prefs:
-        alt.satisfaction_pct = {p: round(100 * alt.satisfaction[p] / max(1e-6, base.satisfaction[p] / base.satisfaction_pct[p] * 100), 1)
-                            for p in request.people}
-
-    # live change: the first stop is crowded right now (Seoul real-time city data)
-    crowded = whatif.stops[0].place
-    now = request.start_min + 5
-    t0 = time.time()
-    replan = solver.reoptimize(replace(request, must_include=["mrt_leather_1600"], exclude=[crowded.id]), now,
-                               request.start, [], {"mrt_leather_1600": hm("16:00")})
-    replan_ms = round((time.time() - t0) * 1000)
-    assert not isinstance(replan, Infeasible)
+    # Keep time-window-compatible starts even when they need a hard concession.
+    choices = []
+    for activity in sorted((p for p in places if p.category == "activity" and
+                            p.fixed_start_min is not None and p.availability != "unavailable"),
+                           key=lambda p: p.fixed_start_min, reverse=True):
+        if not request.start_min <= activity.fixed_start_min <= request.deadline_min - activity.duration_min:
+            continue
+        choices.append(build_whatif(solver, request, activity.id, base, messages))
+        if len(choices) == 2:
+            break
+    primary = choices[0] if choices else {"pick": None, "product": None, "infeasible": False,
+               "plan": plan_json(base, "w"), "diff": diff_plans(base, base, request.people)}
+    selected = primary.get("chosen") if primary["infeasible"] else primary
+    replan_data = selected.get("replan") if selected else None
 
     # "숨은 한 곳 +1": heritage spots join the candidate set and at least one must be visited.
     # Same balanced objective and the same %-scale as the base plan, so the numbers compare.
@@ -202,7 +307,7 @@ def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES,
         "group": p.group, "fixedStart": p.fixed_start_min, "price": p.price,
         "availability": p.availability, "duration": p.duration_min, "crowd": CROWD.get(p.id),
         "tags": p.tags, "story": p.story, "credit": p.credit, "quality": p.quality, "q": p.quality_parts,
-        "hidden": p in hidden,
+        "hidden": p in hidden, "url": p.url, "mrt": MRT_META.get(p.id),
     } for p in places + hidden]
 
     prefs = {person: [{"label": it.label, "kind": it.kind, "weight": it.weight, "quote": it.quote,
@@ -221,17 +326,15 @@ def build_demo(request=REQUEST, places=PLACES, hidden=HIDDEN, messages=MESSAGES,
                     "mrt": len({p.group for p in places if p.source == "mrt"}),
                     "pairs": (n + 2) * (n + 1), "orderings": orderings},
         "series": series, "defaultIdx": default_idx, "diffs": diffs,
-        "whatif": {"product": "mrt_leather", "pick": "mrt_leather_1600",
-                   "plan": plan_json(whatif, "w", whatif_ms), "diff": wdiff,
-                   "alt": {"pick": "mrt_leather_1400", "plan": plan_json(alt, "w14"), "diff": altdiff}},
-        "replan": {"now": now, "crowded": crowded.id,
-                   "reason": f"{crowded.name} 지금 붐빔 · 웨이팅 약 40분",
-                   "done": [], "keep": "mrt_leather_1600",
-                   "plan": plan_json(replan, "r", replan_ms)},
+        "mrt": dict(MRT_SNAPSHOT),
+        "whatif": {**primary, "choices": choices,
+                   "alt": choices[1] if len(choices) > 1 else None},
+        "replan": replan_data,
         "hidden": {"tag": "heritage", "label": "숨은 한 곳 +1", "source": "서울미래유산",
                    "candidates": [p.id for p in heritage], "plan": plan_json(hidden_plan, "h", hidden_ms),
                    "diff": diff_plans(base, hidden_plan, request.people)},
         "conflict": {"limitM": 1500, "relaxations": relax, "ms": conflict_ms},
-        "pay": {"item": "가죽공방 원데이클래스", "price": 55000, "people": 2},
+        "pay": {"item": MRT_META.get(primary["pick"], {}).get("name", "체험 없음"),
+                "price": next((p.price for p in places if p.id == primary["pick"]), 0), "people": 2},
     }
     return mark_muted(data, muted)

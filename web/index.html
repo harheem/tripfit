@@ -246,12 +246,12 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 
 /* sheet = a stack of blocks */
 .dim { position: absolute; inset: 0; background: rgba(5, 14, 20, .6); z-index: 30; }
-.sheet { position: absolute; left: 6px; right: 6px; bottom: 6px; background: var(--navy); border-radius: 50px; padding: 4px; z-index: 31; }
+.sheet { max-height: calc(100% - 24px); overflow-y: auto; overscroll-behavior: contain; position: absolute; left: 6px; right: 6px; bottom: 6px; background: var(--navy); border-radius: 50px; padding: 4px; z-index: 31; }
 .sheet > .b:first-child { border-radius: 46px 46px 30px 30px; }
 .sheet > .b:last-child { margin-bottom: 0; border-radius: 30px 30px 46px 46px; }
 .grab { position: absolute; top: 10px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: currentColor; opacity: .3; }
 .prod { --bg: var(--violet); color: var(--cream); padding-top: 30px; min-height: 186px; overflow: hidden; }
-.prod .pr { font: 500 64px/.9 var(--gr); letter-spacing: -.055em; margin-top: 30px; display: flex; align-items: baseline; gap: 4px; }
+.prod .pr { flex-wrap: wrap; font: 500 64px/.9 var(--gr); letter-spacing: -.055em; margin-top: 30px; display: flex; align-items: baseline; gap: 4px; }
 .prod .pr small { font: 500 14px var(--kr); letter-spacing: 0; }
 .prod .pill { border-color: var(--cream); }
 .prod .ring { position: absolute; right: -40px; top: -40px; width: 170px; height: 170px; animation: rot 18s linear infinite; }
@@ -351,7 +351,7 @@ body.m .screen { width: 100vw; height: 100dvh; border-radius: 0; }
 "use strict";
 (async () => {
 let LIVE = false;
-async function api(path, body, timeout = 30000) {
+async function api(path, body, timeout = 30000, allowInfeasible = false) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
   try {
@@ -361,7 +361,7 @@ async function api(path, body, timeout = 30000) {
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    if (data.infeasible) throw new Error("조건에 맞는 일정 없음");
+    if (data.infeasible && !allowInfeasible) throw new Error("조건에 맞는 일정 없음");
     return data;
   } finally { clearTimeout(timer); }
 }
@@ -385,12 +385,12 @@ const sleep = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
 const hhmm = m => { m = Math.round(m); return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
 const km = m => (m / 1000).toFixed(1);
 const won = n => n.toLocaleString("ko-KR");
-const short = n => n.replace(/ \d\d:\d\d$/, "");
+const short = n => /서울숲.*숲체험/.test(n) ? "서울숲 숲체험" : n.replace(/ \d\d:\d\d$/, "");
 const placeById = Object.fromEntries(D.places.map(p => [p.id, p]));
 const NICK = { cafe_onion: "어니언", cafe_bluebottle: "블루보틀", cafe_grandpa: "할아버지공장", exh_daelim: "대림창고", exh_dmuseum: "디뮤지엄",
   alley_yeonmu: "연무장길", alley_shoe: "수제화거리", shop_atelier: "소품샵 골목", shop_understand: "언더스탠드에비뉴",
   park_seoulforest: "서울숲", heritage_gongs: "공씨책방" };
-const nick = s => NICK[s.id] || (s.id.startsWith("mrt_leather") ? "가죽공방" : short(s.name));
+const nick = s => NICK[s.id] || (s.id.startsWith("mrt_") ? "체험" : short(s.name));
 const diffLine = d => [...d.added.map(s => "+" + nick(s)), ...d.dropped.map(s => "−" + nick(s))].join(" ");
 const diffTitle = d => [d.added.length && `${d.added.length}곳 들어오고`, d.dropped.length && `${d.dropped.length}곳 빠져요`].filter(Boolean).join(" ") || "순서만 바뀌어요";
 const signed = (v, d = 0) => { const r = +Math.abs(v).toFixed(d); return (r === 0 ? "±" : v > 0 ? "+" : "−") + r.toFixed(d); };
@@ -638,6 +638,7 @@ class Timeline {
     const tags = [];
     if (crowd) tags.push(`<span class="pill fill">${svg("people", 13, 2.4)} 지금 붐빔 · 웨이팅 40분</span>`);
     if (lock) tags.push(`<span class="pill">${svg("lock", 12, 2.4)} ${hhmm(s.start)} 예약 고정</span>`);
+    if (s.mrt?.coordSource === "approx" || s.mrt?.durationSource === "default") tags.push(`<span class="pill">추정</span>`);
     if (s.availability === "unverified") tags.push(`<span class="pill">자리 확인 필요</span>`);
     if ((s.tags || []).includes("heritage") && this.o.stories) tags.push(`<span class="pill story" data-story="${s.id}">${svg("heritage", 12, 2.4)} 미래유산 · 이야기</span>`);
     if (!crowd && !lock && this.o.picks) {
@@ -649,7 +650,7 @@ class Timeline {
     const meta = `${s.catKo} · ${s.end - s.start}분 · 도보 ${Math.max(1, Math.round(s.walkMin))}분${s.price ? ` · ${won(s.price)}원` : ""}`;
     return `<div class="b stop ${lock ? "lock" : ""} ${crowd ? "crowd" : ""}" style="--bg:${crowd ? "var(--red)" : CAT[s.cat]}">
         <div class="ico">${svg(s.cat, 21, 2)}</div>
-        <div><div class="nm">${short(s.name)}</div><div class="mt">${meta}</div><div class="tags">${tags.join("")}</div></div>
+        <div><div class="nm">${escapeHTML(short(s.name))}</div><div class="mt">${meta}</div><div class="tags">${tags.join("")}</div></div>
         <div class="tm gr"><b>${hhmm(s.start)}</b><small>~${hhmm(s.end)}</small></div>
       </div>`;
   }
@@ -739,11 +740,11 @@ function openSheet(v, html) {
 /* ---------- presenter caption (desktop only) ---------- */
 const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
   ["결국 한 명이\n참는 여행", "“‘전시는 꼭 봐야 해’, ‘나 많이 못 걸어’. 같이 여행 가면 결국 한 명이 참죠.”"],
-  ["한 문장이면\n조건이 된다", "“각자 한 문장이면 꼭 지킬 것과 되면 좋은 것으로 나눠요. 77만 가지 순서 중 둘 다 OK인 일정 3개.”"],
+  ["한 문장이면\n조건이 된다", `“각자 한 문장이면 꼭 지킬 것과 되면 좋은 것으로 나눠요. ${won(D.sources.orderings)}가지 순서 중 둘 다 OK인 일정 ${D.series.length}개.”`],
   ["만족도는\n한 말의 체크리스트", "“만족도는 각자 한 말이 지켜진 비율이에요. 저울을 밀면 지민 100·서연 75부터 지민 59·서연 89까지. 가운데가 79 대 83.”"],
-  ["넣으면, 뭘\n빼야 하는지", "“공방을 넣으면? 두 곳이 빠지고 서연 씨가 더 걸어야 한다고 바로 다시 계산해요.”"],
+  ["넣으면, 뭘\n빼야 하는지", "“숲체험을 넣으면? 지금 조건으론 안 된다고, 대신 누가 무엇을 양보하면 되는지 바로 계산해요.”"],
   ["둘 다 OK면\n결제까지", "“둘 다 승인하면 분담 결제 요청까지.”"],
-  ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 공방은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
+  ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 숲체험은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
 ];
 
 /* ---------- step 0: group chat as stacked blocks ---------- */
@@ -817,7 +818,7 @@ async function s1(v, t) {
       .catch(() => log("llm", "파싱 호출 실패 · 화면은 샘플 marks로 재생"));
   }
   const marks = P.flatMap(p => p.marks), nh = marks.filter(m => m.kind === "hard").length, ns = marks.length - nh;
-  v.innerHTML = `<div class="scr" id="sc">${topBlock("조건 정리", `<span class="cap-up">A.X K2</span>`)}</div>`;
+  v.innerHTML = `<div class="scr" id="sc">${topBlock("조건 정리", `<span class="cap-up">OpenAI</span>`)}</div>`;
   const sc = $("#sc", v);
   rise($("#top", v), 60);
   setTitle($("#ttl", v), `꼭 지킬 ${nh}가지,\n되면 좋은 ${ns}가지`, 200);
@@ -872,7 +873,7 @@ async function s1(v, t) {
   }
   if (!alive(t)) return;
   log("tmap", `성수 후보 ${D.sources.tmap}곳 (샘플 큐레이션)`);
-  log("mrt", `체험 시작 시각 14:00 확인 / 16:00 미확인 (예시 상품)`);
+  log("mrt", `체험 시작 시각 ${D.whatif.choices.length}개 · ${D.mrt?.fetchedAt ? "MCP 스냅숏" : "예시 상품"}`);
   log("tmap", `도보 행렬 ${D.sources.pairs}쌍 (직선×1.3 추정)`);
   log("city", `실시간 도시데이터 · 혼잡도 (샘플)`);
   fn.style.visibility = "";
@@ -881,7 +882,7 @@ async function s1(v, t) {
   await sleep(450); if (!alive(t)) return;
   odo($("#fnO", v), won(D.sources.orderings));
   await sleep(1700); if (!alive(t)) return;
-  island.show({ spin: true, title: "둘 다 OK인 일정 찾는 중", sub: "77만 가지 순서 비교 중", hold: 0 });
+  island.show({ spin: true, title: "둘 다 OK인 일정 찾는 중", sub: `${won(D.sources.orderings)}가지 순서 비교 중`, hold: 0 });
   const nEl = $("#fnN", v);
   await nEl.animate([{ filter: "blur(0)", transform: "none", opacity: 1 }, { filter: "blur(10px)", transform: "scale(.6)", opacity: 0 }], { duration: reduce ? 1 : 420, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }).finished;
   if (!alive(t)) return;
@@ -1067,8 +1068,38 @@ function renderChecklist(box, total, items) {
 
 /* ---------- step 3: what-if ---------- */
 let chosen = null;
+const selectedWhatif = () => chosen || (D.whatif.infeasible ? { ...D.whatif, ...D.whatif.chosen } : D.whatif);
 async function s3(v, t) {
   status("13:00");
+  chosen = null;
+  let snapshot = D.mrt;
+  if (/^https?:$/.test(location.protocol)) {
+    try {
+      const summary = await api("/api/mrt", undefined, 3000);
+      if (LIVE && summary.fetchedAt !== D.mrt?.fetchedAt) {
+        const fresh = await api("/api/demo");
+        Object.assign(D, fresh);
+        Object.keys(placeById).forEach(k => delete placeById[k]);
+        D.places.forEach(p => { placeById[p.id] = p; });
+      }
+      snapshot = D.mrt;
+    } catch (_) { log("mrt", "조회 실패 · 저장된 스냅숏 사용"); }
+  }
+  if (!alive(t)) return;
+  const fetched = snapshot?.fetchedAt ? new Date(snapshot.fetchedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Seoul" }) : "미확인";
+  log("mrt", `MyRealTrip searchTnas·getTnaOptions · 조회 ${fetched}${snapshot?.fetchedAt ? " · 저장된 조회 결과" : " · 예시 상품"}`);
+  const choices = D.whatif.choices || [];
+  const availabilityText = value => value === true ? "조회 시 2인 예약 가능" : value === false ? "2인 예약 불가" : "자리 확인 필요";
+  const products = snapshot?.picked?.length ? snapshot.picked : D.places.filter(p => p.cat === "activity" && p.id === D.whatif.pick).map(p => ({ name: short(p.name), price: p.price, durationMin: p.duration, options: [], isSample: true }));
+  const productCards = products.map(p => `<div class="b prod"><span class="pill">마이리얼트립${p.isSample ? " · 예시 상품" : ""}</span>
+    <div style="font:600 22px/1.25 var(--kr);margin-top:14px">${escapeHTML(short(p.name))}</div>
+    <div class="pr gr">${p.price == null ? "가격 미확인" : won(p.price)}<small>${p.price == null ? "" : "원부터 / 1인"} · ${p.durationMin}분</small></div>
+    <div>${p.rating == null ? "평점·리뷰 미확인" : `⭐ ${Number(p.rating).toFixed(1)} (${p.reviews == null ? "리뷰 미확인" : p.reviews + "개 리뷰"})`}
+      ${p.coordSource === "approx" || p.durationSource === "default" ? '<span class="pill" title="좌표 또는 소요시간 추정">추정</span>' : ""}</div>
+    <div class="note">${escapeHTML(p.meetingText || "위치 미확인")}<br>${p.coordSource === "approx" ? "좌표 미확인: 성수역 대체 위치 · " : ""}${p.durationSource === "default" ? "소요시간 120분 추정 · " : ""}${escapeHTML(snapshot?.date || "예시 날짜")}</div>
+    <div class="note">${(p.options || []).map(o => `${escapeHTML(o.start)} · ${availabilityText(o.available)} · ${o.price == null ? "가격 미확인" : won(o.price) + "원"}`).join("<br>")}</div>
+    ${p.url ? `<a href="${escapeHTML(p.url)}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 보기 ↗</a>` : ""}
+    ${p.note ? `<div class="note">${escapeHTML(p.note)}</div>` : ""}</div>`).join("");
   const base = D.series[D.defaultIdx];
   v.innerHTML = `<div class="scr" id="sc">${topBlock("마이리얼트립 체험", `<span class="cap-up">넣어보기</span>`, "lime")}<div id="tray"></div><div id="tl"></div><div class="note" id="note"></div></div>`;
   rise($("#top", v), 60);
@@ -1079,17 +1110,20 @@ async function s3(v, t) {
   const next = cta(v, "이대로 합의하기", () => go(4));
   next.disabled = true;
   await sleep(600); if (!alive(t)) return;
-  const sh = openSheet(v, `
-    <div class="b prod"><span class="grab"></span>
-      <svg class="ring" viewBox="0 0 170 170"><defs><path id="circ" d="M85 85m-62 0a62 62 0 1 1 124 0a62 62 0 1 1-124 0"/></defs><circle cx="85" cy="85" r="78" fill="#D6F23B"/><text font-family="Inter Tight, sans-serif" font-size="12.5" font-weight="600" letter-spacing="2.6" fill="#0E2A3A"><textPath href="#circ">MYREALTRIP · ONE-DAY CLASS · SEONGSU ·</textPath></text></svg>
-      <span class="pill">마이리얼트립</span>
-      <div style="font:600 22px/1.25 var(--kr);letter-spacing:-.045em;margin-top:14px">가죽공방<br>원데이클래스</div>
-      <div class="pr gr">55,000<small>원 / 1인 · 2시간</small></div>
-    </div>
-    <div class="slots"><button class="slot" data-k="alt"><span class="cap-up">시작</span><b class="gr">14:00</b><small><i></i>예약 가능</small></button><button class="slot" data-k="main"><span class="cap-up">시작</span><b class="gr">16:00</b><small><i class="a"></i>자리 확인 필요</small></button></div>
+  const sh = openSheet(v, `<span class="grab"></span>${productCards}
+    <div class="note">${choices.length ? `시간창 안의 시작 시각 ${choices.length}개 · 넣고 조건 확인` : "이 일정에 넣을 수 있는 시작 시각이 없습니다."}</div>
+    <div class="slots">${choices.map((w, i) => {
+      const p = placeById[w.pick];
+      return `<button class="slot" data-k="${i}"><span class="cap-up">시작</span><b class="gr">${hhmm(p.fixedStart)}</b><small>${escapeHTML(short(p.name))}<br>${won(p.price)}원 · ${availabilityText(p.availability === "confirmed" ? true : p.availability === "unavailable" ? false : null)}</small></button>`;
+    }).join("")}</div>
     <div class="b lime" style="padding:6px"><button class="btn navy" id="addBtn" disabled><span>시작 시간을 골라주세요</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
-  log("mrt", `getTnaOptions → 16:00 "자동 조회 제한" → 자리 확인 필요 (예시 상품)`);
-  let pick = null, ran = false;
+  if (!choices.length) {
+    next.disabled = false;
+    next.setLabel("체험 없이 계속");
+    v._run = async () => { await sh.close(); go(4); };
+    return;
+  }
+  let pick = null, ran = false, chooseRelaxation = null;
   const addBtn = $("#addBtn", sh.el);
   $$(".slot", sh.el).forEach(btn => btn.addEventListener("click", () => {
     $$(".slot", sh.el).forEach(x => x.classList.remove("on"));
@@ -1099,27 +1133,64 @@ async function s3(v, t) {
     addBtn.disabled = false;
   }));
   const run = async () => {
-    if (!pick || ran) return;
+    if (pick === null || ran) return;
     ran = true;
-    let W = pick === "main" ? D.whatif : D.whatif.alt;
+    let W = choices[Number(pick)];
     const at = hhmm(placeById[W.pick].fixedStart);
     await sh.close(); if (!alive(t)) return;
-    island.show({ spin: true, tone: "var(--violet)", title: `공방 ${at} 넣고 다시 계산 중`, sub: "고정 시각 노드 + 나머지 제약 유지", hold: 0 });
+    island.show({ spin: true, tone: "var(--violet)", title: `체험 ${at} 넣고 다시 계산 중`, sub: "고정 시각 노드 + 나머지 제약 유지", hold: 0 });
     if (LIVE) {
       try {
-        const result = await api("/api/what-if", { pick: W.pick });
-        if (!result.plan?.stops?.length) throw new Error("빈 일정");
+        const result = await api("/api/what-if", { pick: W.pick }, 30000, true);
+        if (!result.infeasible && !result.plan?.stops?.length) throw new Error("빈 일정");
         W = { ...W, ...result };
       } catch (_) { log("mip", "넣어보기 호출 실패 · demo 데이터로 재생"); }
     } else await sleep(800);
     if (!alive(t)) return;
+    if (W.infeasible) {
+      island.show({ title: "지금 조건으론 못 넣어요", sub: "누가 무엇을 양보하면 되는지 계산했어요", hold: 3200 });
+      setTitle($("#ttl", v), "숲체험을 넣으려면\n하나를 양보해야 해요");
+      const tray = $("#tray", v);
+      tray.innerHTML = `<div class="note">꼭 지킬 조건도, 말한 사람이 양보하면 바꿀 수 있어요.</div>${W.relaxations.map((r, i) => {
+        const person = P.find(p => p.name === r.owner);
+        return `<button class="b ${person?.name === "서연" ? "sky" : "pink"} row between relax" data-i="${i}" style="width:100%;text-align:left;padding:18px;--c:${person?.color || "var(--navy)"}"><span class="pill"><i></i>${escapeHTML(r.label)}</span>${svg("arrow", 20, 2.4)}</button>`;
+      }).join("")}`;
+      $$(".relax", tray).forEach((b, i) => rise(b, 100 + i * 100));
+      let selecting = false;
+      chooseRelaxation = async id => {
+        if (selecting || !alive(t)) return;
+        selecting = true;
+        $$(".relax", tray).forEach(b => { b.disabled = true; });
+        const saved = choices[Number(pick)];
+        const option = saved.relaxations.find(r => r.id === id);
+        const replay = saved.chosen?.relaxationId === id ? saved.chosen : option;
+        let selected = { ...W, ...replay, relaxationId: id, infeasible: false };
+        island.show({ spin: true, tone: "var(--violet)", title: "양보한 조건으로 다시 계산 중", sub: W.relaxations.find(r => r.id === id).label, hold: 0 });
+        if (LIVE) {
+          try {
+            const result = await api("/api/what-if", { pick: W.pick, relax: id });
+            if (!result.plan?.stops?.length) throw new Error("빈 일정");
+            selected = { ...selected, ...result };
+          } catch (_) { log("mip", "양보 후 호출 실패 · demo 데이터로 재생"); }
+        } else await sleep(700);
+        if (!alive(t)) return;
+        showResult(selected);
+      };
+      $$(".relax", tray).forEach(b => b.addEventListener("click", () => chooseRelaxation(W.relaxations[+b.dataset.i].id)));
+      log("mip", `what_if_add(체험 ${at}) · 불가능 → ${W.relaxations.map(r => r.label).join(" / ")}`);
+      return;
+    }
+    showResult(W);
+  };
+  function showResult(W) {
+    const at = hhmm(placeById[W.pick].fixedStart);
     chosen = W;
-    log("mip", `what_if_add(가죽공방 ${at}) · 다른 제약 유지`, W.plan.solveMs ?? undefined);
+    log("mip", `what_if_add(체험 ${at})${W.relaxationId ? " · 양보: " + W.relaxationId : " · 다른 제약 유지"}`, W.plan.solveMs ?? undefined);
     tl.render(W.plan, { glowNew: true, inDelay: 500 });
     setTimeout(() => $(`.ti[data-id="${W.pick}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 1300);
     const d = planDiff(base, W.plan);
-    setTitle($("#ttl", v), `공방을 넣으면\n${d.dropped.length}곳을 빼야 해요`);
-    island.show({ title: `${d.dropped.length}곳 빼고 공방 ${at} 넣음`, sub: "Python-MIP 실제 계산", right: W.plan.solveMs ? `${W.plan.solveMs}ms` : "", hold: 2600 });
+    setTitle($("#ttl", v), `체험을 넣으면\n${d.dropped.length}곳을 빼야 해요`);
+    island.show({ title: `${d.dropped.length}곳 빼고 체험 ${at} 넣음`, sub: "Python-MIP 실제 계산", right: W.plan.solveMs ? `${W.plan.solveMs}ms` : "", hold: 2600 });
     const top = $("#top", v);
     top.insertAdjacentHTML("beforeend", `<div class="deltas">
       <div><div class="v gr">${signed(d.walk / 1000, 1)}<em>km</em></div><div class="lab">걷는 거리</div></div>
@@ -1128,21 +1199,36 @@ async function s3(v, t) {
     top.classList.add("cut");
     $$(".deltas > div", top).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateY(20px) scale(.7)" }, { opacity: 1, transform: "none" }], "pop", { delay: 600 + i * 90 }));
     const tray = $("#tray", v);
-    tray.innerHTML = `<div class="b peach tab tray"><div class="row between"><span class="lab" style="opacity:.75;font-weight:600">양보한 곳</span><span class="gr" style="font:500 28px var(--gr)">${d.dropped.length}</span></div><div class="row2">${d.dropped.map(s => `<span class="pill">${short(s.name)}</span>`).join("")}</div></div>`;
+    tray.innerHTML = `<div class="b peach tab tray"><div class="row between"><span class="lab" style="opacity:.75;font-weight:600">빠지는 곳</span><span class="gr" style="font:500 28px var(--gr)">${d.dropped.length}</span></div><div class="row2">${d.dropped.map(s => `<span class="pill">${escapeHTML(short(s.name))}</span>`).join("")}</div></div>`;
     rise(tray.firstChild, 900);
     $$(".tray .pill", tray).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateX(-30px) rotate(-6deg)" }, { opacity: 1, transform: "none" }], "pop", { delay: 1100 + i * 90 }));
-    if (placeById[W.pick].availability === "unverified") $("#note", v).textContent = `${at} 자리는 자동 조회가 막혀 있어요. 결제 전에 한 번 더 확인합니다.`;
+    if (placeById[W.pick].availability === "unverified") $("#note", v).textContent = `${at} 자리와 가격은 확인이 필요해요. 상품 페이지에서 확인해 주세요.`;
     log("llm", `diff → 문장화 (숫자는 솔버 값 그대로)`);
     next.disabled = false;
-  };
+  }
   addBtn.addEventListener("click", run);
-  v._run = async () => { $$(".slot", sh.el)[1].click(); await sleep(700); await run(); };
+  v._run = async () => {
+    const preferred = choices.findIndex(w => placeById[w.pick].fixedStart === 15 * 60);
+    $$(".slot", sh.el)[Math.max(0, preferred)].click();
+    await sleep(700); await run();
+    if (chooseRelaxation && alive(t)) {
+      await sleep(1800);
+      const W = choices[Number(pick)];
+      await chooseRelaxation(W.chosen?.relaxationId || W.relaxations[0].id);
+    }
+  };
 }
 
 /* ---------- step 4: agree + split pay ---------- */
 async function s4(v, t) {
   status("13:01");
-  const W = chosen || D.whatif, plan = W.plan, pay = D.pay;
+  const W = selectedWhatif(), plan = W.plan;
+  if (!W.pick) {
+    v.innerHTML = `<div class="scr">${topBlock("합의", "체험 없이 균형안 유지", "lime")}</div>`;
+    cta(v, "다음", () => go(5)); return;
+  }
+  const picked = placeById[W.pick];
+  const pay = { item: `${short(picked.name)} · ${hhmm(plan.stops.find(s => s.id === W.pick).start)}`, price: picked.price, people: 2 };
   v.innerHTML = `<div class="scr" id="sc">
     ${topBlock("합의", `<span class="cap-up">${plan.stops.length}곳 · ${km(plan.walkM)}km</span>`, "lime cut")}
     <div class="b cream tab cut cl" id="vb">
@@ -1155,7 +1241,7 @@ async function s4(v, t) {
     </div>
     <div class="b mint tab tl" id="pay" style="opacity:.35">
       <div class="chain">${plan.stops.map((s, i) => `${i ? '<span class="ln"></span>' : ""}<span class="ico" style="${s.cat === "activity" ? "background:var(--violet);color:var(--cream)" : ""}">${svg(s.cat, 18, 2)}</span>`).join("")}</div>
-      <div class="rc" style="margin-top:12px"><span>${pay.item} × ${pay.people}</span><span class="gr">${won(pay.price * pay.people)}</span></div>
+      <div class="rc" style="margin-top:12px"><span>${escapeHTML(pay.item)} × ${pay.people}</span><span class="gr">${won(pay.price * pay.people)}</span></div>
       <div class="rc"><span>나머지 ${plan.stops.length - 1}곳</span><span>현장 결제</span></div>
       <div class="rc t"><span>${plan.stops.some(s => s.availability === "unverified") ? "자리 확인되면 결제" : "지금 결제"}</span><span class="gr">${won(pay.price * pay.people)}원</span></div>
     </div>
@@ -1214,8 +1300,13 @@ async function s4(v, t) {
 
 /* ---------- step 5: live re-plan ---------- */
 async function s5(v, t) {
-  let R = { ...D.replan };
-  const selected = LIVE ? (chosen || D.whatif) : D.whatif;
+  const selected = selectedWhatif();
+  const savedReplan = selected.replan;
+  if (!savedReplan || !selected.pick) {
+    v.innerHTML = `<div class="scr">${topBlock("여행 중", "유지할 체험 예약 또는 가능한 재계산 예시가 없습니다", "lime")}</div>`;
+    cta(v, "처음으로", () => go(0)); return;
+  }
+  let R = { ...savedReplan };
   const before = selected.plan;
   const booking = before.stops.find(s => s.id === selected.pick);
   R.keep = booking.id;
@@ -1238,7 +1329,7 @@ async function s5(v, t) {
   const btn = cta(v, "붐비는 곳 빼고 다시 짜기", () => replan());
   btn.disabled = true;
   await sleep(1300); if (!alive(t)) return;
-  island.show({ icon: "people", tone: "var(--red)", title: `${short(crowded.name)} 지금 붐벼요`, sub: "웨이팅 약 40분 · 서울 실시간 도시데이터(샘플)", hold: 3200 });
+  island.show({ icon: "people", tone: "var(--red)", title: `${short(crowded.name)} 지금 붐벼요`, sub: "지금 붐빔(샘플) · 웨이팅 약 40분", hold: 3200 });
   log("city", `실시간 도시데이터 · ${crowded.name} 혼잡 "붐빔" (샘플)`);
   top.classList.add("alert"); status(hhmm(R.now), true);
   setTitle($("#ttl", v), `${hhmm(R.now)}, ${short(crowded.name)}가\n지금 붐벼요`);
@@ -1253,32 +1344,32 @@ async function s5(v, t) {
   async function replan() {
     if (done) return; done = true;
     btn.disabled = true;
-    island.show({ spin: true, tone: "var(--violet)", title: `공방 ${bookingTime}은 지키고 다시 계산`, sub: `제외: ${short(crowded.name)}`, hold: 0 });
+    island.show({ spin: true, tone: "var(--violet)", title: `${short(booking.name)} ${bookingTime} 유지`, sub: `제외: ${short(crowded.name)}`, hold: 0 });
     if (LIVE) {
       try {
-        const result = await api("/api/replan", { now_min: R.now, exclude: [R.crowded], keep: { [R.keep]: booking.start } });
+        const result = await api("/api/replan", { now_min: R.now, exclude: [R.crowded], keep: { [R.keep]: booking.start }, pick: selected.pick, relax: selected.relaxationId || null });
         if (!result.plan?.stops?.length) throw new Error("빈 일정");
         R = { ...R, ...result };
       } catch (_) {
         log("mip", "재계산 호출 실패 · demo 데이터로 재생");
-        R.keep = D.replan.keep;
+        R = { ...savedReplan };
         bookingTime = hhmm(R.plan.stops.find(s => s.id === R.keep).start);
       }
     } else await sleep(700);
     if (!alive(t)) return;
-    log("mip", `reoptimize · lock(공방 ${bookingTime}) · 제외(${crowded.name})`, R.plan.solveMs);
+    log("mip", `reoptimize · lock(체험 ${bookingTime}) · 제외(${crowded.name})`, R.plan.solveMs);
     top.classList.remove("alert"); status(hhmm(R.now));
     tl.render(R.plan, { glowNew: true });
     setTimeout(() => $(`.ti[data-id="${R.keep}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 900);
     map.setRoute(R.plan.stops);
-    setTitle($("#ttl", v), `공방 ${bookingTime}은 그대로,\n나머지만 바꿨어요`);
+    setTitle($("#ttl", v), `${short(booking.name)} ${bookingTime}은 그대로,\n나머지만 바꿨어요`);
     const d = planDiff(before, R.plan);
     island.show({ title: `${R.plan.solveMs}ms 만에 다시 짰어요`, sub: `−${short(crowded.name)}  +${d.added.map(s => short(s.name)).join(", ")}`, hold: 3000 });
     const chg = $("#chg", v);
     chg.innerHTML = [
-      ...d.dropped.map(s => `<span class="pill" style="background:var(--red);color:var(--cream)">− ${short(s.name)}</span>`),
-      ...d.added.map(s => `<span class="pill" style="background:var(--lime)">+ ${short(s.name)}</span>`),
-      `<span class="pill" style="background:var(--violet);color:var(--cream)">${svg("lock", 13, 2.4)} 공방 ${bookingTime} 유지</span>`,
+      ...d.dropped.map(s => `<span class="pill" style="background:var(--red);color:var(--cream)">− ${escapeHTML(short(s.name))}</span>`),
+      ...d.added.map(s => `<span class="pill" style="background:var(--lime)">+ ${escapeHTML(short(s.name))}</span>`),
+      `<span class="pill" style="background:var(--violet);color:var(--cream)">${svg("lock", 13, 2.4)} 체험 ${bookingTime} 유지</span>`,
     ].join("");
     $$(".pill", chg).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateX(-30px) scale(.7)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + i * 100 }));
     btn.setLabel("처음부터 다시 보기");
