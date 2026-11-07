@@ -274,7 +274,7 @@ vooy-mcp/
 
 ### AWS (사용자 제안, 2026-11-07 읽기 전용 점검)
 
-- AWS 조직 계정(서울 리전)의 기존 리소스와 이름이 겹치지 않게 `hapui-` 접두사를 쓴다
+- 배포 계정: 팀원의 AWS 계정(조직 소속, 관리자 역할), 리전 ap-northeast-2. 계정 식별자는 공개 저장소에 적지 않는다. 기존 리소스와 이름이 겹치지 않게 `hapui` 이름을 쓴다
 - 로컬: Docker 27.5(arm64, buildx로 linux/amd64 빌드 가능), `lightsailctl` 없음(이미지 푸시에 필요 → `brew install aws/tap/lightsailctl`)
 
 | 경로 | 장점 | 단점 | 판단 |

@@ -25,7 +25,7 @@ vooy 서비스 연결(사용자 지정 MCP) 화면에 URL 붙여넣기 → 도�
 |---|---|
 | 단위·통합 테스트 | `pytest` **54개 통과** (로컬 macOS) |
 | 공개 서버 스모크 | `scripts/smoke_mcp.py https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` → **9회 호출 모두 통과** (Lightsail 서울, small 0.5 vCPU). 결과 원문: [smoke_result_remote.json](scripts/smoke_result_remote.json) |
-| 공개 서버 응답 시간(같은 실행) | initialize 2.7초(첫 연결) · tools/list 3.0초 · `propose_plans` 3인 4.2초 · `adjust_plan` 양보 7.5초 · 불가능 시나리오 1.0초 · 입력 오류 0.5초 이하 |
+| 공개 서버 응답 시간(같은 실행) | `propose_plans` 3인 3.9초 · `adjust_plan` 양보 7.0초 · 불가능 시나리오 0.8초 · 입력 오류 0.2초 이하 (v5, 14:2x 실행) |
 | 이상 입력 | 빈 인원, 이름 중복·이모지, 모르는 `kind`, 끝이 시작보다 이른 시간창, 1000자 말, `<img onerror>` 이름 → 서버가 죽지 않고 한국어 오류나 정상 결과로 답함 |
 | 로컬 스모크 | 같은 9회 호출 통과. 아래 "예시 대화"는 이 실행의 실제 출력: [smoke_result.json](scripts/smoke_result.json) |
 | vooy 메신저 연결 | 이 문서를 쓰는 시점에 vooy 베타 계정이 없어 **미확인**. 연결 절차는 위 "바로 써 보기"와 [RECIPE.md](RECIPE.md) |
