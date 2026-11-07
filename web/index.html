@@ -191,7 +191,7 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .ti { position: relative; }
 .stop { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 16px 18px 16px 16px; }
 .stop .nm { font: 600 17px/1.25 var(--kr); letter-spacing: -.04em; }
-.stop .mt { font: 500 12.5px var(--kr); opacity: .8; margin-top: 3px; }
+.stop .mt { display:flex; flex-wrap:wrap; column-gap:10px; row-gap:2px; font: 500 12.5px var(--kr); opacity: .8; margin-top: 3px; }
 .stop .tm { text-align: right; }
 .stop .tm b { display: block; font: 500 30px/1 var(--gr); letter-spacing: -.05em; }
 .stop .tm small { display: block; font: 500 12px var(--gr); opacity: .55; margin-top: 4px; }
@@ -419,7 +419,7 @@ body.mobile .try-clear { min-height:36px; }
     </div>
     <aside class="engine" id="engine">
       <div class="eg-hero">
-        <div class="row"><span class="cap-up" style="opacity:.7">Python-MIP · solve</span><span class="cap-up" style="opacity:.7" id="modeLabel">연결 확인 중</span></div>
+        <div class="row"><span class="cap-up" style="opacity:.7">Python-MIP solve</span><span class="cap-up" style="opacity:.7" id="modeLabel">연결 확인 중</span></div>
         <div class="eg-big gr"><span class="odo" id="egBig">0</span><em>ms</em></div>
         <div class="eg-cap" id="egCap">대기 중</div>
       </div>
@@ -464,7 +464,7 @@ P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const muted = [];
-const modeText = LIVE ? "LIVE · 실시간 계산" : "재생 · demo_data.js";
+const modeText = LIVE ? "LIVE 실시간 계산" : "재생 demo_data.js";
 $("#modeLabel").textContent = modeText;
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const sleep = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
@@ -767,18 +767,18 @@ class Timeline {
   html(s, o) {
     const crowd = o.crowd === s.id, lock = s.fixed;
     const tags = [];
-    if (crowd) tags.push(`<span class="pill fill">${svg("people", 13, 2.4)} 지금 붐빔 · 웨이팅 40분</span>`);
+    if (crowd) tags.push(`<span class="pill fill">${svg("people", 13, 2.4)} 지금 붐빔, 웨이팅 40분</span>`);
     if (lock) tags.push(`<span class="pill">${svg("lock", 12, 2.4)} ${hhmm(s.start)} 예약 고정</span>`);
     if (s.mrt?.coordSource?.startsWith("approx") || s.mrt?.durationSource === "default") tags.push(`<span class="pill">추정</span>`);
     if (s.availability === "unverified") tags.push(`<span class="pill">자리 확인 필요</span>`);
-    if ((s.tags || []).includes("heritage") && this.o.stories) tags.push(`<span class="pill story" data-story="${s.id}">${svg("heritage", 12, 2.4)} 미래유산 · 이야기</span>`);
+    if ((s.tags || []).includes("heritage") && this.o.stories) tags.push(`<span class="pill story" data-story="${s.id}">${svg("heritage", 12, 2.4)} 미래유산 이야기</span>`);
     if (!crowd && !lock && this.o.picks) {
       for (const who of whyOf(s)) tags.push(`<span class="pill" style="--c:${P[who.i].color}"><i></i>${who.label}</span>`);
       const q = placeById[s.id].q || {};
       if (q.uniqueness === 1 && !(s.tags || []).includes("heritage")) tags.push(`<span class="pill">여기서만</span>`);
       else if (q.uniqueness === 0) tags.push(`<span class="pill">체인점</span>`);
     }
-    const meta = `${s.catKo} · ${s.end - s.start}분 · 도보 ${Math.max(1, Math.round(s.walkMin))}분${s.price ? ` · ${won(s.price)}원` : ""}`;
+    const meta = `<span>${escapeHTML(s.catKo)}</span><span>${s.end - s.start}분</span><span>도보 ${Math.max(1, Math.round(s.walkMin))}분</span>${s.price ? `<span>${won(s.price)}원</span>` : ""}`;
     return `<div class="b stop ${lock ? "lock" : ""} ${crowd ? "crowd" : ""}" style="--bg:${crowd ? "var(--red)" : CAT[s.cat]}">
         <div class="ico">${svg(s.cat, 21, 2)}</div>
         <div><div class="nm">${escapeHTML(short(s.name))}</div><div class="mt">${meta}</div><div class="tags">${tags.join("")}</div></div>
@@ -911,7 +911,7 @@ function replaceDemo(data, custom = false) {
   P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
   placeById = Object.fromEntries(D.places.map(p => [p.id, p]));
   trying = custom; agreementPlan = null; chosen = null; muted.splice(0);
-  $("#modeLabel").textContent = custom ? "LIVE · 우리 대화로 계산" : modeText;
+  $("#modeLabel").textContent = custom ? "LIVE 우리 대화로 계산" : modeText;
 }
 function returnToSample() {
   autoId++; autoPlaying = false;
@@ -941,11 +941,11 @@ function resetConcessions() {
 }
 function ledgerLine() {
   const counts = concessionCounts();
-  return `<button class="ledger-line" data-ledger>양보 장부 <span class="pill small-pill on-dark">샘플 포함</span>${P.map(p => `<span><i class="person-dot" style="--c:${p.color}"></i>${p.name} ${counts[p.name]}</span>`).join(" · ")}${svg("arrow",14)}</button>`;
+  return `<button class="ledger-line" data-ledger>양보 장부 <span class="pill small-pill on-dark">샘플 포함</span>${P.map(p => `<span><i class="person-dot" style="--c:${p.color}"></i>${p.name} ${counts[p.name]}</span>`).join("")}${svg("arrow",14)}</button>`;
 }
 function openLedger(v) {
   if (autoPlaying || v._sheet) return;
-  const sh = openSheet(v, `<div class="b pink sheet-head"><span class="grab"></span><div class="row between"><span class="cap-up">기억하는 합의</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>양보 장부</div><div class="info-line">${P.map(p => `${p.name} ${concessionCounts()[p.name]}회`).join(" · ")} · 다음엔 ${nextPerson()} 차례</div></div><div class="b cream">${allHistory().map(r => `<div class="ledger-record"><b>${escapeHTML(r.date)} · ${escapeHTML(r.place)} · ${escapeHTML(r.person)}</b> <span class="pill small-pill">${r.sample ? "샘플" : "이번 세션"}</span><div>‘${escapeHTML(r.label)}’ 양보 · ${escapeHTML(r.note || "")}</div></div>`).join("") || "아직 양보 기록이 없어요."}</div>`);
+  const sh = openSheet(v, `<div class="b pink sheet-head"><span class="grab"></span><div class="row between"><span class="cap-up">기억하는 합의</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>양보 장부</div><div class="info-line">${P.map(p => `${p.name} ${concessionCounts()[p.name]}회`).join(", ")}, 다음엔 ${nextPerson()} 차례</div></div><div class="b cream">${allHistory().map(r => `<div class="ledger-record"><b>${escapeHTML(r.date)}, ${escapeHTML(r.place)}, ${escapeHTML(r.person)}</b> <span class="pill small-pill">${r.sample ? "샘플" : "이번 세션"}</span><div>‘${escapeHTML(r.label)}’ 양보, ${escapeHTML(r.note || "")}</div></div>`).join("") || "아직 양보 기록이 없어요."}</div>`);
   $(".sheet-close", sh.el).onclick = sh.close;
 }
 function recommendedFor(W) {
@@ -953,7 +953,7 @@ function recommendedFor(W) {
   const options = [...W.relaxations].sort((a,b) => b.preview.minSat - a.preview.minSat || (counts[a.owner] || 0) - (counts[b.owner] || 0) || (a.id === W.recommended?.id ? -1 : 1));
   const best = options[0], due = nextPerson(), last = allHistory().at(-1);
   const pair = P.map(p => Math.round(best.preview.sat[p.name])).join(" : ");
-  const reasons = [`양보 후 ${pair}으로 더 고르게 · 낮은 쪽 ${best.preview.minSat.toFixed(1)}%`, last ? `${due !== best.owner ? "참고 · " : ""}${last.date === "이번" ? "앞서 성수에선" : `지난번 ${last.place}에선`} ${last.person}이 양보했어요 · 이번엔 ${due} 차례` : "양보 장부에 첫 기록을 남겨요"];
+  const reasons = [`양보 후 ${pair}으로 더 고르게, 낮은 쪽 ${best.preview.minSat.toFixed(1)}%`, last ? `${due !== best.owner ? "참고: " : ""}${last.date === "이번" ? "앞서 성수에선" : `지난번 ${last.place}에선`} ${last.person}이 양보했어요. 이번엔 ${due} 차례` : "양보 장부에 첫 기록을 남겨요"];
   return {id:best.id, options, reasons};
 }
 
@@ -963,31 +963,31 @@ function openPOI(v, id, stop = null) {
   const p = placeById[id]; if (!p) return;
   const f = p.facts || {}, q = p.q || {}, mrt = p.mrt;
   const source = p.source === "mrt" && mrt?.isReal ? "마이리얼트립 실조회" : p.source === "heritage" ? "서울미래유산" : "샘플";
-  const parts = [["uniqueness","고유성","0.4", `지점 ${f.branches ?? "미확인"}곳${f.heritage ? " · 미래유산" : ""}`], ["reputation","평판","0.3", f.rating == null ? "평점·리뷰 미확인 · 사전평점 4.5 사용" : `평점 ${f.rating.toFixed(1)} · 리뷰 ${f.reviews}개 · 사전평점 4.5와 보정`], ["timing","시간대","0.3", f.crowd == null ? "혼잡 미확인 · 기본값 1.0" : `혼잡 ${f.crowd}/4 · 1 여유 ~ 4 붐빔 (샘플)`]];
+  const parts = [["uniqueness","고유성","0.4", `지점 ${f.branches ?? "미확인"}곳${f.heritage ? ", 미래유산" : ""}`], ["reputation","평판","0.3", f.rating == null ? "평점, 리뷰 미확인, 사전평점 4.5 사용" : `평점 ${f.rating.toFixed(1)}, 리뷰 ${f.reviews}개, 사전평점 4.5와 보정`], ["timing","시간대","0.3", f.crowd == null ? "혼잡 미확인, 기본값 1.0" : `혼잡 ${f.crowd}/4, 1 여유 ~ 4 붐빔 (샘플)`]];
   const fetched = D.mrt?.fetchedAt ? new Date(D.mrt.fetchedAt).toLocaleTimeString("ko-KR", {hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Asia/Seoul"}) : "";
   const sh = openSheet(v, `<div class="b ${p.cat === "activity" ? "lilac" : "mint"} sheet-head"><span class="grab"></span><div class="row between"><span class="pill small-pill">${escapeHTML(p.catKo)}</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>${escapeHTML(short(p.name))}</div>
-    <div class="poi-summary">${stop ? `<div><span class="lab">이 일정에서</span><b>${hhmm(stop.start)}–${hhmm(stop.end)} · ${stop.end-stop.start}분</b><small>도착 ${hhmm(stop.arrive)}${stop.wait ? ` · 대기 ${stop.wait}분` : ""}</small></div><div><span class="lab">이전 장소에서 도보</span><b>${won(Math.round(stop.walkM))}m · ${Math.round(stop.walkMin)}분</b></div>` : `<div class="info-line">현재 일정에 포함되지 않은 후보</div>`}<div><span class="lab">가격</span><b>${p.price ? `${won(p.price)}원 / 1인` : "무료 · 샘플"}</b></div><div><span class="lab">영업${mrt ? "" : " · 샘플"}</span><b>${mrt ? "영업시간 미확인" : `${hhmm(f.open ?? 0)}–${hhmm(f.close ?? 1440)}`}</b></div></div></div>
-    <div class="b cream"><div class="q-title"><span class="cap-up">장소 점수 Q</span><b>${p.quality.toFixed(3)}</b><span class="lab">/ 1</span></div>${parts.map(([key,label,weight,reason]) => `<div class="q-row"><div class="row"><b>${label}</b><span>× ${weight}</span><span class="q-value">${(q[key] ?? 0).toFixed(2)}</span></div><div class="q-track"><i style="width:${(q[key] ?? 0)*100}%"></i></div><small>${escapeHTML(reason)}</small></div>`).join("")}<div class="info-line">Q = 고유성×0.4 + 평판×0.3 + 시간대×0.3<br><small>구성요소 표시값은 반올림</small><br><span class="pill small-pill">지점 수·혼잡 샘플</span></div></div>
-    <div class="b pink"><span class="cap-up">이 장소가 채운 말</span><div class="fills">${stop?.fills?.length ? stop.fills.map(it => `<div><b>${escapeHTML(it.person)} · ${escapeHTML(it.label)}</b><br>“${escapeHTML(it.quote)}”</div>`).join("") : stop ? "이 장소에 직접 연결된 말은 없어요." : "일정에 넣으면 연결된 말을 볼 수 있어요."}</div></div>
-    ${p.story ? `<div class="b lilac"><div class="info-line">${escapeHTML(p.story)}</div><div class="info-line">${escapeHTML(p.credit || "")} · 이야기 샘플</div></div>` : ""}
-    <div class="b ${mrt?.isReal ? "lilac" : "cream"}">${mrt ? `<div class="info-line">평점 ${mrt.rating ?? "미확인"} · 리뷰 ${mrt.reviews ?? "미확인"}개<br>시작 ${mrt.start || hhmm(p.fixedStart)} · ${p.duration}분${mrt.durationSource === "default" ? ' <span class="pill small-pill">소요시간 추정</span>' : ""}<br>${escapeHTML(mrt.meetingText || "집결지 미확인")}</div>${p.url ? `<div class="product-link-row"><a class="pill product-link" href="${escapeHTML(p.url)}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 보기 ${svg("arrow",14)}</a></div>` : ""}` : ""}<span class="pill small-pill">${source}${mrt?.isReal && fetched ? ` · ${fetched}` : ""}</span><div class="poi-coord">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${mrt?.coordSource?.startsWith("approx") ? ' <span class="pill small-pill">좌표 추정</span>' : " · 좌표 근사"}</div></div>`);
+    <div class="poi-summary">${stop ? `<div><span class="lab">이 일정에서</span><b>${hhmm(stop.start)}~${hhmm(stop.end)}, ${stop.end-stop.start}분</b><small>도착 ${hhmm(stop.arrive)}${stop.wait ? `, 대기 ${stop.wait}분` : ""}</small></div><div><span class="lab">이전 장소에서 도보</span><b>${won(Math.round(stop.walkM))}m, ${Math.round(stop.walkMin)}분</b></div>` : `<div class="info-line">현재 일정에 포함되지 않은 후보</div>`}<div><span class="lab">가격</span><b>${p.price ? `${won(p.price)}원 / 1인` : "무료, 샘플"}</b></div><div><span class="lab">영업${mrt ? "" : ", 샘플"}</span><b>${mrt ? "영업시간 미확인" : `${hhmm(f.open ?? 0)}~${hhmm(f.close ?? 1440)}`}</b></div></div></div>
+    <div class="b cream"><div class="q-title"><span class="cap-up">장소 점수 Q</span><b>${p.quality.toFixed(3)}</b><span class="lab">/ 1</span></div>${parts.map(([key,label,weight,reason]) => `<div class="q-row"><div class="row"><b>${label}</b><span>× ${weight}</span><span class="q-value">${(q[key] ?? 0).toFixed(2)}</span></div><div class="q-track"><i style="width:${(q[key] ?? 0)*100}%"></i></div><small>${escapeHTML(reason)}</small></div>`).join("")}<div class="info-line">Q = 고유성×0.4 + 평판×0.3 + 시간대×0.3<br><small>구성요소 표시값은 반올림</small><br><span class="pill small-pill">지점 수, 혼잡 샘플</span></div></div>
+    <div class="b pink"><span class="cap-up">이 장소가 채운 말</span><div class="fills">${stop?.fills?.length ? stop.fills.map(it => `<div><b>${escapeHTML(it.person)}, ${escapeHTML(it.label)}</b><br>“${escapeHTML(it.quote)}”</div>`).join("") : stop ? "이 장소에 직접 연결된 말은 없어요." : "일정에 넣으면 연결된 말을 볼 수 있어요."}</div></div>
+    ${p.story ? `<div class="b lilac"><div class="info-line">${escapeHTML(p.story)}</div><div class="info-line">${escapeHTML(p.credit || "")}, 이야기 샘플</div></div>` : ""}
+    <div class="b ${mrt?.isReal ? "lilac" : "cream"}">${mrt ? `<div class="info-line">평점 ${mrt.rating ?? "미확인"}, 리뷰 ${mrt.reviews ?? "미확인"}개<br>시작 ${mrt.start || hhmm(p.fixedStart)}, ${p.duration}분${mrt.durationSource === "default" ? ' <span class="pill small-pill">소요시간 추정</span>' : ""}<br>${escapeHTML(mrt.meetingText || "집결지 미확인")}</div>${p.url ? `<div class="product-link-row"><a class="pill product-link" href="${escapeHTML(p.url)}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 보기 ${svg("arrow",14)}</a></div>` : ""}` : ""}<span class="pill small-pill">${source}${mrt?.isReal && fetched ? `, ${fetched}` : ""}</span><div class="poi-coord">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}${mrt?.coordSource?.startsWith("approx") ? ' <span class="pill small-pill">좌표 추정</span>' : ", 좌표 근사"}</div></div>`);
   $(".sheet-close", sh.el).onclick = sh.close;
 }
 
 function productCard(p, snapshot) {
   const estimatedDuration = p.durationSource === "default", estimatedCoord = p.coordSource?.startsWith("approx");
   const fetched = snapshot?.fetchedAt ? new Date(snapshot.fetchedAt).toLocaleTimeString("ko-KR", {hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Asia/Seoul"}) : "";
-  return `<div class="b prod cut sheet-head"><span class="grab"></span><div class="row between"><span class="pill small-pill">마이리얼트립${p.isSample ? " · 샘플" : ""}</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>${escapeHTML(short(p.name))}</div>
+  return `<div class="b prod cut sheet-head"><span class="grab"></span><div class="row between"><span class="pill small-pill">마이리얼트립${p.isSample ? ", 샘플" : ""}</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>${escapeHTML(short(p.name))}</div>
     <div class="pr gr"><span>${p.price == null ? "가격 미확인" : won(p.price)}</span>${p.price == null ? "" : '<small>원 / 1인</small>'}</div>
-    <div class="product-evidence"><div class="rating">${p.rating == null ? "평점·리뷰 미확인" : `평점 ${Number(p.rating).toFixed(1)} · 리뷰 ${p.reviews ?? "미확인"}개`}</div>
+    <div class="product-evidence"><div class="rating">${p.rating == null ? "평점, 리뷰 미확인" : `평점 ${Number(p.rating).toFixed(1)}, 리뷰 ${p.reviews ?? "미확인"}개`}</div>
     <div class="info-line">소요시간 ${p.durationMin}분 ${estimatedDuration ? '<span class="pill small-pill estimate">추정</span>' : ""}<br>${escapeHTML(p.meetingText || "집결지 미확인")} ${estimatedCoord ? '<span class="pill small-pill estimate">좌표 추정</span>' : ""}</div>
-    <div class="verified">${p.isSample ? "샘플" : `마이리얼트립 실조회 · ${fetched}`} · ${escapeHTML(snapshot?.date || "예시 날짜")}<br>평점·가격·시작 시각 기준</div>
+    <div class="verified">${p.isSample ? "샘플" : `마이리얼트립 실조회, ${fetched}`}, ${escapeHTML(snapshot?.date || "예시 날짜")}<br>평점, 가격, 시작 시각 기준</div>
     <div class="option-chips">${(p.options || []).map(o => {
       const [h,m] = o.start.split(":").map(Number), start = h*60+m;
       const inside = start >= D.window.start && start + p.durationMin <= D.window.end;
       return `<div class="option-chip ${inside ? "in-window" : "out-window"} ${o.available === false ? "sold-out" : ""}"><b>${escapeHTML(o.start)}</b><small>${o.available === false ? "매진" : inside ? "시간창 안" : "시간창 밖"}</small></div>`;
     }).join("")}</div>
-    <div class="info-line">${(p.options || []).some(o => o.available === true) ? `조회 시 ${P.length}인 예약 가능` : "자리 확인 필요"}${p.price != null ? ` · ${won(p.price)}원` : ""}<br>시간창 ${hhmm(D.window.start)}–${hhmm(D.window.end)} · 종료까지 포함</div></div>
+    <div class="info-line">${(p.options || []).some(o => o.available === true) ? `조회 시 ${P.length}인 예약 가능` : "자리 확인 필요"}${p.price != null ? `, ${won(p.price)}원` : ""}<br>시간창 ${hhmm(D.window.start)}~${hhmm(D.window.end)}, 종료까지 포함</div></div>
     ${p.url ? `<div class="product-link-row"><a class="pill product-link" href="${escapeHTML(p.url)}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 보기 ${svg("arrow",14)}</a></div>` : ""}</div>`;
 }
 
@@ -995,7 +995,7 @@ function productCard(p, snapshot) {
 const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
   ["결국 한 명이\n참는 여행", "“‘전시는 꼭 봐야 해’, ‘나 많이 못 걸어’. 같이 여행 가면 결국 한 명이 참죠.”"],
   ["한 문장이면\n조건이 된다", `“각자 한 문장이면 꼭 지킬 것과 되면 좋은 것으로 나눠요. ${won(D.sources.orderings)}가지 순서 중 둘 다 OK인 일정 ${D.series.length}개.”`],
-  ["만족도는\n한 말의 체크리스트", `“만족도는 각자 한 말이 지켜진 비율이에요. 저울을 밀면 지민 ${Math.round(D.series[0].sat["지민"])}·서연 ${Math.round(D.series[0].sat["서연"])}부터 지민 ${Math.round(D.series.at(-1).sat["지민"])}·서연 ${Math.round(D.series.at(-1).sat["서연"])}까지. 가운데가 ${Math.round(D.series[D.defaultIdx].sat["지민"])} 대 ${Math.round(D.series[D.defaultIdx].sat["서연"])}.”`],
+  ["만족도는\n한 말의 체크리스트", `“만족도는 각자 한 말이 지켜진 비율이에요. 저울을 밀면 지민 ${Math.round(D.series[0].sat["지민"])}, 서연 ${Math.round(D.series[0].sat["서연"])}부터 지민 ${Math.round(D.series.at(-1).sat["지민"])}, 서연 ${Math.round(D.series.at(-1).sat["서연"])}까지. 가운데가 ${Math.round(D.series[D.defaultIdx].sat["지민"])} 대 ${Math.round(D.series[D.defaultIdx].sat["서연"])}.”`],
   ["넣으면, 뭘\n빼야 하는지", "“숲체험을 넣으면? 지금 조건으론 안 된다고, 대신 누가 무엇을 양보하면 되는지 바로 계산해요.”"],
   ["둘 다 OK면\n결제까지", "“둘 다 승인하면 분담 결제 요청까지.”"],
   ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 숲체험은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
@@ -1013,7 +1013,7 @@ function openTry(v) {
   ];
   const sh = openSheet(v, `<div class="b lime sheet-head"><span class="grab"></span><div class="row between"><span class="sheet-title" data-sheet-title>우리 대화 넣기</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="lab">오늘 어디서 뭘 하고 싶은지, 각자 한 문장이면 돼요</div></div>
     <form id="tryForm">${P.map((p,i) => `<div class="b ${i ? "sky" : "pink"}"><div class="row between"><label for="try${i}">${escapeHTML(p.name)}</label><button type="button" class="pill try-clear" data-clear="${i}">지우기</button></div><textarea id="try${i}" name="person${i}" maxlength="200" rows="3" required aria-describedby="tryHint${i} tryCount${i}">${escapeHTML(p.text)}</textarea><div class="try-meta"><span id="tryHint${i}" class="try-hint" role="alert"></span><span id="tryCount${i}" class="lab gr"></span></div><div class="try-chips">${examples[i].map((text,k)=>`<button type="button" class="pill" data-example="${i}:${k}">${escapeHTML(text)}</button>`).join("")}</div></div>`).join("")}
-    <div class="b cream try-progress" id="tryProgress" hidden role="status" aria-live="polite"><div class="row between"><b>일정을 만들고 있어요</b><span class="gr" id="trySeconds">0초</span></div><ol><li>① 말을 조건으로 바꾸는 중 · OpenAI</li><li>② 꼭 지킬 것과 되면 좋은 것 나누기</li><li>③ 가능한 순서 비교 중 · CBC</li></ol><div class="lab">예상 진행 단계예요 · 응답이 오면 실제 조건과 일정을 보여드려요</div><button type="button" class="pill" id="tryCancel" hidden>취소</button></div>
+    <div class="b cream try-progress" id="tryProgress" hidden role="status" aria-live="polite"><div class="row between"><b>일정을 만들고 있어요</b><span class="gr" id="trySeconds">0초</span></div><ol><li>① 말을 조건으로 바꾸는 중, OpenAI</li><li>② 꼭 지킬 것과 되면 좋은 것 나누기</li><li>③ 가능한 순서 비교 중, CBC</li></ol><div class="lab">예상 진행 단계예요, 응답이 오면 실제 조건과 일정을 보여드려요</div><button type="button" class="pill" id="tryCancel" hidden>취소</button></div>
     <div class="b lime" style="padding:6px"><button type="submit" class="btn navy" id="trySubmit"><span>이 대화로 일정 짜기</span><span class="go">${svg("arrow",22)}</span></button></div></form>`);
   sh.el.classList.add("try-sheet");
   const form = $("#tryForm", sh.el), submit = $("#trySubmit",sh.el), fields = P.map((_,i)=>$("#try"+i,sh.el));
@@ -1069,8 +1069,8 @@ function openTry(v) {
       await sh.close();
       activeOriginal=JSON.parse(JSON.stringify(data)); replaceDemo(data,true); sessionHistory=[];
       const source=D.source || {};
-      log("llm",`${source.provider==="rules" ? "규칙 파서" : "LLM "+source.model} · ${source.parseMs}ms`);
-      log("mip",`MIP 파레토 ${D.series.length}개 · ${source.solveMs}ms`,source.solveMs);
+      log("llm",`${source.provider==="rules" ? "규칙 파서" : "LLM "+source.model}, ${source.parseMs}ms`);
+      log("mip",`MIP 파레토 ${D.series.length}개, ${source.solveMs}ms`,source.solveMs);
       log("mip",`세션 ${D.sessionId.slice(0,6)}`);
       go(0); const redrawToken=token; await view.lastElementChild._ready; await sleep(800);
       if(alive(redrawToken))go(1);
@@ -1090,7 +1090,7 @@ async function s0(v, t) {
   v.innerHTML = `<div class="scr" id="sc" style="padding-bottom:24px">
     <div class="b top lime cut cl"><div class="row between"><span class="brand app-brand">${LOGO}</span><span class="cap-up">둘이서</span></div>${trying ? '<button class="pill sample-return" id="sampleReturn">처음 대화로 돌아가기</button>' : ""}
       <div class="row between" style="margin-top:14px;align-items:flex-end"><div style="font:500 40px/1.05 var(--kr);letter-spacing:-.055em">성수<br>반나절</div><div class="av-stack">${av(0, 44)}${av(1, 44)}</div></div></div>
-    <div class="b pink tab tl row" style="padding:12px 14px 12px 12px"><div class="date-c"><b class="gr">14</b><small>Nov</small></div><div style="flex:1"><div class="lab">오늘 일정</div><div style="font:600 15px var(--kr);margin-top:2px">${hhmm(D.window.start)} – ${hhmm(D.window.end)} · ${escapeHTML(D.start.name)} 출발</div></div><span class="pill">미정</span></div>
+    <div class="b pink tab tl row" style="padding:12px 14px 12px 12px"><div class="date-c"><b class="gr">14</b><small>Nov</small></div><div style="flex:1"><div class="lab">오늘 일정</div><div style="font:600 15px var(--kr);margin-top:2px">${hhmm(D.window.start)}~${hhmm(D.window.end)}, ${escapeHTML(D.start.name)} 출발</div></div><span class="pill">미정</span></div>
     <div id="chat"></div>
   </div>`;
   if (trying) $("#sampleReturn", v).onclick = returnToSample;
@@ -1160,9 +1160,9 @@ async function s1(v, t) {
       .then(result => {
         const people = result.constraints.people;
         const count = people.reduce((n, p) => n + p.prefs.length + p.hard.length, 0);
-        log("llm", `${result.fallback ? "고정 JSON" : "LLM " + result.model} · ${result.ms}ms · 추출 ${count}개`);
+        log("llm", `${result.fallback ? "고정 JSON" : "LLM " + result.model}, ${result.ms}ms, 추출 ${count}개`);
       })
-      .catch(() => log("llm", "파싱 호출 실패 · 화면은 샘플 marks로 재생"));
+      .catch(() => log("llm", "파싱 호출 실패, 화면은 샘플 marks로 재생"));
   }
   const marks = P.flatMap(p => p.marks), nh = marks.filter(m => m.kind === "hard").length, ns = marks.length - nh;
   v.innerHTML = `<div class="scr" id="sc">${topBlock("조건 정리", `<span class="cap-up">${D.source?.provider === "rules" ? "규칙 파서" : "OpenAI"}</span>`)}</div>`;
@@ -1179,7 +1179,7 @@ async function s1(v, t) {
     rise(el, 200 + i * 110);
     return { p, el, spanFor };
   });
-  const unmatched = Object.entries(D.unmatched || {}).flatMap(([name,words])=>(Array.isArray(words)?words:[words]).filter(Boolean).map(word=>`${name} · ${word}`));
+  const unmatched = Object.entries(D.unmatched || {}).flatMap(([name,words])=>(Array.isArray(words)?words:[words]).filter(Boolean).map(word=>`${name}, ${word}`));
   if(unmatched.length)sc.insertAdjacentHTML("beforeend",`<div class="unmatched">${unmatched.map(word=>`<span class="pill">아직 이해 못 한 말: ${escapeHTML(word)}</span>`).join("")}</div>`);
   const src = document.createElement("div");
   src.className = "src-row";
@@ -1222,9 +1222,9 @@ async function s1(v, t) {
   }
   if (!alive(t)) return;
   log("tmap", `성수 후보 ${D.sources.tmap}곳 (샘플 큐레이션)`);
-  log("mrt", `체험 시작 시각 ${D.whatif.choices.length}개 · ${D.mrt?.fetchedAt ? "MCP 스냅숏" : "예시 상품"}`);
+  log("mrt", `체험 시작 시각 ${D.whatif.choices.length}개, ${D.mrt?.fetchedAt ? "MCP 스냅숏" : "예시 상품"}`);
   log("tmap", `도보 행렬 ${D.sources.pairs}쌍 (직선×1.3 추정)`);
-  log("city", `실시간 도시데이터 · 혼잡도 (샘플)`);
+  log("city", `실시간 도시데이터, 혼잡도 (샘플)`);
   fn.style.visibility = "";
   rise(fn, 250);
   sc.scrollTo({ top: sc.scrollHeight, behavior: reduce ? "auto" : "smooth" });
@@ -1303,16 +1303,16 @@ async function s2(v, t) {
     setTitle($("#ttl", v), planTitle(p));
     const noConflict = n === 1 && Object.values(p.sat).every(value=>value>=99.95);
     $("#lbl", v).textContent = noConflict ? "충돌 없음" : p.label;
-    if(noConflict)setTitle($("#ttl", v), "충돌 없음 ·\n둘 다 다 지켰어요");
+    if(noConflict)setTitle($("#ttl", v), "충돌 없음\n둘 다 다 지켰어요");
     odo($("#nJ", v), Math.round(p.sat[P[0].name]));
     odo($("#nS", v), Math.round(p.sat[P[1].name]));
     odo($("#stW", v), km(p.walkM));
     odo($("#stM", v), Math.round(p.walkMin));
     odo($("#stF", v), hhmm(p.finish));
-    $("#mapPill", v).textContent = `${p.stops.length}곳 · ${km(p.walkM)}km`;
-    $("#minSat", v).textContent = `${Math.floor(Math.min(...Object.values(p.sat)))}% · 둘 중 낮은 쪽`;
+    $("#mapPill", v).textContent = `${p.stops.length}곳, ${km(p.walkM)}km`;
+    $("#minSat", v).textContent = `${Math.floor(Math.min(...Object.values(p.sat)))}%, 둘 중 낮은 쪽`;
     P.forEach((q, i) => renderChecklist($(`#cli${i}`, v), $(`#clp${i}`, v), p.checklist[q.name], p.sat[q.name], $(`#formula${i}`, v), q.name));
-    log("mip", `만족도 = Σ(강도×충족률)/Σ강도 · 지민 ${p.sat["지민"].toFixed(1)} / 서연 ${p.sat["서연"].toFixed(1)}`);
+    log("mip", `만족도 = Σ(강도×충족률)/Σ강도, 지민 ${p.sat["지민"].toFixed(1)} / 서연 ${p.sat["서연"].toFixed(1)}`);
     map.setRoute(p.stops, { delay: first ? 700 : 0 });
     tl.render(p, { animate: !first, inDelay: 60 });
   };
@@ -1335,8 +1335,8 @@ async function s2(v, t) {
     const prev = plan; idx = i; plan = D.series[i];
     paint(plan);
     const d = planDiff(prev, plan);
-    island.show({ icon: "bolt", title: diffTitle(d), sub: `${diffLine(d)} · ${P[0].name} ${signed(d.j)} · ${P[1].name} ${signed(d.s)}`, hold: 2600 });
-    log("mip", `저울 → ${plan.label} · ${P[0].name} ${Math.round(plan.sat[P[0].name])}% / ${P[1].name} ${Math.round(plan.sat[P[1].name])}%`);
+    island.show({ icon: "bolt", title: diffTitle(d), sub: `${diffLine(d)}, ${P[0].name} ${signed(d.j)}, ${P[1].name} ${signed(d.s)}`, hold: 2600 });
+    log("mip", `저울 → ${plan.label}, ${P[0].name} ${Math.round(plan.sat[P[0].name])}% / ${P[1].name} ${Math.round(plan.sat[P[1].name])}%`);
   };
   const scaleTo = i => { if (busy || hiddenOn) return; i = Math.max(0, Math.min(n - 1, i)); thumb.classList.add("snap"); thumb.style.left = (n === 1 ? 50 : i / (n - 1) * 100) + "%"; apply(i); };
   let drag = false;
@@ -1364,13 +1364,13 @@ async function s2(v, t) {
       idx = D.defaultIdx;
       thumb.classList.add("snap"); thumb.style.left = (n === 1 ? 50 : idx / (n - 1) * 100) + "%";
       plan = H.plan;
-      log("heritage", `서울미래유산 CSV · 성수 후보 ${H.candidates.length}곳 (공공누리 1유형)`);
-      log("mip", `tag_min(heritage ≥ 1) · 균형 목적 그대로`, H.plan.solveMs);
+      log("heritage", `서울미래유산 CSV, 성수 후보 ${H.candidates.length}곳 (공공누리 1유형)`);
+      log("mip", `tag_min(heritage ≥ 1), 균형 목적 그대로`, H.plan.solveMs);
     } else plan = D.series[idx];
     track.classList.toggle("off", on);
     paint(plan);
     const d = planDiff(prev, plan);
-    island.show({ icon: "heritage", tone: "var(--lilac)", title: on ? "미래유산 후보를 더해 다시 계산" : "원래 후보로 돌아가요", sub: `${diffLine(d)} · ${P[0].name} ${signed(d.j)} · ${P[1].name} ${signed(d.s)}`, right: on ? `${H.plan.solveMs}ms` : "", hold: 2800 });
+    island.show({ icon: "heritage", tone: "var(--lilac)", title: on ? "미래유산 후보를 더해 다시 계산" : "원래 후보로 돌아가요", sub: `${diffLine(d)}, ${P[0].name} ${signed(d.j)}, ${P[1].name} ${signed(d.s)}`, right: on ? `${H.plan.solveMs}ms` : "", hold: 2800 });
   };
   async function toggleMuted(person, label) {
     if (busy) return;
@@ -1403,7 +1403,7 @@ async function s2(v, t) {
       thumb.classList.add("snap");
       thumb.style.left = (n === 1 ? 50 : idx / (n - 1) * 100) + "%";
       paint(plan);
-      const message = `${person}의 '${label}' ${conceding ? "양보" : "양보 취소"} → 지민 ${plan.sat["지민"]} · 서연 ${plan.sat["서연"]}`;
+      const message = `${person}의 '${label}' ${conceding ? "양보" : "양보 취소"} → 지민 ${plan.sat["지민"]}, 서연 ${plan.sat["서연"]}`;
       island.show({ title: message, right: `${result.solveMs}ms`, hold: 3500 });
       log("mip", message, result.solveMs);
     } catch (_) {
@@ -1435,7 +1435,7 @@ async function s2(v, t) {
   cta(v, "체험 하나 넣어보기", () => go(3));
 }
 
-/* checklist rows: label · bar · % (bars and numbers animate in place) */
+/* checklist rows: label, bar, % (bars and numbers animate in place) */
 function renderChecklist(box, total, items, sat, formula, person) {
   if (box.children.length !== items.length || [...box.children].some((row,i)=>row.dataset.label !== items[i].label)) box.innerHTML = items.map(it => `<div class="ci" role="button" tabindex="0" data-label="${escapeHTML(it.label)}" aria-label="${escapeHTML(it.label)} 이 말은 양보할게"><span><span class="ci-label">${escapeHTML(it.label)}</span><small class="pill intensity"></small><small class="pill conceded" hidden>양보</small></span><i><b style="width:0"></b></i><em></em></div>`).join("");
   [...box.children].forEach((row, k) => {
@@ -1457,7 +1457,7 @@ function renderChecklist(box, total, items, sat, formula, person) {
   formula.dataset.calculated = calculated.toFixed(1); formula.dataset.sat = sat.toFixed(1);
   const numerator = active.map(it => `${+(it.fulfilled * 100).toFixed(2)}×${it.weight.toFixed(1)}`).join(" + ");
   const denominator = active.map(it => it.weight.toFixed(1)).join("+");
-  formula.innerHTML = `<span class="lab">충족률 × 강도, 모두 더해 나누기</span><div class="equation gr">${w ? `(${numerator}) ÷ (${denominator})` : "활성 항목 없음"} = <b>${sat.toFixed(1)}%</b></div><small>꼭 1.0 · 보통 0.7 · 살짝 0.4${matches ? "" : " · 서버 계산값 표시"}</small>`;
+  formula.innerHTML = `<span class="lab">충족률 × 강도, 모두 더해 나누기</span><div class="equation gr">${w ? `(${numerator}) ÷ (${denominator})` : "활성 항목 없음"} = <b>${sat.toFixed(1)}%</b></div><small>꼭 1.0, 보통 0.7, 살짝 0.4${matches ? "" : ", 서버 계산값 표시"}</small>`;
 }
 
 /* ---------- step 3: what-if ---------- */
@@ -1475,17 +1475,17 @@ async function s3(v, t) {
         replaceDemo(fresh);
       }
       snapshot = D.mrt;
-    } catch (_) { log("mrt", "조회 실패 · 저장된 스냅숏 사용"); }
+    } catch (_) { log("mrt", "조회 실패, 저장된 스냅숏 사용"); }
   }
   if (!alive(t)) return;
   const fetched = snapshot?.fetchedAt ? new Date(snapshot.fetchedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Seoul" }) : "미확인";
-  log("mrt", `MyRealTrip searchTnas·getTnaOptions · 조회 ${fetched}${snapshot?.fetchedAt ? " · 저장된 조회 결과" : " · 예시 상품"}`);
+  log("mrt", `MyRealTrip searchTnas, getTnaOptions, 조회 ${fetched}${snapshot?.fetchedAt ? ", 저장된 조회 결과" : ", 예시 상품"}`);
   const choices = (D.whatif.choices || []).filter(w=>w.pick && placeById[w.pick]);
   const availabilityText = value => value === true ? `조회 시 ${P.length}인 예약 가능` : value === false ? `${P.length}인 예약 불가` : "자리 확인 필요";
   const products = snapshot?.picked?.length ? snapshot.picked : D.places.filter(p => p.cat === "activity" && p.id === D.whatif.pick).map(p => ({ name: short(p.name), price: p.price, durationMin: p.duration, options: [], isSample: true }));
   const productCards = products.map(p => productCard(p, snapshot)).join("");
   const base = agreementPlan || D.series[D.defaultIdx];
-  v.innerHTML = `<div class="scr" id="sc">${topBlock("마이리얼트립 체험", `<button class="pill" id="reopenProduct" style="height:28px;font-size:11px">상품·시각</button>`, "lime")}<div id="tray"></div><div id="tl"></div><div class="note" id="note"></div></div>`;
+  v.innerHTML = `<div class="scr" id="sc">${topBlock("마이리얼트립 체험", `<button class="pill" id="reopenProduct" style="height:28px;font-size:11px">상품과 시각</button>`, "lime")}<div id="tray"></div><div id="tl"></div><div class="note" id="note"></div></div>`;
   rise($("#top", v), 60);
   $("#reopenProduct", v).onclick = () => { if (!autoPlaying && !v._sheet) go(3); };
   setTitle($("#ttl", v), "체험을 넣으면\n뭐가 빠질까?", 120);
@@ -1502,10 +1502,10 @@ async function s3(v, t) {
   }
   await sleep(600); if (!alive(t)) return;
   const sh = openSheet(v, `<span class="grab"></span>${productCards}
-    <div class="note">${choices.length ? `시간창 안의 시작 시각 ${choices.length}개 · 넣고 조건 확인` : "이 일정에 넣을 수 있는 시작 시각이 없습니다."}</div>
+    <div class="note">${choices.length ? `시간창 안의 시작 시각 ${choices.length}개, 넣고 조건 확인` : "이 일정에 넣을 수 있는 시작 시각이 없습니다."}</div>
     <div class="slots ${choices.length === 1 ? "single" : ""}">${choices.map((w, i) => {
       const p = placeById[w.pick];
-      return `<button class="slot" data-k="${i}"><div><span class="cap-up">시작</span><b class="gr">${hhmm(p.fixedStart)}</b></div><span class="slot-end">${p.duration}분 · ${hhmm(p.fixedStart + p.duration)} 종료</span></button>`;
+      return `<button class="slot" data-k="${i}"><div><span class="cap-up">시작</span><b class="gr">${hhmm(p.fixedStart)}</b></div><span class="slot-end">${p.duration}분, ${hhmm(p.fixedStart + p.duration)} 종료</span></button>`;
     }).join("")}</div>
     <div class="b lime" style="padding:6px"><button class="btn navy" id="addBtn" disabled><span>시작 시간을 골라주세요</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
   $$(".sheet-close", sh.el).forEach(b => b.onclick = sh.close);
@@ -1536,7 +1536,7 @@ async function s3(v, t) {
         const result = await api("/api/what-if", { pick: W.pick }, 30000, true);
         if (!result.infeasible && !result.plan?.stops?.length) throw new Error("빈 일정");
         W = { ...W, ...result, relaxations: result.relaxations?.map(r => ({...W.relaxations?.find(saved => saved.id === r.id), ...r})) || W.relaxations };
-      } catch (_) { log("mip", "넣어보기 호출 실패 · demo 데이터로 재생"); }
+      } catch (_) { log("mip", "넣어보기 호출 실패, demo 데이터로 재생"); }
     } else await sleep(800);
     if (!alive(t)) return;
     if (W.infeasible) {
@@ -1551,14 +1551,14 @@ async function s3(v, t) {
       recommendationId = recommended.id;
       tray.innerHTML = `${ledgerLine()}${recommended.options.map(r => {
         const person = P.find(p => p.name === r.owner), best = r.id === recommended.id, preview = r.preview;
-        return `<button class="b ${person?.name === "서연" ? "sky" : "pink"} relax ${best ? "recommended" : ""}" data-id="${escapeHTML(r.id)}"><div class="relax-title"><span>${escapeHTML(r.label)}</span>${best ? '<span class="pill recommended-pill">추천</span>' : svg("arrow",18)}</div>${best ? `<div class="reasons">${recommended.reasons.map(reason => `<span>${escapeHTML(reason)}</span>`).join("")}</div>` : ""}<div class="preview">${P.map(p => `${p.name} <b>${Math.round(preview.sat[p.name])}</b>`).join(" · ")}<br>빠지는 곳 ${preview.dropped.length}곳 · 도보 ${km(preview.walkM)}km</div></button>`;
+        return `<button class="b ${person?.name === "서연" ? "sky" : "pink"} relax ${best ? "recommended" : ""}" data-id="${escapeHTML(r.id)}"><div class="relax-title"><span>${escapeHTML(r.label)}</span>${best ? '<span class="pill recommended-pill">추천</span>' : svg("arrow",18)}</div>${best ? `<div class="reasons">${recommended.reasons.map(reason => `<span>${escapeHTML(reason)}</span>`).join("")}</div>` : ""}<div class="preview">${P.map(p => `${p.name} <b>${Math.round(preview.sat[p.name])}</b>`).join(", ")}<br>빠지는 곳 ${preview.dropped.length}곳, 도보 ${km(preview.walkM)}km</div></button>`;
       }).join("")}`;
       const activity = placeById[W.pick];
-      tray.insertAdjacentHTML("beforeend", `<button class="b lilac activity-detail" style="width:100%;text-align:left"><span class="cap-up">넣고 싶은 체험 · 장소 정보</span><div class="sheet-title">${escapeHTML(short(activity.name))}</div><span class="pill">${hhmm(activity.fixedStart)} · ${activity.duration}분 ${svg("arrow",14)}</span></button>`);
+      tray.insertAdjacentHTML("beforeend", `<button class="b lilac activity-detail" style="width:100%;text-align:left"><span class="cap-up">넣고 싶은 체험, 장소 정보</span><div class="sheet-title">${escapeHTML(short(activity.name))}</div><span class="pill">${hhmm(activity.fixedStart)}, ${activity.duration}분 ${svg("arrow",14)}</span></button>`);
       $(".activity-detail", tray).onclick = () => openPOI(v, W.pick);
       $("[data-ledger]", tray).onclick = () => openLedger(v);
       const counts = concessionCounts();
-      log("mip", `MIP 양보안 ${W.relaxations.length}개 사전 계산 · 추천 ${recommended.id} (min ${recommended.options.map(r => r.preview.minSat.toFixed(1)).join(" vs ")}) · 장부 지민 ${counts["지민"]}/서연 ${counts["서연"]}`);
+      log("mip", `MIP 양보안 ${W.relaxations.length}개 사전 계산, 추천 ${recommended.id} (min ${recommended.options.map(r => r.preview.minSat.toFixed(1)).join(" vs ")}), 장부 지민 ${counts["지민"]}/서연 ${counts["서연"]}`);
       $$(".relax", tray).forEach((b, i) => rise(b, 100 + i * 100));
       let selecting = false;
       chooseRelaxation = async id => {
@@ -1575,7 +1575,7 @@ async function s3(v, t) {
             const result = await api("/api/what-if", { pick: W.pick, relax: id });
             if (!result.plan?.stops?.length) throw new Error("빈 일정");
             selected = { ...selected, ...result };
-          } catch (_) { log("mip", "양보 후 호출 실패 · demo 데이터로 재생"); }
+          } catch (_) { log("mip", "양보 후 호출 실패, demo 데이터로 재생"); }
         } else await sleep(700);
         if (!alive(t)) return;
         const label = option.changes.map(c => c.kind === "category_min" ? `${({exhibit:"전시",cafe:"카페"})[c.key] || c.key} ${c.from}곳` : option.label).join(" + ");
@@ -1584,7 +1584,7 @@ async function s3(v, t) {
         showResult(selected);
       };
       $$(".relax", tray).forEach(b => b.addEventListener("click", () => chooseRelaxation(b.dataset.id)));
-      log("mip", `what_if_add(체험 ${at}) · 불가능 → ${W.relaxations.map(r => r.label).join(" / ")}`);
+      log("mip", `what_if_add(체험 ${at}), 불가능 → ${W.relaxations.map(r => r.label).join(" / ")}`);
       return;
     }
     showResult(W);
@@ -1592,7 +1592,7 @@ async function s3(v, t) {
   function showResult(W) {
     const at = hhmm(placeById[W.pick].fixedStart);
     chosen = W;
-    log("mip", `what_if_add(체험 ${at})${W.relaxationId ? " · 양보: " + W.relaxationId : " · 다른 제약 유지"}`, W.plan.solveMs ?? undefined);
+    log("mip", `what_if_add(체험 ${at})${W.relaxationId ? ", 양보: " + W.relaxationId : ", 다른 제약 유지"}`, W.plan.solveMs ?? undefined);
     tl.render(W.plan, { glowNew: true, inDelay: 500 });
     setTimeout(() => $(`.ti[data-id="${W.pick}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 1300);
     const d = planDiff(base, W.plan);
@@ -1628,7 +1628,7 @@ async function s3(v, t) {
 /* Payment input and the visible summary are both made from this agreement. */
 async function openPayment(v, plan, booked) {
   if(v._sheet || autoPlaying)return;
-  const sh=openSheet(v,`<div class="pay-header"><b>예약하고 결제하기</b><button class="pill on-dark" id="closePay">닫기 ×</button></div><div class="b cream pay-empty" role="status">${booked ? "합의한 일정을 불러오는 중" : "결제 항목 0개 · 이 일정에는 예약할 체험이 없어요"}</div>`);
+  const sh=openSheet(v,`<div class="pay-header"><b>예약하고 결제하기</b><button class="pill on-dark" id="closePay">닫기 ×</button></div><div class="b cream pay-empty" role="status">${booked ? "합의한 일정을 불러오는 중" : "결제 항목 0개, 이 일정에는 예약할 체험이 없어요"}</div>`);
   sh.el.classList.add("pay-sheet");
   sh.el.setAttribute("aria-label","예약하고 결제하기");
   $("#closePay",sh.el).onclick=sh.close;
@@ -1647,10 +1647,10 @@ async function openPayment(v, plan, booked) {
     script.textContent=`window.TRIPFIT_PAY_INPUT=${json(input)};const tripfitSummary=${json(summary)};const tripfitFetch=window.fetch.bind(window);window.fetch=(url,options)=>String(url).endsWith('/data/plan_summary.json')?Promise.resolve(new Response(JSON.stringify(tripfitSummary),{headers:{'Content-Type':'application/json'}})):tripfitFetch(url,options);`;
     base.after(script);doc.body.classList.add("embed");
     if(v._sheet!==sh)return;
-    const frame=document.createElement("iframe");frame.title="같이 결제 · 합의한 일정";
+    const frame=document.createElement("iframe");frame.title="같이 결제, 합의한 일정";
     frame.srcdoc="<!doctype html>"+doc.documentElement.outerHTML;
     $(".pay-empty",sh.el).replaceWith(frame);
-    log("pay","AGENTIC PAY · 위임 2건 → 재조회 → 분담 결제(모의)");
+    log("pay","AGENTIC PAY, 위임 2건 → 재조회 → 분담 결제(모의)");
   }catch(error){
     if(v._sheet===sh)$(".pay-empty",sh.el).textContent="결제 화면을 불러오지 못했어요. 잠시 후 다시 열어주세요.";
   }
@@ -1662,9 +1662,9 @@ async function s4(v, t) {
   const W = selectedWhatif(), plan = W.plan;
   const booked = plan.stops.find(s=>s.id===W.pick && (s.mrt || placeById[s.id]?.mrt));
   const picked = booked ? placeById[booked.id] : null;
-  const pay = { item: booked ? `${short(picked.name)} · ${hhmm(booked.start)}` : "결제할 체험 0개", price: picked?.price || 0, people:P.length };
+  const pay = { item: booked ? `${short(picked.name)}, ${hhmm(booked.start)}` : "결제할 체험 0개", price: picked?.price || 0, people:P.length };
   v.innerHTML = `<div class="scr" id="sc">
-    ${topBlock("합의", `<span class="cap-up">${plan.stops.length}곳 · ${km(plan.walkM)}km</span>`, "lime cut")}
+    ${topBlock("합의", `<span class="cap-up">${plan.stops.length}곳, ${km(plan.walkM)}km</span>`, "lime cut")}
     <div class="b cream tab cut cl" id="vb">
       <svg class="venn" width="280" height="136" viewBox="0 0 280 136">
         <g class="vg" id="g0"><circle cx="80" cy="68" r="52" fill="${P[0].color}" stroke="#0E2A3A" stroke-width="2.5"/><text class="who-t" x="62" y="78" text-anchor="middle">${P[0].initial}</text></g>
@@ -1680,7 +1680,7 @@ async function s4(v, t) {
       <div class="rc t"><span>${plan.stops.some(s => s.availability === "unverified") ? "자리 확인되면 결제" : "지금 결제"}</span><span class="gr">${won(pay.price * pay.people)}원</span></div>
     </div>
     <div class="split" id="split">${P.map((p, i) => `<div class="b ${i ? "sky" : "pink"}"><div class="lab">${p.name} 부담</div><div class="gr">${won(pay.price)}<em>원</em></div></div>`).join("")}</div>
-    <div class="b peach"><div class="lab">${booked ? "같이 결제 · 실제 결제 없는 모의 체험" : "이 합의 일정에는 결제할 체험이 없어요 · 결제 항목 0개"}</div><button class="btn navy pay-open" id="openPay" disabled><span>예약하고 결제하기</span><span class="go">${svg("card",22)}</span></button></div>
+    <div class="b peach"><div class="lab">${booked ? "같이 결제, 실제 결제 없는 모의 체험" : "이 합의 일정에는 결제할 체험이 없어요, 결제 항목 0개"}</div><button class="btn navy pay-open" id="openPay" disabled><span>예약하고 결제하기</span><span class="go">${svg("card",22)}</span></button></div>
   </div>`;
   const concession = W.concession || (W.relaxationId ? sessionHistory.find(r => r.id === "whatif") : null);
   if (concession) $("#vb", v).insertAdjacentHTML("beforeend", `<div class="concession-next">이번 양보: ${escapeHTML(concession.person)} ‘${escapeHTML(concession.label)}’ → 다음엔 ${nextPerson()} 차례</div>`);
@@ -1745,7 +1745,7 @@ async function s5(v, t) {
   const crowded=placeById[R.crowded];
   status(hhmm(R.now));
   v.innerHTML = `<div class="scr" id="sc">
-    ${topBlock(`여행 중 · ${hhmm(R.now)}`, `<span class="cap-up">혼잡도 샘플</span>`, "lime cut cr")}
+    ${topBlock(`여행 중, ${hhmm(R.now)}`, `<span class="cap-up">혼잡도 샘플</span>`, "lime cut cr")}
     <div class="b mint tab tr mapblk" id="mapB"><div id="map"></div></div>
     <div class="chg" id="chg"></div>
     <div id="tl"></div>
@@ -1760,8 +1760,8 @@ async function s5(v, t) {
   const btn = cta(v, "붐비는 곳 빼고 다시 짜기", () => replan());
   btn.disabled = true;
   await sleep(1300); if (!alive(t)) return;
-  island.show({ icon: "people", tone: "var(--red)", title: `${short(crowded.name)} 지금 붐벼요`, sub: "지금 붐빔(샘플) · 웨이팅 약 40분", hold: 3200 });
-  log("city", `실시간 도시데이터 · ${crowded.name} 혼잡 "붐빔" (샘플)`);
+  island.show({ icon: "people", tone: "var(--red)", title: `${short(crowded.name)} 지금 붐벼요`, sub: "지금 붐빔(샘플), 웨이팅 약 40분", hold: 3200 });
+  log("city", `실시간 도시데이터, ${crowded.name} 혼잡 "붐빔" (샘플)`);
   top.classList.add("alert"); status(hhmm(R.now), true);
   setTitle($("#ttl", v), `${hhmm(R.now)}, ${short(crowded.name)}가\n지금 붐벼요`);
   tl.render(before, { crowd: R.crowded, animate: false });
@@ -1787,13 +1787,13 @@ async function s5(v, t) {
           done=false;btn.disabled=false;
           island.show({title:"다시 계산하지 못했어요",sub:"지금 합의한 일정을 유지했어요"});return;
         }
-        log("mip", "재계산 호출 실패 · 저장된 같은 세션 일정으로 재생");
+        log("mip", "재계산 호출 실패, 저장된 같은 세션 일정으로 재생");
         R={...savedReplan};
         if(booking)bookingTime=hhmm(R.plan.stops.find(s=>s.id===R.keep)?.start ?? booking.start);
       }
     } else await sleep(700);
     if (!alive(t)) return;
-    log("mip", `reoptimize${booking ? ` · lock(체험 ${bookingTime})` : ""} · 제외(${crowded.name})`, R.plan.solveMs);
+    log("mip", `reoptimize${booking ? `, lock(체험 ${bookingTime})` : ""}, 제외(${crowded.name})`, R.plan.solveMs);
     top.classList.remove("alert"); status(hhmm(R.now));
     tl.render(R.plan, { glowNew: true });
     setTimeout(() => $(`.ti[data-id="${R.keep}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 900);
@@ -1823,9 +1823,9 @@ function openStory(v, id) {
     <div class="b lilac"><span class="grab"></span>
       <div class="row between" style="margin-top:8px"><span class="cap-up">서울미래유산</span><span class="ico" style="color:var(--lilac)">${svg("heritage", 21, 2)}</span></div>
       <div class="story-name">${short(pl.name)}</div>
-      <div class="lab" style="margin-top:8px">서울미래유산 · 성수${st ? ` · ${hhmm(st.start)} 도착 · ${st.end - st.start}분` : ""}</div></div>
+      <div class="lab" style="margin-top:8px">서울미래유산, 성수${st ? `, ${hhmm(st.start)} 도착, ${st.end - st.start}분` : ""}</div></div>
     <div class="b cream"><div class="story-tx">${pl.story}</div></div>
-    <div class="credit">출처: ${pl.credit} · 역사 필드를 짧게 다시 쓴 샘플 문구 · 좌표 근사</div>
+    <div class="credit">출처: ${pl.credit}, 역사 필드를 짧게 다시 쓴 샘플 문구, 좌표 근사</div>
     <div class="b lime" style="padding:6px"><button class="btn navy" id="stOk"><span>일정으로 돌아가기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
   v._sheet = sh;
   E($(".story-tx", sh.el), [{ opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "none" }], 700, { delay: 250 });
@@ -1853,7 +1853,7 @@ function showConflict(explanation = null) {
       <div class="lab">이것 하나만 양보하면 돼요</div>
       <div class="cf-big gr"><span class="from">${km(C.limitM)}</span><span class="arr">→</span><span>${to.toFixed(1)}</span><em>km</em></div>
       <div class="cf-bar"><i id="cfI" style="width:${C.limitM / 1000 / 3.5 * 100}%"></i><b style="left:${C.limitM / 1000 / 3.5 * 100}%"></b></div>
-      <div class="lab" style="margin-top:8px">${C.relaxations[0] || "제약 완화"} · diagnose()가 찾은 최소 양보</div></div>
+      <div class="lab" style="margin-top:8px">${C.relaxations[0] || "제약 완화"}, diagnose()가 찾은 최소 양보</div></div>
     <div class="b lime" style="padding:6px"><button class="btn navy" id="cfOk"><span>이렇게 바꾸기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
   v._sheet = sh;
   log("mip", `infeasible → diagnose: 1개씩, 안 되면 2개 조합 완화`, C.ms);

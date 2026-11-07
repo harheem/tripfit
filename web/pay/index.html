@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0E2A3A">
-<title>같이 결제 · TripFit</title>
+<title>같이 결제 | TripFit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -17,7 +17,7 @@
     <span class="brand"><i></i><i></i> TripFit</span>
     <p class="cap-n">같이 결제 <b id="caption-step">01 / 05</b></p>
     <h1>둘 다 OK면,<br>결제까지.</h1>
-    <p class="cap-s">SKT Agentic Pay · 합의한 범위 안에서<br>조회부터 분담 결제까지 맡겨요.</p>
+    <p class="cap-s">SKT Agentic Pay<br>합의한 범위 안에서<br>조회부터 분담 결제까지 맡겨요.</p>
     <div class="cap-prog" id="caption-progress" aria-hidden="true"></div>
   </header>
   <div class="phone">
@@ -28,16 +28,16 @@
         <summary>기술 정보 <span aria-hidden="true">＋</span></summary>
         <div class="b lilac technical-body">
           <h2>동작과 데이터</h2>
-          <table><caption>실호출·목업 표기</caption><tbody>
-            <tr><th scope="row">위임·범위 검사</th><td>브라우저의 실제 엔진 로직 · 결제사에서 한 번 더 검사</td></tr>
-            <tr><th scope="row">예약 재조회</th><td>서버 연결 시 실시간 API · 실패 시 저장된 조회 결과</td></tr>
-            <tr><th scope="row">결제</th><td>Agentic Pay 모의 결제 · 실제 돈은 나가지 않음</td></tr>
-            <tr><th scope="row">예약 확정</th><td>마이리얼트립 링크에서 진행 · 외부 예약 API 없음</td></tr>
-            <tr><th scope="row">판매자 문의</th><td>초안만 작성 · 전송하지 않음</td></tr>
-            <tr><th scope="row">판매자 기록</th><td>브라우저 내 모의 판매자에게 예약 요청·같은 승인 해시 전달</td></tr>
+          <table><caption>실호출과 목업 표기</caption><tbody>
+            <tr><th scope="row">위임 범위 검사</th><td>브라우저의 실제 엔진 로직, 결제사에서 한 번 더 검사</td></tr>
+            <tr><th scope="row">예약 재조회</th><td>서버 연결 시 실시간 API, 실패 시 저장된 조회 결과</td></tr>
+            <tr><th scope="row">결제</th><td>Agentic Pay 모의 결제. 실제 돈은 나가지 않음</td></tr>
+            <tr><th scope="row">예약 확정</th><td>마이리얼트립 링크에서 진행, 외부 예약 API 없음</td></tr>
+            <tr><th scope="row">판매자 문의</th><td>초안만 작성, 전송하지 않음</td></tr>
+            <tr><th scope="row">판매자 기록</th><td>브라우저 내 모의 판매자에게 예약 요청, 같은 승인 해시 전달</td></tr>
           </tbody></table>
-          <details class="audit"><summary>감사 로그 · 해시 체인 <span id="log-count"></span></summary><p id="chain-status" role="status"></p><ol id="logs"></ol></details>
-          <div class="tests"><h3>흐름 테스트</h3><button id="test-price" disabled>가격 인상 · 38,000원</button><button id="test-merchant" disabled>다른 판매처 결제 시도</button></div>
+          <details class="audit"><summary>감사 로그 (해시 체인) <span id="log-count"></span></summary><p id="chain-status" role="status"></p><ol id="logs"></ol></details>
+          <div class="tests"><h3>흐름 테스트</h3><button id="test-price" disabled>가격 인상 (38,000원)</button><button id="test-merchant" disabled>다른 판매처 결제 시도</button></div>
           <button id="reset" class="secondary">처음부터 다시</button>
         </div>
       </details>

@@ -38,10 +38,10 @@ def recommend(options, people, history=HISTORY):
         return None
     best = max(options, key=lambda o: (o["preview"]["minSat"], -counts.get(o["owner"], 0)))
     pair = " : ".join(str(round(best["preview"]["sat"][p])) for p in people)
-    reasons = [f"양보 후 {pair}으로 더 고르게 · 둘 중 낮은 만족도 {best['preview']['minSat']:.1f}%"]
+    reasons = [f"양보 후 {pair}으로 더 고르게, 둘 중 낮은 만족도 {best['preview']['minSat']:.1f}%"]
     if history:
         last = history[-1]
         due = min(people, key=lambda p: counts[p])
-        prefix = "" if due == best["owner"] else "참고 · "
-        reasons.append(f"{prefix}지난번 {last['place']}에선 {last['person']}이 양보했어요 · 이번엔 {due} 차례")
+        prefix = "" if due == best["owner"] else "참고: "
+        reasons.append(f"{prefix}지난번 {last['place']}에선 {last['person']}이 양보했어요. 이번엔 {due} 차례")
     return {"id": best["id"], "reasons": reasons}
