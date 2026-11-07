@@ -48,7 +48,7 @@ TripFit은 각자의 말을 체크리스트로 바꾸고, MIP가 시간과 도�
 | 기술적 완성도 | 솔버 8개 통과, 서버 62개 통과, 1개 skip. CBC 계산 시간 실측(실행마다 조금 다름): 파레토 대안 전체 0.4~0.7초, 하나 뺀 뒤 재계산, 여행 중 재계산 약 60~100ms | `solver/test_solver.py`, `server/test_api.py`, `server/test_mrt.py`, `server/test_try.py`; 아래 테스트 명령. `web/demo_data.js`의 `solveMs` |
 | 상업적 가능성 | 동행 여행의 "어디 갈지 합의" 단계에서 실제 판매 상품(마이리얼트립 체험, 1인 35,000원)을 일정 안에 넣을 수 있는지까지 계산하고 상품으로 연결. 수익 모델은 일정에 들어간 체험, 입장권의 예약 중개 수수료와 분담 결제(SKT 절). 매출, 전환율은 아직 측정 전 | `web/demo_data.js`의 `mrt.picked`, `pay`; `solver/demo_builder.py` |
 | 팀 실행력 | CBC 엔진 → API → 화면 연결, 실상품 스냅숏과 불가능 판정, 이번에 뺄 조건 선택까지 구현하고 작업 결과 기록 | `server/app.py`, `web/index.html`, `codex/03_mrt_live.result.md`, `codex/04_whatif_concession.result.md` |
-| 스폰서 리소스 활용 | 마이리얼트립 MCP 실상품과 시각 조회와 결제 직전 실시간 재조회, OpenAI 문장 파싱, SKT Agentic Pay 위임, 분담 결제(`agentic-pay/`), vooy 원격 MCP 서버(`vooy-mcp/`, 공개 배포) | `server/parsing.py`, `scripts/fetch_mrt_snapshot.py`, `data/mrt_snapshot.json` |
+| 스폰서 리소스 활용 | 마이리얼트립 MCP 실상품과 시각 조회와 결제 직전 실시간 재조회, OpenAI 문장 파싱, SKT Agentic Pay 위임, 분담 결제(`agentic-pay/`), Articul8 Bivia 결제 직전 판단(`POST https://api.articul8.ai/bivia/choice`), vooy 원격 MCP 서버(`vooy-mcp/`, 공개 배포) | `server/parsing.py`, `server/bivia.py`, `server/pay_router.py`, `scripts/fetch_mrt_snapshot.py`, `data/mrt_snapshot.json` |
 | API 활용도 | OpenAI JSON 응답 검증, 폴백, MRT `tools/list`, `searchTnas`, `getTnaDetail`, `getTnaOptions`, 갱신 실패 시 캐시 보존 | `server/parsing.py`, `solver/mrt_live.py`, `server/app.py`; `GET /api/mrt` |
 | 창의성, 시도 | 한 말의 충족률을 저울로 비교하고, 체험이 불가능하면 사람별 이번에 뺄 조건을 계산. 카페를 이번만 뺀 뒤 기존 4곳 빠짐 | `solver/tripfit_solver.py`, `solver/demo_builder.py`; 화면 2, 3단계 |
 | 빌더 임팩트 | API 키 없이 전체 흐름 재생, 키 없이도 CBC 재계산 가능. 공개한 개인 알고리즘을 합의 앱으로 확장 | `web/index.html`, `web/demo_data.js`, `README_RUN.md`; `A` 자동재생 |
@@ -165,6 +165,7 @@ LLM 호출 동시성은 2개, CBC 호출은 기존 잠금으로 직렬화합니�
 TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 있는 유료 체험을 두 사람이 각자 범위를 정해 에이전트에게 맡기고, 에이전트는 예약 가능 여부와 가격을 다시 확인한 뒤 맡긴 범위 안에서만 나눠 결제합니다.
 
 - 데모 시나리오: 마이리얼트립 "서울숲 힐링 숲체험" 2026-11-14 15:00, 1인 35,000원 × 2명 = 70,000원, 지민 35,000원 / 서연 35,000원
+- Articul8 Bivia: 서버 `POST /api/pay/decide`가 `POST https://api.articul8.ai/bivia/choice`에 "에이전트가 지금 이 결제를 진행해도 되는가?"를 묻습니다. 최종 결정 = 엔진 검사 AND Bivia입니다. 판단 보류도 결제를 잠급니다. 상위 폴더 `.env`의 `A8_API_KEY`, 없으면 `BIVIA_API_KEY`를 쓰며 키가 없거나 호출에 실패하면 확률 없는 규칙 판단을 표시합니다. 호출은 8초 제한, 기존 IP 레이트 리밋과 동시 호출 한도를 공유합니다.
 - 코드: [`agentic-pay/`](agentic-pay/), 자세한 설명: [`agentic-pay/README.md`](agentic-pay/README.md)
 - 데모: [공개 링크 /pay/](https://harheem.github.io/tripfit/pay/)(저장된 조회 결과), 로컬 서버 `http://localhost:8000/pay/`(실시간 재조회)
 
@@ -184,13 +185,13 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 
 카드를 맡길 수 있게 하는 장치는 사람별 위임 범위, 한 번만 쓰는 결제 권한, 독립 검사와 감사 해시입니다. 가격 인상, 예약 불가, 판매처 거절, 위임 철회 시에는 멈춤 사유를 부모 화면에도 반환합니다. 2~4단계에서 맡긴 것 취소로 철회하면 `REVOKED`가 기록되고, 이후 권한 발급과 결제는 `MANDATE_REVOKED`로 거절합니다. 새 승인을 받아 다시 맡길 수 있습니다. 결제와 판매자 기록은 모의이며, 문의 초안은 전송하지 않습니다.
 
-테스트: Node 37개 통과(기존 엔진 25개, 철회 5개, 결과 반환 7개), 라우터 20개 통과, 서버 전체 85개 통과와 1개 건너뜀, 솔버 8개 통과. 문법 검사와 변경 파일 금지 기호 검사 통과. 이번 브라우저 검사는 환경의 macOS 프로세스 권한 제한으로 실행하지 못했고, 실제 LLM 호출과 배포 화면은 확인하지 않았습니다.
+테스트: Node 49개 통과, 서버 전체 106개 통과와 1개 건너뜀. Bivia는 실제 네트워크 없이 응답 파싱, 판단 보류, 실패와 시간 초과, 엔진 거절 우선, 부모 결과와 감사 기록을 확인합니다. 문법 검사와 변경 파일 금지 기호 검사 통과. 이번 브라우저 검사는 macOS 프로세스 권한 제한으로 실행하지 못했습니다. 실제 Bivia 호출과 배포 화면은 확인하지 않았습니다.
 
 | 결제 맡기기(위임) | 에이전트의 예약 재조회 | 이대로 승인해도 되는 이유 | 영수증 |
 |---|---|---|---|
 | ![위임](agentic-pay/docs/screens/02_mandates.png) | ![재조회](agentic-pay/docs/screens/03_recheck.png) | ![승인 근거](agentic-pay/docs/screens/04_quote.png) | ![영수증](agentic-pay/docs/screens/05_paid.png) |
 
-결제 전 확인 버튼 아래와 영수증의 "가격이 오르면?", "다른 곳에서 결제하려 하면?" 버튼으로 멈춤을 시연합니다. 시뮬레이션 표시와 함께 확인서의 해당 줄이 빨간 X로 바뀌고, 결제가 잠기며 다시 맡기기로 복구합니다. "기술 정보"의 테스트 버튼도 유지합니다.
+결제 전 확인 버튼 아래와 영수증의 "가격이 오르면?", "다른 곳에서 결제하려 하면?" 버튼으로 멈춤을 시연합니다. 같은 판단 API를 다시 부르고, 확인서의 해당 줄을 빨간 X로 표시합니다. 거절 시 300ms 화면 흔들림, 아래에서 올라오는 red 블록과 STOP 도장, 제공된 확률 막대를 보여 줍니다. 모션 줄이기 설정에서는 애니메이션을 생략합니다. 결제는 회색으로 잠기고 새 한도로 다시 맡길 수 있습니다. 부모의 빨간 줄에는 실제 Bivia 판단일 때만 "Articul8 Bivia가 결제를 막았어요: 이유"를 표시합니다. "기술 정보"의 테스트 버튼도 유지합니다.
 
 ## Vooy 트랙: 메신저에서 부르는 TripFit MCP 서버 (`vooy-mcp/`)
 

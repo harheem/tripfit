@@ -341,3 +341,13 @@ export async function verifyChain(entries) {
     return true;
   } catch { return false; }
 }
+
+// Store only the public decision summary in the existing hash chain.
+export function recordDecision(world, decision, action) {
+  contexts.get(world).record('agent', action, {
+    provider: decision.provider, value: decision.value, final: decision.final,
+    status: decision.status, reason: decision.reason, override_reason: decision.override_reason ?? null,
+    ...(decision.provider === 'articul8-bivia' ? {model: decision.model, probability: decision.probability ?? null} : {}),
+    ms: decision.ms,
+  });
+}

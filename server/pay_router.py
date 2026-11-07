@@ -65,3 +65,48 @@ class InquiryRequest(StrictModel):
 @router.post("/inquiry")
 async def inquiry(body: InquiryRequest):
     return await generate_inquiry(body.model_dump(exclude_none=True))
+
+
+class DecisionItem(StrictModel):
+    short_name: str = Field(min_length=1, max_length=200)
+    start: str = Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    date: str | None = Field(default=None, max_length=40)
+
+
+class DecisionLine(StrictModel):
+    person: str = Field(min_length=1, max_length=80)
+    mandate_max: int | None = Field(ge=0, le=9007199254740991)
+    amount: int = Field(ge=0, le=9007199254740991)
+
+
+class DecisionCheck(StrictModel):
+    key: str = Field(min_length=1, max_length=80)
+    ok: bool
+    detail: str = Field(max_length=1000)
+
+
+class PriceChange(StrictModel):
+    from_: int = Field(alias="from", ge=0, le=9007199254740991)
+    to: int = Field(ge=0, le=9007199254740991)
+
+
+class DecisionMerchant(StrictModel):
+    expected: str = Field(min_length=1, max_length=200)
+    actual: str = Field(min_length=1, max_length=200)
+
+
+class DecisionRequest(StrictModel):
+    item: DecisionItem
+    people: list[Annotated[str, Field(min_length=1, max_length=80)]] = Field(min_length=1, max_length=10)
+    lines: list[DecisionLine] = Field(min_length=1, max_length=10)
+    checks: list[DecisionCheck] = Field(min_length=1, max_length=20)
+    changed: PriceChange | None = None
+    merchant: DecisionMerchant
+
+
+@router.post("/decide")
+async def decide(body: DecisionRequest):
+    from server.bivia import decide_payment
+    if [line.person for line in body.lines] != body.people or len(set(body.people)) != len(body.people):
+        raise HTTPException(422, detail="사람별 분담 내역을 확인해 주세요")
+    return await decide_payment(body.model_dump(by_alias=True))

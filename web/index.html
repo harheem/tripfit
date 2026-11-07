@@ -1654,7 +1654,7 @@ function renderPaymentResult(v,booked){
   }else{
     let line=$("#payStopped",v);
     if(!line){line=document.createElement('p');line.id='payStopped';line.className='pay-stopped';line.setAttribute('role','alert');button.before(line);}
-    line.textContent=`${result.reason}, 다시 맡기기`;
+    line.textContent=result.decider==='Articul8 Bivia'?`Articul8 Bivia가 결제를 막았어요: ${result.reason}`:`${result.reason}, 다시 맡기기`;
     button.querySelector('span').textContent='다시 맡기기';
   }
   fitNumbers();
@@ -1705,6 +1705,7 @@ async function openPayment(v, plan, booked) {
         if(typeof data.reason!=='string'||!data.reason.trim()||data.reason.length>1000)return;
         if(paymentForStop(booked)?.status==='paid')return;
         paymentResults.set(paymentKey(data.item),structuredClone(data));renderPaymentResult(v,booked);
+        if(typeof data.decision_log==='string'&&data.decision_log.length<=200)log('pay',data.decision_log);
       }
     };
     window.addEventListener('message',onResult);

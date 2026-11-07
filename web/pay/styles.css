@@ -264,3 +264,31 @@ body.embed .hero .cap-prog i{height:4px}
 .simulation-note{background:var(--butter);margin:0 0 8px 8px}
 .revoke{background:transparent;cursor:pointer;margin-top:10px;font-size:11px;min-height:32px}
 .draft #inquiry-meta{margin-top:10px;font-size:10px}
+
+.decision{padding:22px 20px;overflow:hidden}
+.decision h3{font-size:28px;line-height:1.2;letter-spacing:-.04em}
+.decision p{font-size:13px;line-height:1.65;margin:12px 0}
+.decision-loading{background:var(--navy);color:var(--cream);border:1px solid var(--sky)}
+.decision-loading h3{font-size:17px;line-height:1.5}
+.decision-pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--lime);margin-right:8px;animation:decision-pulse 1s ease-in-out infinite alternate}
+.decision-pass{background:var(--navy);color:var(--lime);border:2px solid var(--lime)}
+.decision-pass p{color:var(--cream)}
+.decision-stop{padding-top:67px;animation:decision-rise var(--spring-ms) var(--spring)}
+.decision-stop h3{font-size:36px}
+.stop-stamp{position:absolute;right:20px;top:17px;border:3px solid var(--navy);padding:0 12px;font:600 27px var(--gr);letter-spacing:.08em;transform:rotate(-8deg);animation:decision-stamp 380ms var(--spring) 100ms backwards}
+.decision-confidence{display:flex;align-items:baseline;gap:10px;font:500 36px var(--gr);margin:14px 0}
+.decision-confidence small{font:500 11px var(--kr)}
+.decision-bars{display:grid;gap:12px;margin:18px 0}
+.decision-bar>div:first-child{display:flex;justify-content:space-between;gap:8px;font-size:11px;margin-bottom:5px}
+.decision-track{height:9px;background:#0E2A3A26;border-radius:99px;overflow:hidden}
+.decision-pass .decision-track{background:#F3F1EA33}
+.decision-track i{display:block;width:var(--fill);height:100%;background:var(--navy);border-radius:inherit;animation:decision-fill 900ms var(--ease) both}
+.decision-pass .decision-track i{background:var(--lime)}
+.decision .pill{font-size:10px;overflow-wrap:anywhere}
+.decision-fallback{display:block;margin-top:7px;font-size:10px}
+.action .hold:disabled{background:#B6B9B7;color:var(--navy);border:0}
+.action [hidden]{display:none}
+@keyframes decision-rise{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes decision-stamp{from{transform:scale(1.4) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(-8deg);opacity:1}}
+@keyframes decision-fill{from{width:0}to{width:var(--fill)}}
+@keyframes decision-pulse{from{opacity:.3}to{opacity:1}}

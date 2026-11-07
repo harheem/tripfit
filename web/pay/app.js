@@ -1,4 +1,5 @@
 import * as api from './api.js';
+import {rulesDecision,validDecision,decisionMarkup,decisionLog} from './decision.js';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -22,6 +23,7 @@ const number = (amount,cls='') => `<strong class="num ${cls}">${digits(amount)}<
 const labels=['일정 확인','결제 맡기기','예약 확인','결제 전 확인','결제 완료'];
 const titles=['우리의 합의 일정','정한 만큼만,<br>결제를 맡겨요','예약 확인은<br>에이전트가 대신','이대로 승인해도<br>되는 이유','맡긴 만큼,<br>같이 결제했어요'];
 let input,trip,plan,world,mandates=[],quote,checked,tokens,confirmed,stage=1,epoch=0,recheckController;
+let decision=null,decisionController,decisionRun=0;
 let reapproving=false,cancelHolds=[],expiryTimer,chainRun=0,paying=false;
 let stopReason='',stopCode='',simulation=false,paidNotice='',lastStop='',inquiryController;
 function notifyParent(status, detail){
@@ -86,6 +88,7 @@ async function audit(){
   $('#chain-status').textContent=valid?'해시 체인 검증 통과. 기록의 연결이 일치해요':'해시 체인 검증 실패. 기록을 확인해 주세요';
 }
 function frame(body){
+  decisionController?.abort();decisionRun++;
   clearHolds();clearTimeout(expiryTimer);paying=false;
   $('#caption-step').textContent=`0${stage} / 05`;$('#caption-progress').innerHTML=progress();
   $('#flow').innerHTML=`<header class="b lime hero cut"><div class="eyebrow"><span>TripFit 같이 결제</span><span class="stage-counter">0${stage} / 05</span></div><h2 id="active-title" tabindex="-1"><span class="label">${esc(labels[stage-1])}</span>${titles[stage-1]}</h2><div class="row between"><p>${stage===1?`${dateText(true)}, 성수, 서울숲`:stage===2?'판매처와 상품, 상한을 정하고 각자 승인해요':stage===3?'예약 가능 여부와 가격을 다시 확인해요':stage===4?'맡긴 범위와 조회 결과를 대조했어요':'모의 결제 완료. 실제 돈은 나가지 않아요'}</p>${stage===1?`<div class="avatars">${trip.people.map(p=>`<span class="avatar">${esc(p.name[0])}</span>`).join('')}</div>`:''}</div><div class="hero-progress"><nav class="cap-prog" aria-label="${stage}/5단계, ${labels[stage-1]}">${progress()}</nav><span class="embed-counter" aria-hidden="true">0${stage} / 05</span></div></header>${simulation?'<p class="simulation-note pill" role="status">시뮬레이션</p>':''}${body}<p id="message" role="alert"></p>`;
@@ -235,14 +238,14 @@ function changes(){
 }
 function quoteScreen(){
   stage=4;quote=api.buildQuote(world,trip);
-  if(!stopReason&&['NEEDS_REAPPROVAL','UNAVAILABLE'].includes(quote.status))stopped(quote.reasons.join(', '));
+  if(!stopReason&&['NEEDS_REAPPROVAL','UNAVAILABLE'].includes(quote.status))stopReason=quote.reasons.join(', ');
   const {checks,ready,remaining}=inspection();
-  const canReapprove=!ready;
-  frame(`<section class="b cream checks-sheet" aria-labelledby="checks-title"><div class="checks-heading"><h3 id="checks-title">${checks.every(c=>c.ok)?`${checks.length}가지 모두 맞아요`:`${checks.filter(c=>!c.ok).length}가지 다시 확인해 주세요`}</h3>${changes()}</div><dl class="checks" aria-label="결제 범위 검사 ${checks.length}개">${checks.map(c=>`<div class="check" data-check="${c.key}" data-pass="${c.ok}"><dt>${esc(c.title)}</dt><dd><p>${esc(c.evidence)}</p>${c.ok?'':`<span class="repair">${esc(c.repair)}</span>`}<span class="check-mark" role="img" aria-label="${c.ok?'확인':'확인 필요'}">${icon(c.ok?'check':'cross')}</span></dd></div>`).join('')}</dl></section>${splitBlocks()}<section class="b cream consequences"><h3>누르면 일어나는 일</h3><ol><li>${quote.lines.map(l=>`${esc(l.name)} 카드 ${money(l.amount)}`).join(', ')}을 각각 1회용 결제 권한으로 결제해요.</li><li>판매자도 같은 승인 기록을 받아요. 해시는 승인할 때 생성되며, 영수증에서 앞 8자를 확인해요.</li><li>모의 결제. 실제 돈은 나가지 않아요.</li></ol></section>${!ready?`<section class="b red stop-reason"><h3>다시 확인하고 맡겨 주세요</h3><p>${esc(stopReason||quote.reasons.join(', ')||checks.filter(c=>!c.ok).map(c=>c.repair).join(', '))}</p></section>`:''}<div class="action"><p>대표 ${esc(trip.people[0].name)}이 ${trip.people.length===2?'두 사람':`${trip.people.length}명`} 위임으로 결제</p>${holdMarkup(ready?`${money(quote.total)} 결제하기`:'조건 확인 전 결제 잠김')}${simulationButtons()}${canReapprove?`<button id="reapprove" class="primary">${money(checked?.price??trip.item.price)}으로 다시 맡기기${icon('arrow')}</button>`:''}${!ready?'<button id="cancel" class="secondary">일정부터 다시 확인하기</button>':''}</div>`);
-  const button=$('.hold');button.disabled=!ready;
+  decision=null;
+  frame(`<section class="b cream checks-sheet" aria-labelledby="checks-title"><div class="checks-heading"><h3 id="checks-title">${checks.every(c=>c.ok)?`${checks.length}가지 모두 맞아요`:`${checks.filter(c=>!c.ok).length}가지 다시 확인해 주세요`}</h3>${changes()}</div><dl class="checks" aria-label="결제 범위 검사 ${checks.length}개">${checks.map(c=>`<div class="check" data-check="${c.key}" data-pass="${c.ok}"><dt>${esc(c.title)}</dt><dd><p>${esc(c.evidence)}</p>${c.ok?'':`<span class="repair">${esc(c.repair)}</span>`}<span class="check-mark" role="img" aria-label="${c.ok?'확인':'확인 필요'}">${icon(c.ok?'check':'cross')}</span></dd></div>`).join('')}</dl></section>${splitBlocks()}<section class="b cream consequences"><h3>누르면 일어나는 일</h3><ol><li>${quote.lines.map(l=>`${esc(l.name)} 카드 ${money(l.amount)}`).join(', ')}을 각각 1회용 결제 권한으로 결제해요.</li><li>판매자도 같은 승인 기록을 받아요. 해시는 승인할 때 생성되며, 영수증에서 앞 8자를 확인해요.</li><li>모의 결제. 실제 돈은 나가지 않아요.</li></ol></section><div id="decision" aria-live="polite">${decisionMarkup(null)}</div><div class="action"><p>대표 ${esc(trip.people[0].name)}이 ${trip.people.length===2?'두 사람':`${trip.people.length}명`} 위임으로 결제</p>${holdMarkup('마지막 판단 후 결제할 수 있어요')}${simulationButtons()}<button id="reapprove" class="secondary" hidden>새 한도로 다시 맡기기</button><button id="manual-check" class="secondary" hidden>사람이 직접 확인하기</button><button id="cancel" class="secondary" hidden>일정부터 다시 확인하기</button></div>`);
+  const button=$('.hold');button.disabled=true;
   if(ready){const drawnAt=performance.now(),run=epoch;bindHold(button,drawnAt,async approval_ms=>{
     // Refresh the read-only inspection at the moment of approval; the engine revalidates again.
-    if(!inspection().ready){quoteScreen();return;}
+    if(decision?.final!=='proceed'||!inspection().ready){quoteScreen();return;}
     paying=true;clearTimeout(expiryTimer);$('#test-price').disabled=true;
     try{
       const approval=await api.approveQuote(world,quote,{approver_id:trip.people[0].id,approval_ms});if(run!==epoch)return;
@@ -253,6 +256,8 @@ function quoteScreen(){
   bindRevokes();bindSimulations();
   if($('#reapprove'))$('#reapprove').onclick=()=>{reapproving=true;mandateScreen(checked?.price??trip.item.price);};
   if($('#cancel'))$('#cancel').onclick=reset;
+  $('#manual-check').onclick=()=>{reapproving=true;mandateScreen(checked?.price??trip.item.price);};
+  void lastDecision(checks,ready);
   if(ready){
     const refreshExpiry=()=>{
       if(stage!==4||paying)return;
@@ -264,6 +269,42 @@ function quoteScreen(){
     expiryTimer=setTimeout(refreshExpiry,Math.min(1000,Math.max(1,remaining)));
   }
   focusTitle();
+}
+async function lastDecision(checks,ready){
+  const target=$('#decision'),button=$('.hold'),run=++decisionRun;
+  decisionController?.abort();const controller=new AbortController();decisionController=controller;
+  const changed=quote.lines.find(l=>l.mandate_max!==null&&l.amount!==l.mandate_max);
+  const data={item:{short_name:trip.item.short_name,start:trip.item.start,date:trip.date},people:trip.people.map(p=>p.name),
+    lines:quote.lines.map(l=>({person:l.name,mandate_max:l.mandate_max,amount:l.amount})),
+    checks:checks.map(c=>({key:c.key,ok:c.ok,detail:c.evidence})),
+    changed:changed?{from:changed.mandate_max,to:changed.amount}:null,
+    merchant:{expected:trip.item.merchant_label,actual:stopCode==='MERCHANT_MISMATCH'?'다른 판매처':trip.item.merchant_label}};
+  const timeout=setTimeout(()=>controller.abort(),9000);
+  let result;
+  try{
+    const response=await fetch('/api/pay/decide',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify(data)});
+    if(!response.ok)throw new Error('판단 응답 실패');
+    result=await response.json();if(!validDecision(result))throw new Error('판단 형식 오류');
+  }catch{result=rulesDecision(data);}finally{clearTimeout(timeout);}
+  if(run!==decisionRun||!target.isConnected||stage!==4)return;
+  // The model and transport cannot enlarge the engine's approval scope.
+  if(!ready||!inspection().ready){
+    if(result.final==='proceed')result={...result,final:'stop',override_reason:'엔진 검사에서 결제를 멈췄어요',reason:rulesDecision(data).reason};
+  }
+  decision=result;target.innerHTML=decisionMarkup(result);
+  const allowed=result.final==='proceed'&&inspection().ready;
+  button.disabled=!allowed;button.querySelector('span').innerHTML=`${esc(allowed?`${money(quote.total)} 결제하기`:'결제가 잠겼어요')}<small class="hold-label">${allowed?' (1초)':''}</small>`;
+  $('#reapprove').hidden=allowed||result.status==='abstained';
+  $('#manual-check').hidden=result.status!=='abstained';$('#cancel').hidden=allowed;
+  api.recordDecision(world,result,decisionLog(result));void audit();
+  if(!allowed){
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&result.status!=='abstained'){
+      $('.phone').animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}],{duration:300});
+    }
+    target.scrollIntoView({block:'center',behavior:'instant'});
+    const decider=result.provider==='articul8-bivia'?'Articul8 Bivia':'규칙 판단';
+    notifyParent('stopped',{reason:result.reason,decider,decision_log:decisionLog(result)});
+  }
 }
 function receiptHead(){return `<div class="receipt-head">${chip('모의 결제 영수증')}<strong>${esc(trip.item.short_name)}</strong><small>${dateText(true)}, ${esc(trip.item.start)}, ${trip.people.length}명<br>${esc(trip.item.merchant_label)}</small></div>`;}
 function supplierMarkup(){return api.supplierView(world).map(r=>`<p>${esc(r.item.short_name)} ${esc(r.option_start)}, ${r.people_count}명</p><p>예약 요청 + ${r.payments.length}건 결제 내역 + 각자 위임 기록</p><p>같은 승인 기록 <code>${esc(r.quote_hash.slice(0,8))}</code></p><p>모의 판매자 기록에 전달 완료, 실제 예약 확정은 아래 링크에서 진행해요.</p>`).join('');}
@@ -280,6 +321,7 @@ $('#reset').onclick=()=>{try{reset();}catch(e){showError(e);}};
 async function simulateStop(kind){
   if(paying||stage<3)return;
   $$('[data-sim], [data-revoke], .hold, #test-price, #test-merchant').forEach(b=>b.disabled=true);
+  decisionController?.abort();decisionRun++;decision=null;
   const run=++epoch;simulation=true;recheckController?.abort();inquiryController?.abort();clearHolds();clearTimeout(expiryTimer);
   // A receipt simulation gets its own mock world; settled authorizations stay intact.
   if(stage===5){
@@ -292,13 +334,15 @@ async function simulateStop(kind){
   if(kind==='price'){
     const result={available:true,price:Math.max(38000,...mandates.map(m=>m.max_amount+3000)),source:'test',checked_at:new Date().toISOString()};
     await api.recheck(world,trip,result);if(run!==epoch)return;checked=result;
-    stopped('가격이 맡긴 상한보다 올라 결제를 멈췄어요','AMOUNT_OVER_LIMIT');
+    stopReason='가격이 맡긴 상한보다 올라 결제를 멈췄어요';stopCode='AMOUNT_OVER_LIMIT';
   }else{
     const preview=api.buildQuote(world,trip);
-    if(preview.status!=='READY'){quoteScreen();return;}
-    const approval=await api.approveQuote(world,preview,{approver_id:trip.people[0].id,approval_ms:1000});if(run!==epoch)return;
-    const result=await api.simulateMalfunction(world,approval.tokens[0],{merchant_id:'other:merchant',amount:preview.lines[0].amount});if(run!==epoch)return;
-    if(!result.ok)stopped('맡긴 판매처가 아니어서 결제사가 거절했어요. 결제를 멈췄어요',result.error_code);
+    stopReason='맡긴 판매처가 아니어서 결제를 멈췄어요';stopCode='MERCHANT_MISMATCH';
+    if(preview.status==='READY'){
+      const approval=await api.approveQuote(world,preview,{approver_id:trip.people[0].id,approval_ms:1000});if(run!==epoch)return;
+      const result=await api.simulateMalfunction(world,approval.tokens[0],{merchant_id:'other:merchant',amount:preview.lines[0].amount});if(run!==epoch)return;
+      if(!result.ok)stopCode=result.error_code;
+    }
   }
   quoteScreen();
 }

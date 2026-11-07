@@ -83,3 +83,19 @@ test('entering the same receipt twice sends exactly one paid notification',()=>{
   vm.runInContext(app.slice(app.indexOf('function complete(){'),app.indexOf("$('#reset').onclick=")),context);
   context.complete();context.complete();assert.equal(notices.length,1);assert.equal(notices[0].data.hash8,'d3ed107e');
 });
+
+test('Bivia stop keeps the scene open and adds the actual decision to the parent engine log',async()=>{
+  const h=harness();
+  await h.receive(h.event({...paid,status:'stopped',reason:'38,000원이 한도를 넘었어요',decider:'Articul8 Bivia',decision_log:'ARTICUL8 Bivia 판단: 결제 멈춤 93%, 180ms'}));
+  assert.equal(h.calls.close,0);assert.equal(h.context.paymentForStop().decider,'Articul8 Bivia');
+  assert.equal(h.calls.logs[0][1],'ARTICUL8 Bivia 판단: 결제 멈춤 93%, 180ms');
+});
+
+test('parent red line names Bivia and preserves the retry action',()=>{
+  const line={},span={},button={querySelector:()=>span};
+  const context=vm.createContext({paymentForStop:()=>({status:'stopped',decider:'Articul8 Bivia',reason:'한도를 넘었어요'}),
+    $:selector=>selector==='#openPay'?button:selector==='#payStopped'?line:{},fitNumbers:()=>{}});
+  vm.runInContext(parent.slice(parent.indexOf('function renderPaymentResult('),parent.indexOf('/* Payment input and the visible summary')),context);
+  context.renderPaymentResult({},{});
+  assert.equal(line.textContent,'Articul8 Bivia가 결제를 막았어요: 한도를 넘었어요');assert.equal(span.textContent,'다시 맡기기');
+});

@@ -78,7 +78,7 @@ def session_context(session_id):
 
 @app.middleware("http")
 async def limit_parsing(http_request: HTTPRequest, call_next):
-    if http_request.method == "POST" and http_request.url.path in ("/api/try", "/api/parse", "/api/pay/inquiry"):
+    if http_request.method == "POST" and http_request.url.path in ("/api/try", "/api/parse", "/api/pay/inquiry", "/api/pay/decide"):
         forwarded = http_request.headers.get("x-forwarded-for", "").split(",", 1)[0].strip()
         ip = forwarded or (http_request.client.host if http_request.client else "unknown")
         try:
