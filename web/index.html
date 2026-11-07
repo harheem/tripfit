@@ -210,6 +210,11 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .cl .head { display: flex; justify-content: space-between; align-items: baseline; }
 .cl .head b { font: 500 26px/1 var(--gr); letter-spacing: -.04em; }
 .ci { display: grid; grid-template-columns: 1fr 44px 34px; gap: 6px; align-items: center; margin-top: 9px; font: 600 12.5px var(--kr); }
+.ci { cursor: pointer; }
+.ci.muted .ci-label { text-decoration: line-through; }
+.ci.muted > i { opacity: .25; }
+.ci .pill { height: 17px; padding: 0 4px; font-size: 9px; margin-left: 3px; }
+.ci .pill[hidden] { display: none; }
 .ci i { display: block; height: 8px; border-radius: 6px; background: rgba(14, 42, 58, .15); overflow: hidden; }
 .ci i b { display: block; height: 100%; background: var(--navy); border-radius: 6px; transition: width var(--spring-ms) var(--spring); }
 .ci em { font: 500 12.5px var(--gr); font-style: normal; text-align: right; font-variant-numeric: tabular-nums; }
@@ -330,7 +335,7 @@ body.m .screen { width: 100vw; height: 100dvh; border-radius: 0; }
     </div>
     <aside class="engine" id="engine">
       <div class="eg-hero">
-        <div class="row"><span class="cap-up" style="opacity:.7">Python-MIP · solve</span><span class="cap-up" style="opacity:.7">Live ●</span></div>
+        <div class="row"><span class="cap-up" style="opacity:.7">Python-MIP · solve</span><span class="cap-up" style="opacity:.7" id="modeLabel">연결 확인 중</span></div>
         <div class="eg-big gr"><span class="odo" id="egBig">0</span><em>ms</em></div>
         <div class="eg-cap" id="egCap">대기 중</div>
       </div>
@@ -344,9 +349,37 @@ body.m .screen { width: 100vw; height: 100dvh; border-radius: 0; }
 <script src="demo_data.js"></script>
 <script>
 "use strict";
+(async () => {
+let LIVE = false;
+async function api(path, body, timeout = 30000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(path, {
+      signal: controller.signal,
+      ...(body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (data.infeasible) throw new Error("조건에 맞는 일정 없음");
+    return data;
+  } finally { clearTimeout(timer); }
+}
+if (/^https?:$/.test(location.protocol)) {
+  try {
+    const data = await api("/api/demo", undefined, 3000);
+    if (!data.series?.length || !data.people?.length || !data.places?.length) throw new Error("데모 형식 오류");
+    window.DEMO = data;
+    LIVE = true;
+  } catch (_) { /* file demo remains available if detection fails or times out */ }
+}
 const D = window.DEMO, P = D.people;
 P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const muted = [];
+const modeText = LIVE ? "LIVE · 실시간 계산" : "재생 · demo_data.js";
+$("#modeLabel").textContent = modeText;
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const sleep = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
 const hhmm = m => { m = Math.round(m); return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
@@ -472,10 +505,10 @@ function log(src, text, ms) {
   $$(".eg-row.new", box).forEach(r => r.classList.remove("new"));
   const row = document.createElement("div");
   row.className = "eg-row new";
-  row.innerHTML = `<span class="eg-src" style="--c:${SRC[src][1]}">${SRC[src][0]}</span><span>${text}</span><span class="eg-ms">${ms != null ? won(ms) + "ms" : ""}</span>`;
+  row.innerHTML = `<span class="eg-src" style="--c:${SRC[src][1]}">${SRC[src][0]}</span><span>${escapeHTML(text)}</span><span class="eg-ms">${ms != null ? won(ms) + "ms" : ""}</span>`;
   box.appendChild(row);
   E(row, [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], 420);
-  while (box.children.length > 12) box.children[1].remove();
+  while (box.children.length > 12) box.children[2].remove();
   if (src === "mip" && ms != null) {
     odo($("#egBig"), won(ms));
     $("#egCap").textContent = text;
@@ -773,6 +806,16 @@ const chipHTML = m => m.kind === "hard"
 
 async function s1(v, t) {
   status("12:59");
+  if (LIVE) {
+    // Start parsing independently; chip motion always follows the sample marks.
+    api("/api/parse", { messages: P.map(p => ({ name: p.name, text: p.text })) }, 12000)
+      .then(result => {
+        const people = result.constraints.people;
+        const count = people.reduce((n, p) => n + p.prefs.length + p.hard.length, 0);
+        log("llm", `${result.fallback ? "고정 JSON" : "LLM " + result.model} · ${result.ms}ms · 추출 ${count}개`);
+      })
+      .catch(() => log("llm", "파싱 호출 실패 · 화면은 샘플 marks로 재생"));
+  }
   const marks = P.flatMap(p => p.marks), nh = marks.filter(m => m.kind === "hard").length, ns = marks.length - nh;
   v.innerHTML = `<div class="scr" id="sc">${topBlock("조건 정리", `<span class="cap-up">A.X K2</span>`)}</div>`;
   const sc = $("#sc", v);
@@ -865,7 +908,7 @@ function planTitle(p) {
 }
 async function s2(v, t) {
   status("13:00");
-  const n = D.series.length;
+  let n = D.series.length, busy = false;
   let idx = D.defaultIdx, plan = D.series[idx];
   v.innerHTML = `<div class="scr" id="sc">
     <div class="b top lime cut cr" id="top">
@@ -873,7 +916,7 @@ async function s2(v, t) {
       <div class="h" id="ttl" style="font-size:21px;min-height:2.5em"></div>
       <div class="big2"><div class="bn gr"><span class="odo" id="nJ">0</span><em>%</em></div><div class="colon gr">:</div><div class="bn r gr"><span class="odo" id="nS">0</span><em>%</em></div></div>
       <div class="bn-lab"><span style="--c:${P[0].color}"><i></i>${P[0].name} 만족도</span><span style="--c:${P[1].color}">${P[1].name} 만족도<i></i></span></div>
-      <div class="sc-track" id="track"><div class="sc-rail"></div>${D.series.map((_, i) => `<span class="sc-det" style="left:${i / (n - 1) * 100}%"></span>`).join("")}<div class="sc-thumb snap" id="thumb">${svg("check", 20, 3)}</div></div>
+      <div class="sc-track" id="track"><div class="sc-rail"></div>${D.series.map((_, i) => `<span class="sc-det" style="left:${(n === 1 ? 50 : i / (n - 1) * 100)}%"></span>`).join("")}<div class="sc-thumb snap" id="thumb">${svg("check", 20, 3)}</div></div>
       <div class="sc-lab"><span>${P[0].name} 쪽</span><span>균형</span><span>${P[1].name} 쪽</span></div>
     </div>
     <div class="split cl" id="cl">${P.map((p, i) => `<div class="b ${i ? "sky tab tr" : "pink"}"><div class="head"><span class="cap-up">${p.name}이 한 말</span><b id="clp${i}"></b></div><div id="cli${i}"></div></div>`).join("")}</div>
@@ -903,23 +946,23 @@ async function s2(v, t) {
     map.setRoute(p.stops, { delay: first ? 700 : 0 });
     tl.render(p, { animate: !first, inDelay: 60 });
   };
-  thumb.style.left = idx / (n - 1) * 100 + "%";
+  thumb.style.left = (n === 1 ? 50 : idx / (n - 1) * 100) + "%";
   await sleep(250); if (!alive(t)) return;
   map.flicker();
   paint(plan, true);
   log("mip", `만족도 = 각자 한 말 체크리스트(가중평균) · 동점이면 장소 점수`);
   const apply = i => {
-    if (i === idx) return;
+    if (busy || hiddenOn || i === idx) return;
     const prev = plan; idx = i; plan = D.series[i];
     paint(plan);
     const d = planDiff(prev, plan);
     island.show({ icon: "bolt", title: diffTitle(d), sub: `${diffLine(d)} · ${P[0].name} ${signed(d.j)} · ${P[1].name} ${signed(d.s)}`, hold: 2600 });
     log("mip", `저울 → ${plan.label} · ${P[0].name} ${Math.round(plan.sat[P[0].name])}% / ${P[1].name} ${Math.round(plan.sat[P[1].name])}%`);
   };
-  const scaleTo = i => { i = Math.max(0, Math.min(n - 1, i)); thumb.classList.add("snap"); thumb.style.left = i / (n - 1) * 100 + "%"; apply(i); };
+  const scaleTo = i => { if (busy || hiddenOn) return; i = Math.max(0, Math.min(n - 1, i)); thumb.classList.add("snap"); thumb.style.left = (n === 1 ? 50 : i / (n - 1) * 100) + "%"; apply(i); };
   let drag = false;
   const at = e => { const r = track.getBoundingClientRect(); return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); };
-  track.addEventListener("pointerdown", e => { drag = true; track.setPointerCapture(e.pointerId); thumb.classList.remove("snap"); const f = at(e); thumb.style.left = f * 100 + "%"; apply(Math.round(f * (n - 1))); });
+  track.addEventListener("pointerdown", e => { if (busy || hiddenOn) return; drag = true; track.setPointerCapture(e.pointerId); thumb.classList.remove("snap"); const f = at(e); thumb.style.left = f * 100 + "%"; apply(Math.round(f * (n - 1))); });
   track.addEventListener("pointermove", e => { if (!drag) return; const f = at(e); thumb.style.left = f * 100 + "%"; apply(Math.round(f * (n - 1))); });
   const up = () => { if (!drag) return; drag = false; scaleTo(idx); };
   track.addEventListener("pointerup", up); track.addEventListener("pointercancel", up);
@@ -930,14 +973,14 @@ async function s2(v, t) {
   const H = D.hidden, hidBlk = $("#hid", v);
   let hiddenOn = false;
   const setHidden = on => {
-    if (on === hiddenOn) return;
+    if (busy || on === hiddenOn) return;
     hiddenOn = on;
     hidBlk.classList.toggle("on", on);
     A(hidBlk, [{ transform: "scale(.97)" }, { transform: "none" }], "pop");
     const prev = plan;
     if (on) {
       idx = D.defaultIdx;
-      thumb.classList.add("snap"); thumb.style.left = idx / (n - 1) * 100 + "%";
+      thumb.classList.add("snap"); thumb.style.left = (n === 1 ? 50 : idx / (n - 1) * 100) + "%";
       plan = H.plan;
       log("heritage", `서울미래유산 CSV · 성수 후보 ${H.candidates.length}곳 (공공누리 1유형)`);
       log("mip", `tag_min(heritage ≥ 1) · 균형 목적 그대로`, H.plan.solveMs);
@@ -947,6 +990,57 @@ async function s2(v, t) {
     const d = planDiff(prev, plan);
     island.show({ icon: "heritage", tone: "var(--lilac)", title: on ? "미래유산 후보를 더해 다시 계산" : "원래 후보로 돌아가요", sub: `${diffLine(d)} · ${P[0].name} ${signed(d.j)} · ${P[1].name} ${signed(d.s)}`, right: on ? `${H.plan.solveMs}ms` : "", hold: 2800 });
   };
+  async function toggleMuted(person, label) {
+    if (busy) return;
+    if (hiddenOn) setHidden(false);
+    if (!LIVE) {
+      island.show({ title: "서버 연결 시 동작해요" });
+      return;
+    }
+    const nextMuted = muted.filter(it => it.person !== person || it.label !== label);
+    const conceding = nextMuted.length === muted.length;
+    if (conceding) nextMuted.push({ person, label });
+    busy = true;
+    drag = false;
+    track.classList.add("off");
+    island.show({ spin: true, title: "양보를 반영해 다시 계산 중", hold: 0 });
+    try {
+      const result = await api("/api/plan", { muted: nextMuted, tag_min: {} });
+      if (!result.series?.length) throw new Error("빈 일정");
+      if (!alive(t)) return;
+      // Commit together, so failed requests preserve the previous checklist.
+      muted.splice(0, muted.length, ...nextMuted);
+      D.series = result.series;
+      D.defaultIdx = result.defaultIdx;
+      n = D.series.length;
+      idx = D.defaultIdx;
+      plan = D.series[idx];
+      $$(".sc-det", track).forEach(dot => dot.remove());
+      thumb.insertAdjacentHTML("beforebegin", D.series.map((_, i) => `<span class="sc-det" style="left:${n === 1 ? 50 : i / (n - 1) * 100}%"></span>`).join(""));
+      thumb.classList.add("snap");
+      thumb.style.left = (n === 1 ? 50 : idx / (n - 1) * 100) + "%";
+      paint(plan);
+      const message = `${person}의 '${label}' ${conceding ? "양보" : "양보 취소"} → 지민 ${plan.sat["지민"]} · 서연 ${plan.sat["서연"]}`;
+      island.show({ title: message, right: `${result.solveMs}ms`, hold: 3500 });
+      log("mip", message, result.solveMs);
+    } catch (_) {
+      if (alive(t)) island.show({ title: "다시 계산하지 못했어요", sub: "한 번 더 눌러주세요" });
+    } finally {
+      busy = false;
+      track.classList.remove("off");
+    }
+  }
+  P.forEach((person, i) => {
+    const box = $(`#cli${i}`, v);
+    const toggle = e => {
+      const row = e.target.closest(".ci");
+      if (row) toggleMuted(person.name, row.dataset.label);
+    };
+    box.addEventListener("click", toggle);
+    box.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); toggle(e); }
+    });
+  });
   hidBlk.addEventListener("click", () => setHidden(!hiddenOn));
   $("#tl", v).addEventListener("click", e => { const b = e.target.closest("[data-story]"); if (b) openStory(v, b.dataset.story); });
   v._hidden = setHidden;
@@ -957,14 +1051,18 @@ async function s2(v, t) {
 
 /* checklist rows: label · bar · % (bars and numbers animate in place) */
 function renderChecklist(box, total, items) {
-  if (!box.children.length) box.innerHTML = items.map(it => `<div class="ci"><span>${it.label}</span><i><b style="width:0"></b></i><em></em></div>`).join("");
+  if (!box.children.length) box.innerHTML = items.map(it => `<div class="ci" role="button" tabindex="0" data-label="${escapeHTML(it.label)}" aria-label="${escapeHTML(it.label)} 이 말은 양보할게"><span><span class="ci-label">${escapeHTML(it.label)}</span><small class="pill" hidden>양보</small></span><i><b style="width:0"></b></i><em></em></div>`).join("");
   [...box.children].forEach((row, k) => {
     const f = items[k].fulfilled;
+    const conceded = !!items[k].muted;
+    row.classList.toggle("muted", conceded);
+    row.setAttribute("aria-pressed", String(conceded));
+    $(".pill", row).hidden = !conceded;
     $("b", row).style.width = f * 100 + "%";
     $("em", row).textContent = Math.round(f * 100) + "%";
   });
   const w = items.reduce((a, it) => a + it.weight, 0);
-  total.textContent = Math.round(100 * items.reduce((a, it) => a + it.weight * it.fulfilled, 0) / w) + "%";
+  total.textContent = Math.round(100 * items.reduce((a, it) => a + it.weight * it.fulfilled, 0) / (w || 1)) + "%";
 }
 
 /* ---------- step 3: what-if ---------- */
@@ -1003,11 +1101,19 @@ async function s3(v, t) {
   const run = async () => {
     if (!pick || ran) return;
     ran = true;
-    const W = pick === "main" ? D.whatif : D.whatif.alt, at = hhmm(placeById[W.pick].fixedStart);
-    chosen = W;
+    let W = pick === "main" ? D.whatif : D.whatif.alt;
+    const at = hhmm(placeById[W.pick].fixedStart);
     await sh.close(); if (!alive(t)) return;
     island.show({ spin: true, tone: "var(--violet)", title: `공방 ${at} 넣고 다시 계산 중`, sub: "고정 시각 노드 + 나머지 제약 유지", hold: 0 });
-    await sleep(800); if (!alive(t)) return;
+    if (LIVE) {
+      try {
+        const result = await api("/api/what-if", { pick: W.pick });
+        if (!result.plan?.stops?.length) throw new Error("빈 일정");
+        W = { ...W, ...result };
+      } catch (_) { log("mip", "넣어보기 호출 실패 · demo 데이터로 재생"); }
+    } else await sleep(800);
+    if (!alive(t)) return;
+    chosen = W;
     log("mip", `what_if_add(가죽공방 ${at}) · 다른 제약 유지`, W.plan.solveMs ?? undefined);
     tl.render(W.plan, { glowNew: true, inDelay: 500 });
     setTimeout(() => $(`.ti[data-id="${W.pick}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 1300);
@@ -1108,7 +1214,13 @@ async function s4(v, t) {
 
 /* ---------- step 5: live re-plan ---------- */
 async function s5(v, t) {
-  const R = D.replan, before = D.whatif.plan, crowded = placeById[R.crowded];
+  let R = { ...D.replan };
+  const selected = LIVE ? (chosen || D.whatif) : D.whatif;
+  const before = selected.plan;
+  const booking = before.stops.find(s => s.id === selected.pick);
+  R.keep = booking.id;
+  let bookingTime = hhmm(booking.start);
+  const crowded = placeById[R.crowded];
   status(hhmm(R.now));
   v.innerHTML = `<div class="scr" id="sc">
     ${topBlock(`여행 중 · ${hhmm(R.now)}`, `<span class="cap-up">혼잡도 샘플</span>`, "lime cut cr")}
@@ -1141,21 +1253,32 @@ async function s5(v, t) {
   async function replan() {
     if (done) return; done = true;
     btn.disabled = true;
-    island.show({ spin: true, tone: "var(--violet)", title: "공방 16:00은 지키고 다시 계산", sub: `제외: ${short(crowded.name)}`, hold: 0 });
-    await sleep(700); if (!alive(t)) return;
-    log("mip", `reoptimize · lock(공방 16:00) · 제외(${crowded.name})`, R.plan.solveMs);
+    island.show({ spin: true, tone: "var(--violet)", title: `공방 ${bookingTime}은 지키고 다시 계산`, sub: `제외: ${short(crowded.name)}`, hold: 0 });
+    if (LIVE) {
+      try {
+        const result = await api("/api/replan", { now_min: R.now, exclude: [R.crowded], keep: { [R.keep]: booking.start } });
+        if (!result.plan?.stops?.length) throw new Error("빈 일정");
+        R = { ...R, ...result };
+      } catch (_) {
+        log("mip", "재계산 호출 실패 · demo 데이터로 재생");
+        R.keep = D.replan.keep;
+        bookingTime = hhmm(R.plan.stops.find(s => s.id === R.keep).start);
+      }
+    } else await sleep(700);
+    if (!alive(t)) return;
+    log("mip", `reoptimize · lock(공방 ${bookingTime}) · 제외(${crowded.name})`, R.plan.solveMs);
     top.classList.remove("alert"); status(hhmm(R.now));
     tl.render(R.plan, { glowNew: true });
     setTimeout(() => $(`.ti[data-id="${R.keep}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 900);
     map.setRoute(R.plan.stops);
-    setTitle($("#ttl", v), "공방 16:00은 그대로,\n나머지만 바꿨어요");
+    setTitle($("#ttl", v), `공방 ${bookingTime}은 그대로,\n나머지만 바꿨어요`);
     const d = planDiff(before, R.plan);
     island.show({ title: `${R.plan.solveMs}ms 만에 다시 짰어요`, sub: `−${short(crowded.name)}  +${d.added.map(s => short(s.name)).join(", ")}`, hold: 3000 });
     const chg = $("#chg", v);
     chg.innerHTML = [
       ...d.dropped.map(s => `<span class="pill" style="background:var(--red);color:var(--cream)">− ${short(s.name)}</span>`),
       ...d.added.map(s => `<span class="pill" style="background:var(--lime)">+ ${short(s.name)}</span>`),
-      `<span class="pill" style="background:var(--violet);color:var(--cream)">${svg("lock", 13, 2.4)} 공방 16:00 유지</span>`,
+      `<span class="pill" style="background:var(--violet);color:var(--cream)">${svg("lock", 13, 2.4)} 공방 ${bookingTime} 유지</span>`,
     ].join("");
     $$(".pill", chg).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateX(-30px) scale(.7)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + i * 100 }));
     btn.setLabel("처음부터 다시 보기");
@@ -1268,7 +1391,7 @@ addEventListener("keydown", e => {
   else if (k === "," && v?._scaleBy) v._scaleBy(-1);
   else if (k === "." && v?._scaleBy) v._scaleBy(1);
   else if (k === "e" || k === "E") { document.body.classList.toggle("no-eng"); fit(); }
-  else if (k === "r" || k === "R") { $$("#egLog .eg-row").forEach(r => r.remove()); go(0); }
+  else if (k === "r" || k === "R") { $$("#egLog .eg-row").forEach(r => r.remove()); log("mip", modeText); go(0); }
 });
 
 /* ---------- fit to window ---------- */
@@ -1285,7 +1408,9 @@ function fit() {
 }
 addEventListener("resize", fit);
 fit();
+log("mip", modeText);
 go(0);
+})();
 </script>
 </body>
 </html>

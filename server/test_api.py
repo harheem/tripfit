@@ -77,6 +77,16 @@ def test_plan_muting_changes_real_solution_and_retains_item(client):
                    for i in p["checklist"]["서연"])
 
 
+def test_muted_walking_has_unique_satisfaction_pairs(client):
+    response = client.post("/api/plan", json={
+        "muted": [{"person": "서연", "label": "덜 걷기"}], "tag_min": {}})
+    assert response.status_code == 200
+    series = response.json()["series"]
+    assert series
+    pairs = [tuple(round(p["sat"][name], 1) for name in ("지민", "서연")) for p in series]
+    assert len(pairs) == len(set(pairs))
+
+
 def test_all_prefs_can_be_conceded(client):
     muted = [{"person": name, "label": pref.label} for name, prefs in PREFS.items() for pref in prefs]
     response = client.post("/api/plan", json={"muted": muted})

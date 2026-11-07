@@ -121,7 +121,13 @@ def pareto_series(solver, request=REQUEST):
         and q.satisfaction_pct["서연"] >= p.satisfaction_pct["서연"]
         and (q.satisfaction_pct["지민"], q.satisfaction_pct["서연"]) != (p.satisfaction_pct["지민"], p.satisfaction_pct["서연"])
         for q in plans)]
-    return front, ms
+    # Equal displayed satisfaction is one slider choice; prefer less walking.
+    unique = {}
+    for plan in front:
+        pair = tuple(round(plan.satisfaction_pct[person], 1) for person in request.people)
+        if pair not in unique or plan.total_walk_m < unique[pair].total_walk_m:
+            unique[pair] = plan
+    return list(unique.values()), ms
 
 
 def label_for(plan):
