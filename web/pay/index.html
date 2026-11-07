@@ -3,26 +3,47 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>예약하고 결제하기 · TripFit</title>
+<meta name="theme-color" content="#0E2A3A">
+<title>같이 결제 · TripFit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="./styles.css">
 <script type="module" src="./app.js"></script>
 </head>
 <body>
-<div class="shell">
-<header class="heading"><div><h1>예약하고 결제하기</h1><p>합의한 일정의 유료 항목을 두 분이 나눠 결제해요</p></div></header>
-<div class="toolbar"><span class="chip">모의 결제 · 실제 결제 없음</span><button id="reset" class="text-button">처음부터 다시</button></div>
-<nav aria-label="결제 단계"><ol id="steps"></ol></nav>
-<div class="layout"><main id="flow" aria-label="같이 결제"><p role="status">일정을 불러오고 있어요</p></main><aside><section class="supplier"><h2>판매자에게 전달되는 내용</h2><div id="supplier" aria-live="polite">아직 전달된 내용이 없어요</div></section><details class="audit"><summary>승인 기록 <span id="log-count"></span></summary><ol id="logs"></ol></details></aside></div>
-<div class="tests"><span class="chip">테스트용</span><button id="test-price" disabled>테스트: 가격이 오른 경우</button><button id="test-merchant" disabled>테스트: 다른 판매처로 결제 시도</button></div>
-<div id="malfunction" role="status"></div>
-<footer><table><caption>실호출·목업 표기</caption><thead><tr><th scope="col">요소</th><th scope="col">상태</th></tr></thead><tbody>
-<tr><th scope="row">위임·범위 검사·두 겹 검사·해시 기록·판매자 칸</th><td>브라우저에서 도는 실제 로직</td></tr>
-<tr><th scope="row">예약 가능 여부·가격 재조회</th><td>TripFit 서버에 붙으면 마이리얼트립 실시간 조회, 단독 페이지에서는 저장된 조회 결과</td></tr>
-<tr><th scope="row">결제(Agentic Pay)</th><td>모의 결제. 실제 결제 없음</td></tr>
-<tr><th scope="row">예약 확정</th><td>마이리얼트립 상품 페이지 링크(외부 예약 API 없음)</td></tr>
-<tr><th scope="row">문의 초안</th><td>고정 문안(보내지 않음)</td></tr><tr><th scope="row">테스트 버튼</th><td>테스트용</td></tr>
-</tbody></table></footer>
+<div class="rig">
+  <header class="cap">
+    <span class="brand"><i></i><i></i> TripFit</span>
+    <p class="cap-n">같이 결제 <b id="caption-step">01 / 05</b></p>
+    <h1>둘 다 OK면,<br>결제까지.</h1>
+    <p class="cap-s">SKT Agentic Pay · 합의한 범위 안에서<br>조회부터 분담 결제까지 맡겨요.</p>
+    <div class="cap-prog" id="caption-progress" aria-hidden="true"></div>
+  </header>
+  <div class="phone">
+    <div class="shell">
+      <main id="flow" aria-label="같이 결제"><p class="b lime" role="status">일정을 불러오고 있어요</p></main>
+      <div id="malfunction" role="status" aria-live="polite"></div>
+      <details class="technical" id="technical">
+        <summary>기술 정보 <span aria-hidden="true">＋</span></summary>
+        <div class="b lilac technical-body">
+          <h2>동작과 데이터</h2>
+          <table><caption>실호출·목업 표기</caption><tbody>
+            <tr><th scope="row">위임·범위 검사</th><td>브라우저의 실제 엔진 로직 · 결제사에서 한 번 더 검사</td></tr>
+            <tr><th scope="row">예약 재조회</th><td>서버 연결 시 실시간 API · 실패 시 저장된 조회 결과</td></tr>
+            <tr><th scope="row">결제</th><td>Agentic Pay 모의 결제 · 실제 돈은 나가지 않음</td></tr>
+            <tr><th scope="row">예약 확정</th><td>마이리얼트립 링크에서 진행 · 외부 예약 API 없음</td></tr>
+            <tr><th scope="row">판매자 문의</th><td>초안만 작성 · 전송하지 않음</td></tr>
+            <tr><th scope="row">판매자 기록</th><td>브라우저 내 모의 판매자에게 예약 요청·같은 승인 해시 전달</td></tr>
+          </tbody></table>
+          <details class="audit"><summary>감사 로그 · 해시 체인 <span id="log-count"></span></summary><p id="chain-status" role="status"></p><ol id="logs"></ol></details>
+          <div class="tests"><h3>흐름 테스트</h3><button id="test-price" disabled>가격 인상 · 38,000원</button><button id="test-merchant" disabled>다른 판매처 결제 시도</button></div>
+          <button id="reset" class="secondary">처음부터 다시</button>
+        </div>
+      </details>
+      <div class="home-ind" aria-hidden="true"></div>
+    </div>
+  </div>
 </div>
-</body></html>
+</body>
+</html>

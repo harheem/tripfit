@@ -1,0 +1,10 @@
+mcp==2.3.0
+mip==1.16rc0; sys_platform == "darwin"  # Apple Silicon CBC
+mip==1.15.0; sys_platform == "linux"  # 1.16rc0의 Linux CBC는 이 모델에서 SIGSEGV(2026-11-07 확인)
+pydantic>=2,<3
+starlette>=1,<2
+python-dotenv>=1,<2
+httpx>=0.28,<1
+httpx2
+uvicorn
+pytest

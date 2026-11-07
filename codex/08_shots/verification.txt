@@ -1,0 +1,20 @@
+08 verification
+
+Implementation edits: web/index.html only. Other workers' web/pay/ edits were preserved.
+
+PASS
+- Extracted inline JavaScript: node --check /private/tmp/tripfit08.js
+- git diff --check -- web/index.html
+- (cd agentic-pay && node --test test/*.test.mjs): 25 passed, 0 failed
+- FastAPI TestClient + actual CBC: /api/demo, /api/try (requested two sentences), /api/plan, /api/what-if, /api/replan (backend-results.json)
+- JSDOM with real backend response fixtures: live sample autoplay A through step 5 (79.4 / 83.1), custom flow 0–5 at 1440px and 390×844, response marks, POI/fills, satisfaction formula, single plan state, session propagation, sample pill/R reset
+- JSDOM edge cases: needsMore, infeasible explanation, 429, network failure, unmatched, no activity, no-booking replan, 0-item payment, 30-second cancellation, sessionExpired, examples/clear/maxlength, input keyboard shortcut guard
+- Actual fromTripFit adapter + srcdoc input script/summary checked in DOM. Dynamic import transport was substituted in this test because JSDOM does not execute module imports. The real payment page module was not run inside an actual browser.
+- file:// replay button notice verified in DOM
+- DOM runtime errors and captured console errors: 0 on passing checks (dom-results.json)
+
+BLOCKED BY EXECUTION ENVIRONMENT
+- Requested uvicorn server command on port 8012 completed startup calculation, then exited: [Errno 1] error while attempting to bind on address (127.0.0.1, 8012): operation not permitted. Application shutdown completed; no test server left running.
+- Playwright Chromium launch failed with macOS MachPortRendezvous bootstrap_check_in Permission denied (1100). See playwright-status.json.
+- No PNG screenshots were generated. Real browser console count, desktop pixel rendering, mobile keyboard/visualViewport layout and live browser HTTP E2E could not be verified.
+- Real API try used rules-v1. OpenAI live parsing was not verified.

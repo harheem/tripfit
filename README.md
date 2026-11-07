@@ -12,7 +12,14 @@
 |---|---|
 | ![두 사람 승인](docs/screens/04-agree.png) | ![혼잡한 전시 교체](docs/screens/05-replan.png) |
 
-<!-- TODO(총괄): 공개 데모 URL 추가 -->
+**바로 열어 보기**
+
+| 무엇 | 링크 | 비고 |
+|---|---|---|
+| TripFit 데모(재생) | https://harheem.github.io/tripfit/ | 키·서버 없이 1~5단계 재생. 휴대폰에서도 열림. 발표용 키: `→` `A`(자동재생) `1`~`6` |
+| SKT 같이 결제 | https://harheem.github.io/tripfit/pay/ | 저장된 조회 결과로 위임 → 재조회 → 승인 근거 → 영수증 |
+| Vooy MCP 서버 | `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` | vooy에 사용자 지정 MCP로 등록 |
+| 직접 해보기(내 두 문장 → 일정) | 로컬 서버 `http://localhost:8000/` | OpenAI 실호출 + CBC 실계산. 아래 실행법 |
 
 ## 30초 요약
 
@@ -39,7 +46,7 @@ TripFit은 각자의 말을 체크리스트로 바꾸고, MIP가 시간과 도�
 | 기술적 완성도 | 솔버 8개 통과, 서버 62개 통과·1개 skip. CBC 계산 시간 실측(실행마다 조금 다름): 파레토 대안 전체 0.4~0.7초, 양보 후 재계산·여행 중 재계산 약 60~100ms | `solver/test_solver.py`, `server/test_api.py`, `server/test_mrt.py`, `server/test_try.py`; 아래 테스트 명령. `web/demo_data.js`의 `solveMs` |
 | 상업적 가능성 | 동행 여행의 "어디 갈지 합의" 단계에서 실제 판매 상품(마이리얼트립 체험, 1인 35,000원)을 일정 안에 넣을 수 있는지까지 계산하고 상품으로 연결. 수익 모델은 일정에 들어간 체험·입장권의 예약 중개 수수료와 분담 결제(SKT 절). 매출·전환율은 아직 측정 전 | `web/demo_data.js`의 `mrt.picked`, `pay`; `solver/demo_builder.py` |
 | 팀 실행력 | CBC 엔진 → API → 화면 연결, 실상품 스냅숏과 불가능 판정·양보 선택까지 구현하고 작업 결과 기록 | `server/app.py`, `web/index.html`, `codex/03_mrt_live.result.md`, `codex/04_whatif_concession.result.md` |
-| 스폰서 리소스 활용 | OpenAI 문장 파싱 연결, 마이리얼트립 실상품·시각 조회. SKT·Vooy 제출 내용은 아래 통합 예정 절 | `server/parsing.py`, `scripts/fetch_mrt_snapshot.py`, `data/mrt_snapshot.json` |
+| 스폰서 리소스 활용 | 마이리얼트립 MCP 실상품·시각 조회와 결제 직전 실시간 재조회, OpenAI 문장 파싱, SKT Agentic Pay 위임·분담 결제(`agentic-pay/`), vooy 원격 MCP 서버(`vooy-mcp/`, 공개 배포) | `server/parsing.py`, `scripts/fetch_mrt_snapshot.py`, `data/mrt_snapshot.json` |
 | API 활용도 | OpenAI JSON 응답 검증·폴백, MRT `tools/list`·`searchTnas`·`getTnaDetail`·`getTnaOptions`, 갱신 실패 시 캐시 보존 | `server/parsing.py`, `solver/mrt_live.py`, `server/app.py`; `GET /api/mrt` |
 | 창의성·시도 | 한 말의 충족률을 저울로 비교하고, 체험이 불가능하면 사람별 양보안을 계산. 카페 양보 후 기존 4곳 빠짐 | `solver/tripfit_solver.py`, `solver/demo_builder.py`; 화면 2·3단계 |
 | 빌더 임팩트 | API 키 없이 전체 흐름 재생, 키 없이도 CBC 재계산 가능. 공개한 개인 알고리즘을 합의 앱으로 확장 | `web/index.html`, `web/demo_data.js`, `README_RUN.md`; `A` 자동재생 |
@@ -171,13 +178,31 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 
 테스트: 엔진 25개, 라우터 12개 통과. 2026-11-07 13:21 실시간 재조회에서 15:00 옵션 예약 가능·35,000원 확인.
 
-| 정상 결제 준비 | 가격이 오르면 멈춤 | 다른 판매처 결제 거절 |
-|---|---|---|
-| ![예상 영수증](agentic-pay/docs/screens/04_quote.png) | ![가격 인상 멈춤](agentic-pay/docs/screens/04b_price_stop.png) | ![확정 영수증과 거절](agentic-pay/docs/screens/05_paid_and_rejected.png) |
+| 결제 맡기기(위임) | 에이전트의 예약 재조회 | 이대로 승인해도 되는 이유 | 영수증 |
+|---|---|---|---|
+| ![위임](agentic-pay/docs/screens/02_mandates.png) | ![재조회](agentic-pay/docs/screens/03_recheck.png) | ![승인 근거](agentic-pay/docs/screens/04_quote.png) | ![영수증](agentic-pay/docs/screens/05_paid.png) |
 
-## Vooy 트랙 — 메신저에서 부르는 TripFit MCP 서버 (vooy-mcp/)
+가격 인상(38,000원 → 결제 잠금 → 재위임)과 다른 판매처 결제 시도(`MERCHANT_MISMATCH` 거절)는 화면 맨 아래 "기술 정보"의 테스트 버튼으로 재현합니다.
 
-<!-- TODO(총괄): https 엔드포인트, 도구 목록, 레시피 -->
+## Vooy 트랙 — 메신저에서 부르는 TripFit MCP 서버 (`vooy-mcp/`)
+
+단톡방에서 각자 한 줄씩 말하면, vooy가 그 말을 조건으로 바꿔 이 서버를 부르고, TripFit의 같은 합의 엔진(Python-MIP)이 다들 OK인 코스와 누가 얼마나 양보하는지를 돌려줍니다. 결과는 대화 속 카드(MCP Apps 위젯)로 뜹니다. 메인 앱이 두 사람이라면 여기서는 3명 이상도 됩니다.
+
+- **원격 MCP 엔드포인트(Streamable HTTP, 인증 없음):** `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` · [헬스체크](https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/healthz)
+- **vooy 레시피(지침·예시 대화):** [`vooy-mcp/RECIPE.md`](vooy-mcp/RECIPE.md) · 자세한 설명: [`vooy-mcp/README.md`](vooy-mcp/README.md)
+
+| 도구 | 하는 일 |
+|---|---|
+| `propose_plans` | 사람별 말(조건) → 균형안·사람별 우선안 코스와 사람별 만족도 |
+| `adjust_plan` | "이 조건은 양보할게" 같은 후속 말로 같은 문제를 다시 계산 |
+| `explain_infeasible` | 불가능하면 누구의 어떤 조건을 풀어야 가능한지 |
+| `find_candidates` | 조건에 맞는 장소 후보와 근거 |
+
+| 대화 속 결과 카드 | 양보 뒤 다시 계산된 카드 |
+|---|---|
+| ![대화 속 결과 카드](vooy-mcp/docs/chat_card.jpg) | ![양보 뒤 카드](vooy-mcp/docs/chat_card_yield.jpg) |
+
+검증: `pytest` 54개 통과(`cd vooy-mcp && python -m pytest -q`), 공개 서버 스모크 9회 호출 모두 통과(initialize → tools/list → 3인 제안 → 양보 → 불가능 → 이상 입력 6종, [결과 원문](vooy-mcp/scripts/smoke_result_remote.json)). MCP 프로토콜 2024-11-05 ~ 2025-11-25 네 버전의 initialize에 모두 응답합니다. 장소 데이터는 메인과 같은 성수 샘플입니다.
 
 ## 마이리얼트립 — 실제 체험을 일정에 넣을 수 있는지 계산
 

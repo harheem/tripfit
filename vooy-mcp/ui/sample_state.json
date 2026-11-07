@@ -1,0 +1,404 @@
+{
+  "v": 1,
+  "rev": 1,
+  "status": "partial",
+  "problem_id": "p_demo_seongsu_3friends_0001",
+  "area": "성수",
+  "window": {
+    "start": "13:00",
+    "end": "18:00"
+  },
+  "members": [
+    {
+      "name": "민지",
+      "color": "pink"
+    },
+    {
+      "name": "지훈",
+      "color": "sky"
+    },
+    {
+      "name": "서연",
+      "color": "peach"
+    }
+  ],
+  "search_space": 774144,
+  "solve_ms": 1340,
+  "plans": [
+    {
+      "plan_id": "balanced",
+      "label": "균형",
+      "stops": [
+        {
+          "place_id": "s_meal",
+          "name": "성수 골목 식당",
+          "category": "restaurant",
+          "arrive": "13:06",
+          "leave": "14:06",
+          "walk_m": 420,
+          "price": 10000,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        },
+        {
+          "place_id": "s_gallery",
+          "name": "성수 작은 갤러리",
+          "category": "exhibition",
+          "arrive": "14:12",
+          "leave": "15:12",
+          "walk_m": 350,
+          "price": 0,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        },
+        {
+          "place_id": "s_cafe",
+          "name": "서울숲 옆 카페",
+          "category": "cafe",
+          "arrive": "15:17",
+          "leave": "16:07",
+          "walk_m": 280,
+          "price": 5000,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        },
+        {
+          "place_id": "s_alley",
+          "name": "연무장길 소품 골목",
+          "category": "alley",
+          "arrive": "16:11",
+          "leave": "16:41",
+          "walk_m": 0,
+          "price": 0,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        }
+      ],
+      "per_person": [
+        {
+          "name": "민지",
+          "pct": 79,
+          "items": [
+            {
+              "text": "전시 하나는 꼭",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "골목 두 곳 구경도",
+              "fill": 0.5,
+              "weight": 0.7,
+              "status": "partial"
+            }
+          ]
+        },
+        {
+          "name": "지훈",
+          "pct": 76,
+          "items": [
+            {
+              "text": "많이 걷기 싫어",
+              "fill": 0.59,
+              "weight": 1,
+              "status": "partial"
+            },
+            {
+              "text": "3시 전엔 밥",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            }
+          ]
+        },
+        {
+          "name": "서연",
+          "pct": 100,
+          "items": [
+            {
+              "text": "카페에서 쉬고 싶어",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "2만원 안으로",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "재밌게 놀자",
+              "fill": 0,
+              "weight": 0,
+              "status": "unmapped"
+            }
+          ]
+        }
+      ],
+      "min_pct": 76,
+      "walk_km": 2.32,
+      "cost_per_person": 15000,
+      "end": "16:41"
+    },
+    {
+      "plan_id": "favor:지훈",
+      "label": "지훈 우선",
+      "stops": [
+        {
+          "place_id": "s_meal",
+          "name": "성수 골목 식당",
+          "category": "restaurant",
+          "arrive": "13:06",
+          "leave": "14:06",
+          "walk_m": 420,
+          "price": 10000,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        },
+        {
+          "place_id": "s_gallery",
+          "name": "성수 작은 갤러리",
+          "category": "exhibition",
+          "arrive": "14:12",
+          "leave": "15:12",
+          "walk_m": 350,
+          "price": 0,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        },
+        {
+          "place_id": "s_cafe",
+          "name": "서울숲 옆 카페",
+          "category": "cafe",
+          "arrive": "15:15",
+          "leave": "16:05",
+          "walk_m": 0,
+          "price": 5000,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        }
+      ],
+      "per_person": [
+        {
+          "name": "민지",
+          "pct": 59,
+          "items": [
+            {
+              "text": "전시 하나는 꼭",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "골목 두 곳 구경도",
+              "fill": 0,
+              "weight": 0.7,
+              "status": "missed"
+            }
+          ]
+        },
+        {
+          "name": "지훈",
+          "pct": 100,
+          "items": [
+            {
+              "text": "많이 걷기 싫어",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "3시 전엔 밥",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            }
+          ]
+        },
+        {
+          "name": "서연",
+          "pct": 100,
+          "items": [
+            {
+              "text": "카페에서 쉬고 싶어",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "2만원 안으로",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "재밌게 놀자",
+              "fill": 0,
+              "weight": 0,
+              "status": "unmapped"
+            }
+          ]
+        }
+      ],
+      "min_pct": 59,
+      "walk_km": 1.38,
+      "cost_per_person": 15000,
+      "end": "16:05"
+    },
+    {
+      "plan_id": "favor:민지",
+      "label": "민지 우선",
+      "stops": [
+        {
+          "place_id": "s_meal",
+          "name": "성수 골목 식당",
+          "category": "restaurant",
+          "arrive": "13:06",
+          "leave": "14:06",
+          "walk_m": 420,
+          "price": 10000,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        },
+        {
+          "place_id": "s_gallery",
+          "name": "성수 작은 갤러리",
+          "category": "exhibition",
+          "arrive": "14:12",
+          "leave": "15:12",
+          "walk_m": 350,
+          "price": 0,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        },
+        {
+          "place_id": "s_alley",
+          "name": "연무장길 소품 골목",
+          "category": "alley",
+          "arrive": "15:17",
+          "leave": "15:47",
+          "walk_m": 490,
+          "price": 0,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        },
+        {
+          "place_id": "s_cafe",
+          "name": "서울숲 옆 카페",
+          "category": "cafe",
+          "arrive": "15:54",
+          "leave": "16:44",
+          "walk_m": 0,
+          "price": 5000,
+          "source": "sample",
+          "flags": [
+            "영업시간 미확인"
+          ]
+        }
+      ],
+      "per_person": [
+        {
+          "name": "민지",
+          "pct": 100,
+          "items": [
+            {
+              "text": "전시 하나는 꼭",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "골목 두 곳 구경도",
+              "fill": 1,
+              "weight": 0.7,
+              "status": "met"
+            }
+          ]
+        },
+        {
+          "name": "지훈",
+          "pct": 64,
+          "items": [
+            {
+              "text": "많이 걷기 싫어",
+              "fill": 0.35,
+              "weight": 1,
+              "status": "partial"
+            },
+            {
+              "text": "3시 전엔 밥",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            }
+          ]
+        },
+        {
+          "name": "서연",
+          "pct": 100,
+          "items": [
+            {
+              "text": "카페에서 쉬고 싶어",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "2만원 안으로",
+              "fill": 1,
+              "weight": 1,
+              "status": "met"
+            },
+            {
+              "text": "재밌게 놀자",
+              "fill": 0,
+              "weight": 0,
+              "status": "unmapped"
+            }
+          ]
+        }
+      ],
+      "min_pct": 64,
+      "walk_km": 2.8,
+      "cost_per_person": 15000,
+      "end": "16:44"
+    }
+  ],
+  "default_plan_id": "balanced",
+  "diff": null,
+  "concessions": [],
+  "unmapped": [
+    {
+      "name": "서연",
+      "text": "재밌게 놀자",
+      "reason": "장소 데이터로 확인할 수 없는 말"
+    }
+  ],
+  "data_labels": {
+    "solver": "샘플 수치 · 계산 예시",
+    "places": "샘플(성수) · 가상 장소",
+    "mrt": "미사용",
+    "walk": "직선거리×1.3 추정"
+  }
+}

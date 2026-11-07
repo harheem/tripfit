@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content='width=device-width, initial-scale=1'>
+<meta name="referrer" content='no-referrer'>
+<title>TripFit · 대화 속 미리보기</title>
+<style>
+:root{font-family:-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;color:#1b3545;background:#f3f5f6;font-size:14px;line-height:1.4;font-variant-numeric:tabular-nums}*{box-sizing:border-box}body{margin:0;padding:24px 12px 40px}h1,p{margin:0}button,select{font:inherit;color:inherit;min-height:40px;border:1px solid #c7d2da;border-radius:20px;background:#fff;padding:0 12px;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #536b11;outline-offset:2px}button:disabled{opacity:.5;cursor:wait}[hidden]{display:none!important}.intro{max-width:700px;margin:0 auto 18px;text-align:center}.intro p{font-size:12px;color:#536673}.intro h1{font-size:24px;letter-spacing:-.05em;margin:7px 0 15px}.controls{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.controls label{display:flex;align-items:center;gap:5px;font-size:12px}.phone{--chat-bg:#e8eef3;--face:#fff;--ink:#1b3545;--muted:#526571;--line:#ccd7df;--mine:#e7f0c7;width:min(390px,100%);height:844px;max-height:calc(100dvh - 195px);min-height:540px;background:var(--chat-bg);color:var(--ink);border:1px solid var(--line);border-radius:30px;box-shadow:0 16px 50px #243d5215;margin:auto;position:relative;overflow:hidden}.phone.dark{--chat-bg:#101e2d;--face:#26384a;--ink:#f0f4f7;--muted:#bfccd8;--line:#415468;--mine:#3d4d29}.phone.small{width:min(320px,100%)}.phone-head{height:65px;padding:13px 17px;border-bottom:1px solid var(--line);background:var(--face);display:flex;gap:11px;align-items:center}.group-icon{width:34px;height:34px;border-radius:12px;background:#d6f23b;color:#193244;display:grid;place-items:center;font-weight:700}.phone-head strong{display:block;font-size:15px}.phone-head small{font-size:12px;color:var(--muted)}.conversation{height:calc(100% - 119px);overflow-y:auto;padding:16px 13px 22px;scrollbar-width:thin}.day{font-size:12px;text-align:center;color:var(--muted);margin-bottom:18px}.message{display:flex;gap:8px;align-items:flex-start;margin-bottom:15px;min-width:0}.avatar{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;flex:none;color:#203849;font-size:12px;font-weight:650;background:#f3cfe1}.avatar.sky{background:#bcd8ef}.avatar.peach{background:#f0d7c3}.message-main{max-width:calc(100% - 38px);min-width:0}.who{font-size:12px;margin-bottom:4px;color:var(--muted)}.bubble{padding:9px 11px;background:var(--face);border-radius:4px 16px 16px 16px;font-size:14px;line-height:1.4;overflow-wrap:anywhere}.mine{justify-content:flex-end}.mine .bubble{background:var(--mine);border-radius:16px 4px 16px 16px}.bot-heading{display:flex;align-items:center;gap:6px;margin:6px 0;font-size:12px;color:var(--muted)}.bot-mark{display:grid;place-items:center;width:22px;height:22px;border-radius:8px;background:#d6f23b;color:#1b3545;font-size:14px}.bot-text{white-space:pre-line;background:var(--face);padding:10px 11px;border-radius:12px;margin-bottom:6px;font-size:14px;overflow-wrap:anywhere}.widget-slot{width:100%;min-width:0;margin-bottom:14px}iframe{width:100%;height:140px;display:block;border:0;background:transparent}.link-note{font-size:12px;margin:6px 0 17px;color:var(--muted)}.composer{height:54px;border-top:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:8px;background:var(--face);color:var(--muted);font-size:12px}.composer span:first-child{border:1px solid var(--line);border-radius:20px;padding:7px 12px;flex:1}.host-state{max-width:500px;margin:12px auto 0;min-height:18px;font-size:12px;text-align:center;color:#526571}.replay{display:block;margin:12px auto 0}.fullscreen-cover{position:absolute;inset:0;background:#0e2a3a;z-index:10}.fullscreen-bar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:5px 10px;color:#f3f1ea;z-index:30;font-size:13px}.fullscreen-bar button{background:#f3f1ea;color:#1b3545}.phone.fullscreen .conversation{overflow:visible}.phone.fullscreen .conversation>*{visibility:hidden}.phone.fullscreen .is-fullscreen iframe{visibility:visible;position:absolute;left:0;top:52px;width:100%;height:calc(100% - 52px)!important;z-index:20}.phone.fullscreen .composer{visibility:hidden}@media(max-width:430px){body{padding-top:14px}.intro h1{font-size:21px}.phone{max-height:calc(100dvh - 210px);border-radius:24px}.controls{gap:4px}.controls label{gap:3px}button,select{padding:0 9px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="intro"><p>MCP Apps 호스트 미리보기 · 실제 서버 결과(장소는 성수 샘플)</p><h1>말풍선 사이, 함께 가는 코스</h1><div class="controls"><label>폰 폭 <select id="width"><option value="390">390px</option><option value="326">카드 300px</option><option value="386">카드 360px</option><option value="320">320px</option></select></label><label>테마 <select id="theme"><option value="light">라이트</option><option value="dark">다크</option></select></label><label>시나리오 <select id="scenario"><option value="normal">정상</option><option value="infeasible">불가능</option></select></label></div></header>
+<main class="phone" id="phone" aria-label="일반 단톡방 미리보기">
+<header class="phone-head"><span class="group-icon" aria-hidden="true">3</span><div><strong>토요일, 성수에서</strong><small>민지 · 지훈 · 서연 · vooy</small></div></header>
+<div class="conversation" id="conversation">
+<p class="day">토요일 오후를 정하는 중</p>
+<div class="message"><span class="avatar" aria-hidden="true">민</span><div class="message-main"><p class="who">민지</p><p class="bubble">난 전시 하나는 꼭</p></div></div>
+<div class="message"><span class="avatar sky" aria-hidden="true">지</span><div class="message-main"><p class="who">지훈</p><p class="bubble">많이 걷기 싫어. 3시 전엔 밥</p></div></div>
+<div class="message"><span class="avatar peach" aria-hidden="true">서</span><div class="message-main"><p class="who">서연</p><p class="bubble">카페에서 좀 쉬고 싶고 2만원 안으로</p></div></div>
+<div class="message mine"><div class="message-main"><p class="who">서연</p><p class="bubble">@vooy 성수 1시부터 6시까지 코스 짜줘</p></div></div>
+<div class="bot-heading"><span class="bot-mark" aria-hidden="true">↗</span>vooy</div>
+<p class="bot-text" id="bot-text">코스를 계산하고 있어요…</p>
+<div class="widget-slot" id="widget-slot"><iframe id="widget" title="TripFit 나들이 대화 카드" sandbox="allow-scripts"></iframe></div>
+<p class="link-note">웹 보드: 만료될 수 있는 링크</p>
+<div id="followup" hidden><div class="message mine"><div class="message-main"><p class="who">서연</p><p class="bubble">예산은 좀 넘어도 돼</p></div></div><div class="bot-heading"><span class="bot-mark" aria-hidden="true">↗</span>vooy</div><p class="bot-text" id="followup-text">다시 계산했어요</p><div class="widget-slot" id="followup-slot"></div></div>
+</div>
+<div class="composer" aria-hidden="true"><span>친구들과 다음 이야기를 이어 가세요</span><span>↗</span></div>
+<div class="fullscreen-cover" id="fullscreen-cover" hidden></div><div class="fullscreen-bar" id="fullscreen-bar" hidden><span>TripFit · 전체 보드</span><button id="close-fullscreen" type="button">닫기</button></div>
+</main>
+<button class="replay" id="replay" type="button" disabled>다음 대화 재생 · 예산 양보</button>
+<p class="host-state" id="host-state" role="status">실제 서버 결과를 불러오고 있어요.</p>
+<script>
+'use strict';
+(() => {
+  const $=id=>document.getElementById(id),phone=$('phone'),object=x=>x!==null&&typeof x==='object'&&!Array.isArray(x)?x:{};
+  let fixtures={},source='',instances=[],active=null,generation=0,scrollBefore=0;
+  function send(view,method,params={}){view.frame.contentWindow.postMessage({jsonrpc:'2.0',method,params},'*');}
+  function reply(view,id,result,error){const m={jsonrpc:'2.0',id};if(error)m.error=error;else m.result=result;view.frame.contentWindow.postMessage(m,'*');}
+  function hostContext(view){return {theme:$('theme').value,displayMode:active===view?'fullscreen':'inline',availableDisplayModes:['inline','fullscreen'],containerDimensions:{maxWidth:active===view?phone.clientWidth:view.slot.clientWidth},locale:'ko-KR',platform:'mobile',safeAreaInsets:{top:0,right:0,bottom:0,left:0}};}
+  function changeMode(view,mode){
+    if(mode==='fullscreen'&&active!==view){if(active)changeMode(active,'inline');scrollBefore=$('conversation').scrollTop;active=view;view.slot.classList.add('is-fullscreen');phone.classList.add('fullscreen');$('fullscreen-cover').hidden=false;$('fullscreen-bar').hidden=false;$('close-fullscreen').focus();}
+    else if(mode==='inline'&&active===view){view.slot.classList.remove('is-fullscreen');active=null;phone.classList.remove('fullscreen');$('fullscreen-cover').hidden=true;$('fullscreen-bar').hidden=true;view.frame.style.height=view.height+'px';$('conversation').scrollTop=scrollBefore;view.frame.focus();}
+    send(view,'ui/notifications/host-context-changed',hostContext(view));
+  }
+  function firstText(fixture){const first=(Array.isArray(fixture.content)?fixture.content:[]).find(x=>x.type==='text'&&typeof x.text==='string');return (first?first.text.split('\n').find(x=>x.trim())||'코스를 계산했어요.':'코스를 계산했어요.')+'\n아래 카드에서 비교해 보세요.';}
+  function updateReplay(){$('replay').disabled=!instances[0]?.ready||instances[0].current!=='propose'||instances.length>1;}
+  function register(frame,slot,key){const view={frame,slot,key,current:'',ready:false,height:140,timer:null,generation};instances.push(view);frame.srcdoc=source;return view;}
+  function deliver(view,key){view.current=key;send(view,'ui/notifications/tool-result',fixtures[key]);updateReplay();$('host-state').textContent=key==='infeasible'?'불가능 결과 · 후속 적용 fixture가 없는 조작은 이전 결과를 유지합니다.':key==='yield'?'예산 양보 결과 · 대화 맨 아래 새 위젯 인스턴스에 표시했습니다.':'첫 결과 · 다음 대화를 재생하면 새 카드가 추가됩니다.';if(key==='yield')view.slot.scrollIntoView({block:'end',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+  function startScenario(){
+    if(active)changeMode(active,'inline');generation++;instances.forEach(v=>clearTimeout(v.timer));instances=[];$('followup').hidden=true;$('followup-slot').replaceChildren();const key=$('scenario').value==='infeasible'?'infeasible':'propose';$('bot-text').textContent=firstText(fixtures[key]);$('widget').style.height='140px';register($('widget'),$('widget-slot'),key);updateReplay();
+  }
+  function replay(){
+    if($('replay').disabled)return;$('followup').hidden=false;$('followup-text').textContent=firstText(fixtures.yield);const frame=document.createElement('iframe');frame.title='TripFit 예산 양보 결과 카드';frame.setAttribute('sandbox','allow-scripts');$('followup-slot').append(frame);register(frame,$('followup-slot'),'yield');updateReplay();$('followup').scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  }
+  window.addEventListener('message',event=>{
+    const view=instances.find(v=>event.source===v.frame.contentWindow);if(!view)return;
+    const m=object(event.data);if(m.jsonrpc!=='2.0'||typeof m.method!=='string')return;const p=object(m.params),hasID=Object.hasOwn(m,'id');
+    if(m.method==='ui/initialize'&&hasID)reply(view,m.id,{protocolVersion:'2026-01-26',hostInfo:{name:'preview-host',version:'0.2'},hostCapabilities:{},hostContext:hostContext(view)});
+    else if(m.method==='ui/notifications/initialized'){
+      if(view.ready)return;view.ready=true;send(view,'ui/notifications/tool-input',{arguments:view.key==='yield'?{action:{type:'yield',name:'서연',text:'2만원 안으로'}}:{area:'성수'}});view.timer=setTimeout(()=>{if(view.generation===generation)deliver(view,view.key);},600);
+    }
+    else if(m.method==='ui/notifications/size-changed'){
+      if(active!==view&&Number.isFinite(p.height)&&p.height>0&&p.height<20000){view.height=Math.ceil(p.height);view.frame.style.height=view.height+'px';}
+    }
+    else if(m.method==='ui/request-display-mode'&&hasID){if(p.mode==='inline'||p.mode==='fullscreen'){changeMode(view,p.mode);reply(view,m.id,{mode:active===view?'fullscreen':'inline'});}else reply(view,m.id,null,{code:-32602,message:'지원하지 않는 표시 모드'});}
+    else if(m.method==='tools/call'&&hasID){
+      const args=object(p.arguments),action=object(args.action),canYield=view.current==='propose'&&args.problem_id===fixtures.propose.structuredContent.problem_id&&action.type==='yield'&&action.name==='서연'&&action.text==='2만원 안으로';
+      if(p.name!=='adjust_plan'||!canYield){$('host-state').textContent='이 조작의 실제 후속 fixture가 없습니다. 요청한 카드의 이전 결과를 유지합니다.';reply(view,m.id,null,{code:-32001,message:'해당 조작의 다음 실제 fixture가 없습니다.'});return;}
+      view.timer=setTimeout(()=>{if(view.generation!==generation)return;view.current='yield';reply(view,m.id,fixtures.yield);updateReplay();$('host-state').textContent='카드 내부 tools/call 응답 · 요청한 위젯만 갱신했습니다.';},600);
+    }
+    else if(m.method==='ui/open-link'&&hasID){try{const u=new URL(p.url);if(!['http:','https:'].includes(u.protocol)||u.username||u.password||!/^\/b\/[^/]+\/?$/.test(u.pathname))throw new Error('url');window.open(u.href,'_blank','noopener,noreferrer');reply(view,m.id,{});}catch{reply(view,m.id,null,{code:-32602,message:'잘못된 보드 링크'});}}
+    else if(hasID)reply(view,m.id,null,{code:-32601,message:'지원하지 않는 요청'});
+  });
+  $('close-fullscreen').addEventListener('click',()=>{if(active)changeMode(active,'inline');});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&active)changeMode(active,'inline');});
+  const broadcast=()=>instances.filter(v=>v.ready).forEach(v=>send(v,'ui/notifications/host-context-changed',hostContext(v)));
+  $('theme').addEventListener('change',()=>{phone.classList.toggle('dark',$('theme').value==='dark');broadcast();});
+  $('width').addEventListener('change',()=>{phone.style.width='min('+$('width').value+'px,100%)';broadcast();});
+  $('scenario').addEventListener('change',()=>{if(source)startScenario();});$('replay').addEventListener('click',replay);window.addEventListener('resize',broadcast);window.addEventListener('pagehide',()=>{instances.forEach(v=>clearTimeout(v.timer));generation++;});
+  (async()=>{try{
+    const paths=['board.html','fixtures/real_propose.json','fixtures/real_yield.json','fixtures/real_infeasible.json'],values=await Promise.all(paths.map(async(path,i)=>{const r=await fetch(path,{cache:'no-store'});if(!r.ok)throw new Error('fetch');return i===0?r.text():r.json();}));fixtures={propose:values[1],yield:values[2],infeasible:values[3]};
+    const nonce=Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join(''),boot=document.createElement('script');boot.id='hapui-boot';boot.type='application/json';boot.textContent=JSON.stringify({mode:'app'});source=values[0].replace('<!--HAPUI_BOOT-->',boot.outerHTML).replaceAll('__CSP_NONCE__',nonce);startScenario();
+  }catch{$('host-state').textContent='미리보기를 불러오지 못했어요. ui 폴더에서 python3 -m http.server 8791을 실행한 뒤 /preview.html을 여세요.';}})();
+})();
+</script>
+</body>
+</html>

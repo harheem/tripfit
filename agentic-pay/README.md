@@ -14,9 +14,7 @@
 | ② 결제 맡기기 | ![위임](docs/screens/02_mandates.png) |
 | ③ 예약 확인 | ![재조회](docs/screens/03_recheck.png) |
 | ④ 결제 전 확인 | ![예상 영수증](docs/screens/04_quote.png) |
-| ④ 가격이 오른 경우(테스트) | ![멈춤](docs/screens/04b_price_stop.png) |
-| ⑤ 결제 완료 + 다른 판매처 결제 거절(테스트) | ![확정 영수증](docs/screens/05_paid_and_rejected.png) |
-| 모바일 375px | ![모바일](docs/screens/mobile_quote.png) |
+| ⑤ 결제 완료(영수증) | ![확정 영수증](docs/screens/05_paid.png) |
 
 ## 1. 데모 시나리오
 

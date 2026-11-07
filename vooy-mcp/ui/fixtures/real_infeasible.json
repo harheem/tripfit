@@ -1,0 +1,81 @@
+{
+  "structuredContent": {
+    "v": 1,
+    "status": "infeasible",
+    "problem_id": "hlc8zTSRnhRp4in5p3powQy1gXj7ApVF",
+    "rev": 1,
+    "board_url": "https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/b/rNp-40GXmU-DaKUuqQOEDcT4eJVDIAWo",
+    "area": "성수",
+    "window": {
+      "start": "13:00",
+      "end": "18:00"
+    },
+    "members": [
+      {
+        "name": "민지",
+        "color": "pink"
+      },
+      {
+        "name": "지훈",
+        "color": "sky"
+      }
+    ],
+    "search_space": 6337216,
+    "solve_ms": 769,
+    "plans": [],
+    "default_plan_id": "balanced",
+    "diff": null,
+    "concessions": [
+      {
+        "id": "c1",
+        "who": "민지",
+        "give_up": [
+          "민지: 디뮤지엄 꼭 조건 해제"
+        ],
+        "then_min_pct": 100.0,
+        "apply": {
+          "type": "yield",
+          "name": "민지",
+          "text": "디뮤지엄 꼭",
+          "weights": null,
+          "place_name": null,
+          "rev": null,
+          "also": []
+        }
+      },
+      {
+        "id": "c2",
+        "who": "지훈",
+        "give_up": [
+          "지훈: 걷기 1km 하드 조건 해제"
+        ],
+        "then_min_pct": 100.0,
+        "apply": {
+          "type": "yield",
+          "name": "지훈",
+          "text": "걷기 1km 하드",
+          "weights": null,
+          "place_name": null,
+          "rev": null,
+          "also": []
+        }
+      }
+    ],
+    "unmapped": [],
+    "warnings": [],
+    "data_labels": {
+      "solver": "실제 계산",
+      "places": "샘플(성수)",
+      "mrt": "미사용",
+      "walk": "직선거리×1.3 추정"
+    },
+    "flags": [],
+    "message": null
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "모든 필수 조건을 함께 지키는 코스가 없습니다.\n양보: \"민지\" · \"민지: 디뮤지엄 꼭 조건 해제\" → 최소 100%\n양보: \"지훈\" · \"지훈: 걷기 1km 하드 조건 해제\" → 최소 100%\n미반영: 없음 · 실제 계산 / 샘플(성수) / MRT 미사용 / 직선거리×1.3 추정 · 보드 https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/b/rNp-40GXmU-DaKUuqQOEDcT4eJVDIAWo"
+    }
+  ]
+}

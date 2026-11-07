@@ -148,10 +148,8 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 
 /* understand */
 .quote { font: 500 20px/1.5 var(--kr); letter-spacing: -.035em; margin: 12px 0 14px; }
-.ph { position: relative; z-index: 0; transition: color .3s; }
-.ph::before { content: ""; position: absolute; left: -3px; right: -3px; top: 3px; bottom: 1px; background: var(--navy); border-radius: 7px; z-index: -1; transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
-.ph.on { color: var(--bg); }
-.ph.on::before { transform: scaleX(1); }
+.ph { padding: 0 3px; margin: 0 -3px; border-radius: 7px; background: linear-gradient(var(--navy), var(--navy)) no-repeat 0 70% / 0% 86%; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background-size .45s var(--ease), color .3s; }
+.ph.on { color: var(--bg); background-size: 100% 86%; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 34px; }
 .chip.hide { visibility: hidden; }
 .fly { position: absolute; z-index: 30; pointer-events: none; }
@@ -359,6 +357,35 @@ body.mobile .eg-log { overflow-y: auto; min-height: 50px; }
 body.mobile .eg-row { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 6px; }
 body.mobile .eg-rule { flex: none; }
 
+
+/* Own words reuse the existing sheet, bento blocks, and palette. */
+.sample-return { margin-top:12px; height:28px; font-size:11px; }
+.try-sheet textarea { display:block; width:100%; resize:vertical; min-height:86px; max-height:180px; margin:12px 0 6px; padding:12px; border:1.5px solid var(--navy); border-radius:18px; color:var(--navy); background:var(--cream); font:500 16px/1.45 var(--kr); }
+.try-sheet textarea:focus { outline:2px solid var(--navy); outline-offset:2px; }
+.try-sheet label { font-weight:600; }
+.try-meta { display:flex; gap:8px; justify-content:space-between; align-items:flex-start; min-height:20px; }
+.try-hint { color:var(--red); font-size:13px; line-height:1.4; }
+.try-meta .lab { flex:none; }
+.try-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.try-chips .pill { height:auto; min-height:30px; padding:6px 10px; white-space:normal; text-align:left; font-size:11px; }
+.try-progress { position:relative; }
+.try-sheet [hidden], .hid[hidden] { display:none; }
+.try-progress ol { list-style:none; padding:0; font-size:13px; line-height:1.5; }
+.try-progress li { opacity:.5; padding:5px 0; }
+.try-progress li.on { opacity:1; font-weight:600; }
+.try-progress #tryCancel { margin-top:12px; }
+.unmatched { display:flex; flex-wrap:wrap; gap:6px; padding:10px 4px; }
+.unmatched .pill { height:auto; padding:8px 12px; white-space:normal; background:var(--cream); opacity:.75; font-size:12px; }
+.sc-track.single { pointer-events:none; cursor:default; }
+.pay-open { margin-top:14px; }
+.sheet.pay-sheet { inset:0; max-height:none; border-radius:52px; padding:58px 0 18px; overflow:hidden; display:flex; flex-direction:column; }
+.pay-sheet .pay-header { flex:none; padding:10px 18px; color:var(--cream); display:flex; align-items:center; justify-content:space-between; }
+.pay-sheet iframe { width:100%; flex:1; min-height:0; border:0; background:var(--cream); }
+.pay-sheet .pay-empty { margin:16px; }
+body.mobile .sheet.pay-sheet { inset:0; max-height:none; border-radius:0; padding-top:calc(72px + env(safe-area-inset-top)); padding-bottom:env(safe-area-inset-bottom); }
+body.mobile .try-sheet { scroll-padding:16px; }
+body.mobile .try-clear { min-height:36px; }
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 </style>
 <link rel="stylesheet" href="details.css">
@@ -405,9 +432,9 @@ body.mobile .eg-rule { flex: none; }
 <script>
 "use strict";
 (async () => {
-let LIVE = false;
+let LIVE = false, expiredNotice = false;
 async function api(path, body, timeout = 30000, allowInfeasible = false) {
-  if (body && window.DEMO?.sessionId && !body.sessionId) body = {sessionId:window.DEMO.sessionId, ...body};
+  if (body && /^\/api\/(plan|what-if|replan)$/.test(path) && window.DEMO?.sessionId && !body.sessionId) body = {sessionId:window.DEMO.sessionId, ...body};
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
   try {
@@ -415,8 +442,9 @@ async function api(path, body, timeout = 30000, allowInfeasible = false) {
       signal: controller.signal,
       ...(body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }),
     });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) throw Object.assign(new Error(`HTTP ${response.status}`), {status: response.status});
     const data = await response.json();
+    if (data.sessionExpired) expiredNotice = true;
     if (data.infeasible && !allowInfeasible) throw new Error("조건에 맞는 일정 없음");
     return data;
   } finally { clearTimeout(timer); }
@@ -429,7 +457,7 @@ if (/^https?:$/.test(location.protocol)) {
     LIVE = true;
   } catch (_) { /* file demo remains available if detection fails or times out */ }
 }
-const D = window.DEMO, P = D.people;
+let D = window.DEMO, P = D.people, trying = false, agreementPlan = null;
 P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -442,7 +470,7 @@ const hhmm = m => { m = Math.round(m); return `${String(Math.floor(m / 60)).padS
 const km = m => (m / 1000).toFixed(1);
 const won = n => n.toLocaleString("ko-KR");
 const short = n => /서울숲.*숲체험/.test(n) ? "서울숲 숲체험" : n.replace(/ \d\d:\d\d$/, "");
-const placeById = Object.fromEntries(D.places.map(p => [p.id, p]));
+let placeById = Object.fromEntries(D.places.map(p => [p.id, p]));
 const NICK = { cafe_onion: "어니언", cafe_bluebottle: "블루보틀", cafe_grandpa: "할아버지공장", exh_daelim: "대림창고", exh_dmuseum: "디뮤지엄",
   alley_yeonmu: "연무장길", alley_shoe: "수제화거리", shop_atelier: "소품샵 골목", shop_understand: "언더스탠드에비뉴",
   park_seoulforest: "서울숲", heritage_gongs: "공씨책방" };
@@ -555,7 +583,7 @@ function odo(el, str) {
 function setTitle(el, text, delay = 0) {
   if (el.dataset.text === text) return;
   el.dataset.text = text;
-  el.innerHTML = text.split("\n").map(line => `<span class="tl-line">${line.split(" ").map(w => `<span class="w">${[...w].map(c => `<span class="c">${c}</span>`).join("")}</span>`).join(" ")}</span>`).join("");
+  el.innerHTML = text.split("\n").map(line => `<span class="tl-line">${line.split(" ").map(w => `<span class="w">${[...w].map(c => `<span class="c">${escapeHTML(c)}</span>`).join("")}</span>`).join(" ")}</span>`).join("");
   if (document.body.classList.contains("mobile")) {
     E(el, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], 180, { delay: reduce ? 0 : Math.min(delay, 60) });
     return;
@@ -574,7 +602,8 @@ const island = {
   },
   show({ icon = "check", tone = "var(--lime)", title, sub = "", right = "", hold = 2600, spin = false }) {
     clearTimeout(this.timer);
-    this.c.innerHTML = `<div class="is-ic" style="--t:${tone}">${spin ? '<span class="spin"></span>' : svg(icon, 20, 2.4)}</div><div class="is-tx"><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right ? `<div class="is-r">${right}</div>` : ""}`;
+    if (expiredNotice) { title = "세션이 만료돼 샘플로 계산했어요"; sub = "샘플로 돌아가 다시 시작할 수 있어요"; spin = false; hold = 4500; expiredNotice = false; }
+    this.c.innerHTML = `<div class="is-ic" style="--t:${tone}">${spin ? '<span class="spin"></span>' : svg(icon, 20, 2.4)}</div><div class="is-tx"><b>${escapeHTML(title)}</b>${sub ? `<small>${escapeHTML(sub)}</small>` : ""}</div>${right ? `<div class="is-r">${right}</div>` : ""}`;
     if (!this.el.classList.contains("open")) this.size(Math.min(369, $("#screen").offsetWidth - 24), 70, 35);
     else E(this.c, [{ opacity: 0, filter: "blur(4px)" }, { opacity: 1, filter: "none" }], 260);
     this.el.classList.add("open");
@@ -836,6 +865,7 @@ function openSheet(v, html) {
   let closed = false;
   const close = async () => {
     if (closed) return; closed = true;
+    result.onClose?.();
     if (v._sheet && v._sheet.el === sh) v._sheet = null;
     dim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: reduce ? 1 : 260, fill: "forwards" });
     await sh.animate([{ transform: "none" }, { transform: "translateY(110%)" }], { duration: reduce ? 1 : 340, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }).finished;
@@ -849,7 +879,7 @@ function openSheet(v, html) {
   // Drag from the handle/header, or pull down when the scroll is at the top.
   let pull = null;
   sh.addEventListener("touchstart", e => {
-    if (sh.scrollTop <= 0 && !e.target.closest("button,a,input")) pull = { x: e.touches[0].clientX, y: e.touches[0].clientY, dy: 0 };
+    if (sh.scrollTop <= 0 && !e.target.closest("button,a,input,textarea,label,iframe")) pull = { x: e.touches[0].clientX, y: e.touches[0].clientY, dy: 0 };
   }, { passive: true });
   sh.addEventListener("touchmove", e => {
     if (!pull) return;
@@ -872,6 +902,20 @@ function openSheet(v, html) {
 /* ---------- concession memory: sample history + this session ---------- */
 const ledgerKey = "tripfit.concessions.v1";
 const initialDemo = JSON.parse(JSON.stringify(D));
+let activeOriginal = JSON.parse(JSON.stringify(D));
+function replaceDemo(data, custom = false) {
+  D = window.DEMO = JSON.parse(JSON.stringify(data));
+  P = D.people;
+  P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
+  placeById = Object.fromEntries(D.places.map(p => [p.id, p]));
+  trying = custom; agreementPlan = null; chosen = null; muted.splice(0);
+  $("#modeLabel").textContent = custom ? "LIVE · 내 말로 계산" : modeText;
+}
+function returnToSample() {
+  autoId++; autoPlaying = false;
+  resetConcessions(); activeOriginal = JSON.parse(JSON.stringify(initialDemo));
+  replaceDemo(initialDemo); go(0);
+}
 let sessionHistory = [];
 try {
   const saved = JSON.parse(localStorage.getItem(ledgerKey) || "[]");
@@ -891,7 +935,7 @@ function recordConcession(id, row) {
 function resetConcessions() {
   sessionHistory = []; muted.splice(0); chosen = null;
   try { localStorage.removeItem(ledgerKey); } catch (_) {}
-  Object.assign(D, JSON.parse(JSON.stringify(initialDemo)));
+  replaceDemo(activeOriginal, trying);
 }
 function ledgerLine() {
   const counts = concessionCounts();
@@ -941,7 +985,7 @@ function productCard(p, snapshot) {
       const inside = start >= D.window.start && start + p.durationMin <= D.window.end;
       return `<div class="option-chip ${inside ? "in-window" : "out-window"} ${o.available === false ? "sold-out" : ""}"><b>${escapeHTML(o.start)}</b><small>${o.available === false ? "매진" : inside ? "시간창 안" : "시간창 밖"}</small></div>`;
     }).join("")}</div>
-    <div class="info-line">${(p.options || []).some(o => o.available === true) ? "조회 시 2인 예약 가능" : "자리 확인 필요"}${p.price != null ? ` · ${won(p.price)}원` : ""}<br>시간창 ${hhmm(D.window.start)}–${hhmm(D.window.end)} · 종료까지 포함</div></div>
+    <div class="info-line">${(p.options || []).some(o => o.available === true) ? `조회 시 ${P.length}인 예약 가능` : "자리 확인 필요"}${p.price != null ? ` · ${won(p.price)}원` : ""}<br>시간창 ${hhmm(D.window.start)}–${hhmm(D.window.end)} · 종료까지 포함</div></div>
     ${p.url ? `<div class="product-link-row"><a class="pill product-link" href="${escapeHTML(p.url)}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 보기 ${svg("arrow",14)}</a></div>` : ""}</div>`;
 }
 
@@ -955,15 +999,99 @@ const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
   ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 숲체험은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
 ];
 
+/* ---------- own words: commit a complete session only after a successful solve ---------- */
+function openTry(v) {
+  if (!LIVE) {
+    island.show({title:"직접 해보기는 서버 연결 시 동작해요", sub:"README의 실행법 참고", hold:5000}); return;
+  }
+  if (v._sheet) return;
+  const examples = [
+    ["골목 산책 느긋하게, 소품샵은 꼭", "걷는 건 괜찮아 전시 위주로", "카페에서 오래 쉬고 싶어"],
+    ["걷는 건 괜찮아 전시 위주로", "카페에서 오래 쉬고 싶어", "골목 산책 느긋하게, 소품샵은 꼭"],
+  ];
+  const sh = openSheet(v, `<div class="b lime sheet-head"><span class="grab"></span><div class="row between"><span class="sheet-title" data-sheet-title>내 말로 해보기</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="lab">각자 하고 싶은 말을 적어주세요</div></div>
+    <form id="tryForm">${P.map((p,i) => `<div class="b ${i ? "sky" : "pink"}"><div class="row between"><label for="try${i}">${escapeHTML(p.name)}</label><button type="button" class="pill try-clear" data-clear="${i}">지우기</button></div><textarea id="try${i}" name="person${i}" maxlength="200" rows="3" required aria-describedby="tryHint${i} tryCount${i}">${escapeHTML(p.text)}</textarea><div class="try-meta"><span id="tryHint${i}" class="try-hint" role="alert"></span><span id="tryCount${i}" class="lab gr"></span></div><div class="try-chips">${examples[i].map((text,k)=>`<button type="button" class="pill" data-example="${i}:${k}">${escapeHTML(text)}</button>`).join("")}</div></div>`).join("")}
+    <div class="b cream try-progress" id="tryProgress" hidden role="status" aria-live="polite"><div class="row between"><b>일정을 만들고 있어요</b><span class="gr" id="trySeconds">0초</span></div><ol><li>① 말을 조건으로 바꾸는 중 · OpenAI</li><li>② 꼭 지킬 것과 되면 좋은 것 나누기</li><li>③ 가능한 순서 비교 중 · CBC</li></ol><div class="lab">예상 진행 단계예요 · 응답이 오면 실제 조건과 일정을 보여드려요</div><button type="button" class="pill" id="tryCancel" hidden>취소</button></div>
+    <div class="b lime" style="padding:6px"><button type="submit" class="btn navy" id="trySubmit"><span>이 말로 일정 짜기</span><span class="go">${svg("arrow",22)}</span></button></div></form>`);
+  sh.el.classList.add("try-sheet");
+  const form = $("#tryForm", sh.el), submit = $("#trySubmit",sh.el), fields = P.map((_,i)=>$("#try"+i,sh.el));
+  let controller = null, ticker = 0;
+  const count = i => { $("#tryCount"+i,sh.el).textContent = `${fields[i].value.length}/200`; $("#tryHint"+i,sh.el).textContent = ""; };
+  fields.forEach((field,i) => { count(i); field.oninput=()=>count(i); });
+  $$("[data-clear]",sh.el).forEach(b=>b.onclick=()=>{ const i=+b.dataset.clear; fields[i].value="";count(i);fields[i].focus(); });
+  $$("[data-example]",sh.el).forEach(b=>b.onclick=()=>{ const [i,k]=b.dataset.example.split(":").map(Number); fields[i].value=examples[i][k]; count(i);fields[i].focus(); });
+  const viewport = () => {
+    if (!document.body.classList.contains("mobile")) return;
+    const vv = window.visualViewport, height = vv?.height || innerHeight, offset = vv?.offsetTop || 0;
+    const screenBottom = $("#screen").getBoundingClientRect().bottom || innerHeight;
+    sh.el.style.bottom = `calc(${Math.max(6,screenBottom-height-offset+6)}px + env(safe-area-inset-bottom))`;
+    sh.el.style.maxHeight = `calc(${Math.max(120,height-20)}px - env(safe-area-inset-top) - env(safe-area-inset-bottom))`;
+    if (sh.el.contains(document.activeElement)) document.activeElement.scrollIntoView({block:"nearest"});
+  };
+  window.visualViewport?.addEventListener("resize",viewport);
+  window.visualViewport?.addEventListener("scroll",viewport);
+  viewport();
+  sh.onClose=()=>{controller?.abort();clearInterval(ticker);window.visualViewport?.removeEventListener("resize",viewport);window.visualViewport?.removeEventListener("scroll",viewport);};
+  $(".sheet-close",sh.el).onclick=sh.close;
+  $("#tryCancel",sh.el).onclick=()=>controller?.abort();
+  form.onsubmit=async e=>{
+    e.preventDefault(); if(controller) return;
+    const texts = fields.map(f=>f.value.trim());
+    const empty = texts.findIndex(text=>!text);
+    if(empty>=0){$("#tryHint"+empty,sh.el).textContent="하고 싶은 말을 적어주세요";fields[empty].focus();return;}
+    fields.forEach(f=>f.blur());
+    $$(".try-hint",sh.el).forEach(el=>el.textContent="");
+    controller=new AbortController(); submit.disabled=true;
+    $$("textarea,.try-clear,[data-example]",sh.el).forEach(el=>el.disabled=true);
+    const progress=$("#tryProgress",sh.el), started=Date.now();
+    progress.hidden=false; $("#tryCancel",sh.el).hidden=true;
+    const update=()=>{
+      const seconds=Math.floor((Date.now()-started)/1000);
+      $("#trySeconds",sh.el).textContent=`${seconds}초`;
+      $$("li",progress).forEach((li,i)=>li.classList.toggle("on",i===(seconds<5?0:seconds<9?1:2)));
+      $("#tryCancel",sh.el).hidden=seconds<30;
+    };
+    update();ticker=setInterval(update,1000);progress.scrollIntoView({block:"nearest",behavior:"smooth"});
+    island.show({spin:true,title:"두 사람 말을 조건으로 바꾸는 중",hold:0});
+    const requestToken=token;
+    try {
+      const response=await fetch("/api/try",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({people:P.map((p,i)=>({name:p.name,text:texts[i]}))}),signal:controller.signal});
+      if(response.status===429){island.show({title:"잠깐만요, 1분에 6번까지예요",hold:4500});return;}
+      if(!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data=await response.json();
+      if(!alive(requestToken))return;
+      if(data.needsMore){const i=P.findIndex(p=>p.name===data.person);const field=fields[Math.max(0,i)];$("#tryHint"+Math.max(0,i),sh.el).textContent=data.hint;field.disabled=false;field.focus();island.hide();return;}
+      if(data.infeasible){await sh.close();showConflict(data.explanation || data);return;}
+      if(!data.series?.length || !data.people?.length || !data.places?.length)throw new Error("빈 일정");
+      clearInterval(ticker); controller=null;
+      await sh.close();
+      activeOriginal=JSON.parse(JSON.stringify(data)); replaceDemo(data,true); sessionHistory=[];
+      const source=D.source || {};
+      log("llm",`${source.provider==="rules" ? "규칙 파서" : "LLM "+source.model} · ${source.parseMs}ms`);
+      log("mip",`MIP 파레토 ${D.series.length}개 · ${source.solveMs}ms`,source.solveMs);
+      log("mip",`세션 ${D.sessionId.slice(0,6)}`);
+      go(0); const redrawToken=token; await view.lastElementChild._ready; await sleep(800);
+      if(alive(redrawToken))go(1);
+    } catch(error) {
+      if(alive(requestToken))island.show({title:error.name==="AbortError"?"계산을 취소했어요":"서버에 연결하지 못했어요",sub:"기존 일정을 유지했어요",hold:4500});
+    } finally {
+      clearInterval(ticker);controller=null;submit.disabled=false;
+      $$("textarea,.try-clear,[data-example]",sh.el).forEach(el=>el.disabled=false);
+      progress.hidden=true;
+    }
+  };
+}
+
 /* ---------- step 0: group chat as stacked blocks ---------- */
 async function s0(v, t) {
-  status("12:58");
+  status(hhmm(D.window.start - 2));
   v.innerHTML = `<div class="scr" id="sc" style="padding-bottom:24px">
-    <div class="b top lime cut cl"><div class="row between"><span class="brand app-brand">${LOGO}</span><span class="cap-up">둘이서</span></div>
+    <div class="b top lime cut cl"><div class="row between"><span class="brand app-brand">${LOGO}</span><span class="cap-up">둘이서</span></div>${trying ? '<button class="pill sample-return" id="sampleReturn">샘플로 돌아가기</button>' : ""}
       <div class="row between" style="margin-top:14px;align-items:flex-end"><div style="font:500 40px/1.05 var(--kr);letter-spacing:-.055em">성수<br>반나절</div><div class="av-stack">${av(0, 44)}${av(1, 44)}</div></div></div>
-    <div class="b pink tab tl row" style="padding:12px 14px 12px 12px"><div class="date-c"><b class="gr">14</b><small>Nov</small></div><div style="flex:1"><div class="lab">오늘 일정</div><div style="font:600 15px var(--kr);margin-top:2px">13:00 – 18:30 · 성수역 출발</div></div><span class="pill">미정</span></div>
+    <div class="b pink tab tl row" style="padding:12px 14px 12px 12px"><div class="date-c"><b class="gr">14</b><small>Nov</small></div><div style="flex:1"><div class="lab">오늘 일정</div><div style="font:600 15px var(--kr);margin-top:2px">${hhmm(D.window.start)} – ${hhmm(D.window.end)} · ${escapeHTML(D.start.name)} 출발</div></div><span class="pill">미정</span></div>
     <div id="chat"></div>
   </div>`;
+  if (trying) $("#sampleReturn", v).onclick = returnToSample;
   if (!brandEntered) {
     brandEntered = true;
     [$(".app-brand", v), $("#capLogo")].forEach(el => el.classList.add("brand-enter"));
@@ -982,15 +1110,17 @@ async function s0(v, t) {
     const el = add(`<div class="msg ${me ? "me" : ""}">${av(i, 40, true)}<div class="tx"><div class="who">${who}</div><div class="typing"><i></i><i></i><i></i></div></div></div>`, me ? "sky" : "pink");
     await sleep(750); if (!alive(t)) return;
     const tx = $(".tx", el);
-    tx.innerHTML = `<div class="who">${who}</div>${text}`;
+    tx.innerHTML = `<div class="who">${escapeHTML(who)}</div>${escapeHTML(text)}`;
     E(tx, [{ opacity: .3 }, { opacity: 1 }], 300);
     await sleep(500);
   };
-  await sleep(500); if (!alive(t)) return;
+  await sleep(trying ? 0 : 500); if (!alive(t)) return;
   await say(0, P[0].text); if (!alive(t)) return;
   await say(1, P[1].text); if (!alive(t)) return;
-  await say(0, "…그럼 전시 포기해야 돼?"); if (!alive(t)) return;
-  await say(1, "아니 그건 아닌데ㅠ"); if (!alive(t)) return;
+  if (!trying) {
+    await say(0, "…그럼 전시 포기해야 돼?"); if (!alive(t)) return;
+    await say(1, "아니 그건 아닌데ㅠ"); if (!alive(t)) return;
+  }
   await sleep(250); if (!alive(t)) return;
   const fl = document.createElement("div");
   fl.className = "flag"; fl.innerHTML = `${svg("check", 16, 2.4)} 같이 만드는 일정`;
@@ -999,28 +1129,30 @@ async function s0(v, t) {
   const card = add(`<div style="font:500 23px/1.35 var(--kr);letter-spacing:-.045em;margin:12px 0 18px">둘이 한 말을 조건으로 바꿔서,<br>둘 다 OK인 일정을 찾아볼게요</div><button class="btn navy"><span>같이 정하기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button>`, "lime");
   card.style.paddingTop = "26px";
   $(".btn", card).addEventListener("click", () => go(1));
+  card.insertAdjacentHTML("beforeend", '<button class="pill try-open" style="margin-top:12px">내 말로 해보기</button>');
+  $(".try-open",card).onclick=()=>openTry(v);
 }
 
 /* ---------- step 1: words → constraint chips → 773,665 → 5 ---------- */
 function markup(text, marks) {
-  const phrases = [...new Set(marks.map(m => m.phrase))].sort((a, b) => b.length - a.length);
-  const done = [];
-  let html = text;
-  for (const ph of phrases) {
-    if (done.some(w => w.includes(ph))) continue;
-    html = html.replace(ph, `<span class="ph" data-ph="${ph}">${ph}</span>`);
-    done.push(ph);
+  const phrases = [...new Set(marks.map(m => m.phrase).filter(Boolean))].sort((a,b)=>b.length-a.length);
+  let html="", offset=0; const done=[];
+  while(offset<text.length){
+    const phrase=phrases.find(ph=>text.startsWith(ph,offset));
+    if(phrase){html+=`<span class="ph" data-ph="${escapeHTML(phrase)}">${escapeHTML(phrase)}</span>`;done.push(phrase);offset+=phrase.length;}
+    else html+=escapeHTML(text[offset++]);
   }
-  return { html, spanFor: ph => done.find(w => w.includes(ph)) };
+  return {html, spanFor:ph=>done.find(w=>w.includes(ph))};
 }
+
 const chipHTML = m => m.kind === "hard"
-  ? `<span class="pill fill chip">${svg("lock", 13, 2.4)}${m.chip}</span>`
-  : `<span class="pill chip">${svg("heart", 13, 2.4)}${m.chip}</span>`;
+  ? `<span class="pill fill chip">${svg("lock", 13, 2.4)}${escapeHTML(m.chip)}</span>`
+  : `<span class="pill chip">${svg("heart", 13, 2.4)}${escapeHTML(m.chip)}</span>`;
 
 async function s1(v, t) {
-  status("12:59");
-  if (LIVE) {
-    // Start parsing independently; chip motion always follows the sample marks.
+  status(hhmm(D.window.start - 1));
+  if (LIVE && !trying) {
+    // Sample replay retains the independent parser demonstration.
     api("/api/parse", { messages: P.map(p => ({ name: p.name, text: p.text })) }, 12000)
       .then(result => {
         const people = result.constraints.people;
@@ -1030,7 +1162,7 @@ async function s1(v, t) {
       .catch(() => log("llm", "파싱 호출 실패 · 화면은 샘플 marks로 재생"));
   }
   const marks = P.flatMap(p => p.marks), nh = marks.filter(m => m.kind === "hard").length, ns = marks.length - nh;
-  v.innerHTML = `<div class="scr" id="sc">${topBlock("조건 정리", `<span class="cap-up">OpenAI</span>`)}</div>`;
+  v.innerHTML = `<div class="scr" id="sc">${topBlock("조건 정리", `<span class="cap-up">${D.source?.provider === "rules" ? "규칙 파서" : "OpenAI"}</span>`)}</div>`;
   const sc = $("#sc", v);
   rise($("#top", v), 60);
   setTitle($("#ttl", v), `꼭 지킬 ${nh}가지,\n되면 좋은 ${ns}가지`, 200);
@@ -1044,12 +1176,14 @@ async function s1(v, t) {
     rise(el, 200 + i * 110);
     return { p, el, spanFor };
   });
+  const unmatched = Object.entries(D.unmatched || {}).flatMap(([name,words])=>(Array.isArray(words)?words:[words]).filter(Boolean).map(word=>`${name} · ${word}`));
+  if(unmatched.length)sc.insertAdjacentHTML("beforeend",`<div class="unmatched">${unmatched.map(word=>`<span class="pill">아직 이해 못 한 말: ${escapeHTML(word)}</span>`).join("")}</div>`);
   const src = document.createElement("div");
   src.className = "src-row";
   sc.appendChild(src);
   const fn = document.createElement("div");
   fn.className = "b mint";
-  fn.innerHTML = `<div class="row between"><span class="lab" id="fnK" style="font-weight:600">6곳 이하로 가능한 방문 순서</span><span class="ico" style="width:38px;height:38px">${svg("bolt", 18, 2.2)}</span></div><div class="fn-n gr" id="fnN"><span class="odo" id="fnO">0</span><em>가지</em></div>`;
+  fn.innerHTML = `<div class="row between"><span class="lab" id="fnK" style="font-weight:600">후보지로 가능한 방문 순서</span><span class="ico" style="width:38px;height:38px">${svg("bolt", 18, 2.2)}</span></div><div class="fn-n gr" id="fnN"><span class="odo" id="fnO">0</span><em>가지</em></div>`;
   fn.style.visibility = "hidden";
   sc.appendChild(fn);
   const next = cta(v, "일정 보기", () => go(2));
@@ -1060,7 +1194,7 @@ async function s1(v, t) {
     const chipsBox = $(".chips", el);
     for (const m of p.marks) {
       if (!alive(t)) return;
-      const span = $(`.ph[data-ph="${spanFor(m.phrase)}"]`, el);
+      const span = $$(".ph", el).find(node=>node.dataset.ph===spanFor(m.phrase)) || $(".quote",el);
       span.classList.add("on");
       chipsBox.insertAdjacentHTML("beforeend", chipHTML(m));
       const target = chipsBox.lastElementChild;
@@ -1121,7 +1255,7 @@ function planTitle(p) {
   return j > s ? `지민을 위해\n서연이 양보한 일정` : `서연을 위해\n지민이 양보한 일정`;
 }
 async function s2(v, t) {
-  status("13:00");
+  status(hhmm(D.window.start));
   let n = D.series.length, busy = false;
   let idx = D.defaultIdx, plan = D.series[idx];
   v.innerHTML = `<div class="scr" id="sc">
@@ -1155,14 +1289,18 @@ async function s2(v, t) {
     actions.innerHTML = '<button class="pill" data-scale="-1">지민 쪽</button><button class="pill" data-scale="1">서연 쪽</button><button class="pill" id="conflictBtn">조건 충돌 보기</button>';
     $("#top", v).appendChild(actions);
     $$("[data-scale]", actions).forEach(b => b.onclick = () => v._scaleBy(+b.dataset.scale));
-    $("#conflictBtn", actions).onclick = showConflict;
+    $("#conflictBtn", actions).onclick = () => showConflict();
     $("#hid", v).setAttribute("role", "switch");
     $("#hid", v).setAttribute("aria-checked", "false");
     $("#hid", v).setAttribute("tabindex", "0");
   }
   const paint = (p, first) => {
+    agreementPlan = p; chosen = null;
+    track.classList.toggle("single", n === 1);
     setTitle($("#ttl", v), planTitle(p));
-    $("#lbl", v).textContent = p.label;
+    const noConflict = n === 1 && Object.values(p.sat).every(value=>value>=99.95);
+    $("#lbl", v).textContent = noConflict ? "충돌 없음" : p.label;
+    if(noConflict)setTitle($("#ttl", v), "충돌 없음 ·\n둘 다 다 지켰어요");
     odo($("#nJ", v), Math.round(p.sat[P[0].name]));
     odo($("#nS", v), Math.round(p.sat[P[1].name]));
     odo($("#stW", v), km(p.walkM));
@@ -1210,7 +1348,9 @@ async function s2(v, t) {
   // 숨은 한 곳 +1: heritage spots join the candidates and at least one must be visited
   const H = D.hidden, hidBlk = $("#hid", v);
   let hiddenOn = false;
+  hidBlk.hidden = !H.plan;
   const setHidden = on => {
+    if (!H.plan) return;
     if (busy || on === hiddenOn) return;
     hiddenOn = on;
     hidBlk.classList.toggle("on", on);
@@ -1288,13 +1428,13 @@ async function s2(v, t) {
 
   v._hidden = setHidden;
   v._toggleHidden = () => setHidden(!hiddenOn);
-  v._story = () => openStory(v, H.plan.stops.find(s => placeById[s.id].hidden).id);
+  v._story = () => {const stop=H.plan?.stops.find(s=>placeById[s.id]?.hidden);if(stop)openStory(v,stop.id);};
   cta(v, "체험 하나 넣어보기", () => go(3));
 }
 
 /* checklist rows: label · bar · % (bars and numbers animate in place) */
 function renderChecklist(box, total, items, sat, formula, person) {
-  if (!box.children.length) box.innerHTML = items.map(it => `<div class="ci" role="button" tabindex="0" data-label="${escapeHTML(it.label)}" aria-label="${escapeHTML(it.label)} 이 말은 양보할게"><span><span class="ci-label">${escapeHTML(it.label)}</span><small class="pill intensity"></small><small class="pill conceded" hidden>양보</small></span><i><b style="width:0"></b></i><em></em></div>`).join("");
+  if (box.children.length !== items.length || [...box.children].some((row,i)=>row.dataset.label !== items[i].label)) box.innerHTML = items.map(it => `<div class="ci" role="button" tabindex="0" data-label="${escapeHTML(it.label)}" aria-label="${escapeHTML(it.label)} 이 말은 양보할게"><span><span class="ci-label">${escapeHTML(it.label)}</span><small class="pill intensity"></small><small class="pill conceded" hidden>양보</small></span><i><b style="width:0"></b></i><em></em></div>`).join("");
   [...box.children].forEach((row, k) => {
     const it = items[k], f = it.fulfilled, conceded = !!it.muted || it.weight === 0;
     row.classList.toggle("muted", conceded);
@@ -1319,19 +1459,17 @@ function renderChecklist(box, total, items, sat, formula, person) {
 
 /* ---------- step 3: what-if ---------- */
 let chosen = null;
-const selectedWhatif = () => chosen || (D.whatif.infeasible ? { ...D.whatif, ...D.whatif.chosen } : D.whatif);
+const selectedWhatif = () => chosen || (D.whatif.pick ? (D.whatif.infeasible ? { ...D.whatif, ...D.whatif.chosen } : D.whatif) : {pick:null,plan:agreementPlan || D.series[D.defaultIdx]});
 async function s3(v, t) {
-  status("13:00");
+  status(hhmm(D.window.start));
   chosen = null;
   let snapshot = D.mrt;
-  if (/^https?:$/.test(location.protocol)) {
+  if (!trying && /^https?:$/.test(location.protocol)) {
     try {
       const summary = await api("/api/mrt", undefined, 3000);
       if (LIVE && summary.fetchedAt !== D.mrt?.fetchedAt) {
         const fresh = await api("/api/demo");
-        Object.assign(D, fresh);
-        Object.keys(placeById).forEach(k => delete placeById[k]);
-        D.places.forEach(p => { placeById[p.id] = p; });
+        replaceDemo(fresh);
       }
       snapshot = D.mrt;
     } catch (_) { log("mrt", "조회 실패 · 저장된 스냅숏 사용"); }
@@ -1339,11 +1477,11 @@ async function s3(v, t) {
   if (!alive(t)) return;
   const fetched = snapshot?.fetchedAt ? new Date(snapshot.fetchedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Seoul" }) : "미확인";
   log("mrt", `MyRealTrip searchTnas·getTnaOptions · 조회 ${fetched}${snapshot?.fetchedAt ? " · 저장된 조회 결과" : " · 예시 상품"}`);
-  const choices = D.whatif.choices || [];
-  const availabilityText = value => value === true ? "조회 시 2인 예약 가능" : value === false ? "2인 예약 불가" : "자리 확인 필요";
+  const choices = (D.whatif.choices || []).filter(w=>w.pick && placeById[w.pick]);
+  const availabilityText = value => value === true ? `조회 시 ${P.length}인 예약 가능` : value === false ? `${P.length}인 예약 불가` : "자리 확인 필요";
   const products = snapshot?.picked?.length ? snapshot.picked : D.places.filter(p => p.cat === "activity" && p.id === D.whatif.pick).map(p => ({ name: short(p.name), price: p.price, durationMin: p.duration, options: [], isSample: true }));
   const productCards = products.map(p => productCard(p, snapshot)).join("");
-  const base = D.series[D.defaultIdx];
+  const base = agreementPlan || D.series[D.defaultIdx];
   v.innerHTML = `<div class="scr" id="sc">${topBlock("마이리얼트립 체험", `<button class="pill" id="reopenProduct" style="height:28px;font-size:11px">상품·시각</button>`, "lime")}<div id="tray"></div><div id="tl"></div><div class="note" id="note"></div></div>`;
   rise($("#top", v), 60);
   $("#reopenProduct", v).onclick = () => { if (!autoPlaying && !v._sheet) go(3); };
@@ -1353,6 +1491,12 @@ async function s3(v, t) {
   rise($("#tl", v), 160);
   const next = cta(v, "이대로 합의하기", () => go(4));
   next.disabled = true;
+  if (!D.whatif.pick || !choices.length) {
+    chosen={pick:null,plan:base};
+    setTitle($("#ttl",v),"이 일정에는\n넣을 수 있는 체험이 없어요");
+    next.setLabel("체험 없이 합의하기");next.disabled=false;
+    v._run=async()=>{};return;
+  }
   await sleep(600); if (!alive(t)) return;
   const sh = openSheet(v, `<span class="grab"></span>${productCards}
     <div class="note">${choices.length ? `시간창 안의 시작 시각 ${choices.length}개 · 넣고 조건 확인` : "이 일정에 넣을 수 있는 시작 시각이 없습니다."}</div>
@@ -1364,7 +1508,7 @@ async function s3(v, t) {
   $$(".sheet-close", sh.el).forEach(b => b.onclick = sh.close);
   if (!choices.length) {
     next.disabled = false;
-    next.setLabel("체험 없이 계속");
+    next.setLabel("체험 없이 합의하기");
     v._run = async () => { await sh.close(); go(4); };
     return;
   }
@@ -1394,8 +1538,12 @@ async function s3(v, t) {
     if (!alive(t)) return;
     if (W.infeasible) {
       island.show({ title: "지금 조건으론 못 넣어요", sub: "누가 무엇을 양보하면 되는지 계산했어요", hold: 3200 });
-      setTitle($("#ttl", v), "숲체험을 넣으려면\n하나를 양보해야 해요");
+      setTitle($("#ttl", v), `${short(placeById[W.pick].name)}을 넣으려면\n조건을 양보해야 해요`);
       const tray = $("#tray", v);
+      if (!W.relaxations?.length) {
+        chosen={pick:null,plan:base};next.setLabel("체험 없이 합의하기");next.disabled=false;
+        $("#note",v).textContent=W.reason || "조건을 유지하며 넣을 수 있는 체험이 없어요.";return;
+      }
       const recommended = recommendedFor(W);
       recommendationId = recommended.id;
       tray.innerHTML = `${ledgerLine()}${recommended.options.map(r => {
@@ -1474,16 +1622,44 @@ async function s3(v, t) {
   };
 }
 
+/* Payment input and the visible summary are both made from this agreement. */
+async function openPayment(v, plan, booked) {
+  if(v._sheet || autoPlaying)return;
+  const sh=openSheet(v,`<div class="pay-header"><b>예약하고 결제하기</b><button class="pill on-dark" id="closePay">닫기 ×</button></div><div class="b cream pay-empty" role="status">${booked ? "합의한 일정을 불러오는 중" : "결제 항목 0개 · 이 일정에는 예약할 체험이 없어요"}</div>`);
+  sh.el.classList.add("pay-sheet");
+  sh.el.setAttribute("aria-label","예약하고 결제하기");
+  $("#closePay",sh.el).onclick=sh.close;
+  if(!booked)return;
+  const controller=new AbortController();sh.onClose=()=>controller.abort();
+  try{
+    const [{fromTripFit},response]=await Promise.all([import(new URL("pay/engine/tripfit.js",location.href).href),fetch("pay/index.html",{signal:controller.signal})]);
+    if(!response.ok)throw new Error("결제 화면 불러오기 실패");
+    const product=booked.mrt || placeById[booked.id].mrt;
+    const input=fromTripFit({pay:{item:product.name,price:placeById[booked.id].price,people:P.length},plan,people:P,snapshot:D.mrt});
+    const summary=plan.stops.map(stop=>({name:short(stop.name),start:hhmm(stop.start),end:hhmm(stop.end),catKo:stop.catKo || placeById[stop.id]?.catKo,paid:!!stop.price}));
+    const doc=new DOMParser().parseFromString(await response.text(),"text/html");
+    const base=doc.createElement("base");base.href=new URL("pay/",location.href).href;doc.head.prepend(base);
+    const script=doc.createElement("script");
+    const json=value=>JSON.stringify(value).replace(/</g,"\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
+    script.textContent=`window.TRIPFIT_PAY_INPUT=${json(input)};const tripfitSummary=${json(summary)};const tripfitFetch=window.fetch.bind(window);window.fetch=(url,options)=>String(url).endsWith('/data/plan_summary.json')?Promise.resolve(new Response(JSON.stringify(tripfitSummary),{headers:{'Content-Type':'application/json'}})):tripfitFetch(url,options);`;
+    base.after(script);doc.body.classList.add("embed");
+    if(v._sheet!==sh)return;
+    const frame=document.createElement("iframe");frame.title="같이 결제 · 합의한 일정";
+    frame.srcdoc="<!doctype html>"+doc.documentElement.outerHTML;
+    $(".pay-empty",sh.el).replaceWith(frame);
+    log("pay","AGENTIC PAY · 위임 2건 → 재조회 → 분담 결제(모의)");
+  }catch(error){
+    if(v._sheet===sh)$(".pay-empty",sh.el).textContent="결제 화면을 불러오지 못했어요. 잠시 후 다시 열어주세요.";
+  }
+}
+
 /* ---------- step 4: agree + split pay ---------- */
 async function s4(v, t) {
-  status("13:01");
+  status(hhmm(D.window.start + 1));
   const W = selectedWhatif(), plan = W.plan;
-  if (!W.pick) {
-    v.innerHTML = `<div class="scr">${topBlock("합의", "체험 없이 균형안 유지", "lime")}</div>`;
-    cta(v, "다음", () => go(5)); return;
-  }
-  const picked = placeById[W.pick];
-  const pay = { item: `${short(picked.name)} · ${hhmm(plan.stops.find(s => s.id === W.pick).start)}`, price: picked.price, people: 2 };
+  const booked = plan.stops.find(s=>s.id===W.pick && (s.mrt || placeById[s.id]?.mrt));
+  const picked = booked ? placeById[booked.id] : null;
+  const pay = { item: booked ? `${short(picked.name)} · ${hhmm(booked.start)}` : "결제할 체험 0개", price: picked?.price || 0, people:P.length };
   v.innerHTML = `<div class="scr" id="sc">
     ${topBlock("합의", `<span class="cap-up">${plan.stops.length}곳 · ${km(plan.walkM)}km</span>`, "lime cut")}
     <div class="b cream tab cut cl" id="vb">
@@ -1496,12 +1672,12 @@ async function s4(v, t) {
     </div>
     <div class="b mint tab tl" id="pay" style="opacity:.35">
       <div class="chain">${plan.stops.map((s, i) => `${i ? '<span class="ln"></span>' : ""}<button class="ico" data-poi="${s.id}" aria-label="${escapeHTML(short(s.name))} 장소 정보" style="${s.cat === "activity" ? "background:var(--violet);color:var(--cream)" : ""}">${svg(s.cat, 18, 2)}</button>`).join("")}</div>
-      <div class="rc" style="margin-top:12px"><span>${escapeHTML(pay.item)} × ${pay.people}</span><span class="gr">${won(pay.price * pay.people)}</span></div>
-      <div class="rc"><span>나머지 ${plan.stops.length - 1}곳</span><span>현장 결제</span></div>
+      <div class="rc" style="margin-top:12px"><span>${escapeHTML(pay.item)}${booked ? ` × ${pay.people}` : ""}</span><span class="gr">${won(pay.price * pay.people)}</span></div>
+      <div class="rc"><span>나머지 ${plan.stops.length - (booked ? 1 : 0)}곳</span><span>현장 결제</span></div>
       <div class="rc t"><span>${plan.stops.some(s => s.availability === "unverified") ? "자리 확인되면 결제" : "지금 결제"}</span><span class="gr">${won(pay.price * pay.people)}원</span></div>
     </div>
     <div class="split" id="split">${P.map((p, i) => `<div class="b ${i ? "sky" : "pink"}"><div class="lab">${p.name} 부담</div><div class="gr">${won(pay.price)}<em>원</em></div></div>`).join("")}</div>
-    <div class="mock">Agentic Pay 연동 지점 (데모 목업) · 결제 후 마이리얼트립 예약으로 연결</div>
+    <div class="b peach"><div class="lab">${booked ? "같이 결제 · 실제 결제 없는 모의 체험" : "이 합의 일정에는 결제할 체험이 없어요 · 결제 항목 0개"}</div><button class="btn navy pay-open" id="openPay" disabled><span>예약하고 결제하기</span><span class="go">${svg("card",22)}</span></button></div>
   </div>`;
   const concession = W.concession || (W.relaxationId ? sessionHistory.find(r => r.id === "whatif") : null);
   if (concession) $("#vb", v).insertAdjacentHTML("beforeend", `<div class="concession-next">이번 양보: ${escapeHTML(concession.person)} ‘${escapeHTML(concession.label)}’ → 다음엔 ${nextPerson()} 차례</div>`);
@@ -1510,17 +1686,9 @@ async function s4(v, t) {
   ["#top", "#vb"].forEach((s, i) => rise($(s, v), 60 + i * 90));
   A($("#pay", v), [{ opacity: 0, transform: "translateY(40px)" }, { opacity: .35, transform: "none" }], "pop", { delay: 240 });
   $("#split", v).style.visibility = "hidden";
-  const payBtn = cta(v, "각자 결제 요청 보내기", async () => {
-    payBtn.disabled = true;
-    island.show({ spin: true, tone: "var(--peach)", title: "결제 요청 보내는 중", sub: "Agentic Pay · 목업", hold: 0 });
-    log("pay", `결제 요청 2건 (${won(pay.price)}원 × 2) · 목업`);
-    await sleep(1000); if (!alive(t)) return;
-    island.show({ icon: "card", tone: "var(--peach)", title: "결제 요청 2건 보냈어요", sub: "확정되면 마이리얼트립 예약으로", hold: 2600 });
-    payBtn.setLabel("여행 중 화면 보기");
-    payBtn.disabled = false;
-    payBtn.onclick = () => go(5);
-    A(payBtn, [{ transform: "scale(.94)" }, { transform: "none" }], "pop");
-  });
+  const payBtn = cta(v, "여행 중 화면 보기", () => go(5));
+  const openPayBtn = $("#openPay",v);
+  openPayBtn.onclick=()=>openPayment(v,plan,booked);
   payBtn.disabled = true;
   const ok = new Set();
   const approve = async i => {
@@ -1550,26 +1718,28 @@ async function s4(v, t) {
     split.style.visibility = "";
     $$(".b", split).forEach((x, k) => A(x, [{ opacity: 0, transform: "translateY(30px) scale(.85)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + k * 100 }));
     $("#sc", v).scrollTo({ top: 260, behavior: reduce ? "auto" : "smooth" });
-    payBtn.disabled = false;
+    payBtn.disabled = openPayBtn.disabled = false;
   };
   $$(".app", v).forEach(b => b.addEventListener("click", () => approve(+b.dataset.i)));
-  v._run = async () => { await approve(0); await sleep(600); await approve(1); await sleep(1600); if (alive(t)) payBtn.click(); };
+  v._run = async () => { await approve(0); await sleep(600); await approve(1); await sleep(1600); };
 }
 
 /* ---------- step 5: live re-plan ---------- */
 async function s5(v, t) {
   const selected = selectedWhatif();
+  const before = selected.plan || agreementPlan || D.series[D.defaultIdx];
+  const booking = before.stops.find(s=>s.id===selected.pick);
+  const flexible = before.stops.find(s=>!s.fixed && s.id!==booking?.id);
   const savedReplan = selected.replan;
-  if (!savedReplan || !selected.pick) {
-    v.innerHTML = `<div class="scr">${topBlock("여행 중", "유지할 체험 예약 또는 가능한 재계산 예시가 없습니다", "lime")}</div>`;
-    cta(v, "처음으로", () => go(0)); return;
+  if (!flexible || (!LIVE && !savedReplan)) {
+    v.innerHTML=`<div class="scr">${topBlock("여행 중", "지금 합의한 일정", "lime")}<div id="tl"></div></div>`;
+    setTitle($("#ttl",v),"합의한 일정을\n이어서 즐겨요");new Timeline($("#tl",v)).render(before,{animate:false});
+    cta(v,"처음부터 다시 보기",()=>go(0));v._run=async()=>{};return;
   }
-  let R = { ...savedReplan };
-  const before = selected.plan;
-  const booking = before.stops.find(s => s.id === selected.pick);
-  R.keep = booking.id;
-  let bookingTime = hhmm(booking.start);
-  const crowded = placeById[R.crowded];
+  let R={...(savedReplan || {now:Math.min(D.window.start+5,D.window.end),crowded:flexible.id})};
+  R.keep=booking?.id || null;
+  let bookingTime=booking ? hhmm(booking.start) : "";
+  const crowded=placeById[R.crowded];
   status(hhmm(R.now));
   v.innerHTML = `<div class="scr" id="sc">
     ${topBlock(`여행 중 · ${hhmm(R.now)}`, `<span class="cap-up">혼잡도 샘플</span>`, "lime cut cr")}
@@ -1602,32 +1772,37 @@ async function s5(v, t) {
   async function replan() {
     if (done) return; done = true;
     btn.disabled = true;
-    island.show({ spin: true, tone: "var(--violet)", title: `${short(booking.name)} ${bookingTime} 유지`, sub: `제외: ${short(crowded.name)}`, hold: 0 });
+    island.show({ spin: true, tone: "var(--violet)", title: booking ? `${short(booking.name)} ${bookingTime} 유지` : "붐비는 곳 빼고 다시 계산 중", sub: `제외: ${short(crowded.name)}`, hold: 0 });
     if (LIVE) {
       try {
-        const result = await api("/api/replan", { now_min: R.now, exclude: [R.crowded], keep: { [R.keep]: booking.start }, pick: selected.pick, relax: selected.relaxationId || null });
+        const result = await api("/api/replan", { now_min: R.now, exclude: [R.crowded], keep: booking ? { [R.keep]: booking.start } : {}, pick: selected.pick, relax: selected.relaxationId || null });
         if (!result.plan?.stops?.length) throw new Error("빈 일정");
         R = { ...R, ...result };
       } catch (_) {
-        log("mip", "재계산 호출 실패 · demo 데이터로 재생");
-        R = { ...savedReplan };
-        bookingTime = hhmm(R.plan.stops.find(s => s.id === R.keep).start);
+        if (!alive(t)) return;
+        if (!savedReplan?.plan) {
+          done=false;btn.disabled=false;
+          island.show({title:"다시 계산하지 못했어요",sub:"지금 합의한 일정을 유지했어요"});return;
+        }
+        log("mip", "재계산 호출 실패 · 저장된 같은 세션 일정으로 재생");
+        R={...savedReplan};
+        if(booking)bookingTime=hhmm(R.plan.stops.find(s=>s.id===R.keep)?.start ?? booking.start);
       }
     } else await sleep(700);
     if (!alive(t)) return;
-    log("mip", `reoptimize · lock(체험 ${bookingTime}) · 제외(${crowded.name})`, R.plan.solveMs);
+    log("mip", `reoptimize${booking ? ` · lock(체험 ${bookingTime})` : ""} · 제외(${crowded.name})`, R.plan.solveMs);
     top.classList.remove("alert"); status(hhmm(R.now));
     tl.render(R.plan, { glowNew: true });
     setTimeout(() => $(`.ti[data-id="${R.keep}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 900);
     map.setRoute(R.plan.stops);
-    setTitle($("#ttl", v), `${short(booking.name)} ${bookingTime}은 그대로,\n나머지만 바꿨어요`);
+    setTitle($("#ttl", v), booking ? `${short(booking.name)} ${bookingTime}은 그대로,\n나머지만 바꿨어요` : `${short(crowded.name)} 대신\n다른 곳으로 바꿨어요`);
     const d = planDiff(before, R.plan);
     island.show({ title: `${R.plan.solveMs}ms 만에 다시 짰어요`, sub: `−${short(crowded.name)}  +${d.added.map(s => short(s.name)).join(", ")}`, hold: 3000 });
     const chg = $("#chg", v);
     chg.innerHTML = [
       ...d.dropped.map(s => `<span class="pill" style="background:var(--red);color:var(--cream)">− ${escapeHTML(short(s.name))}</span>`),
       ...d.added.map(s => `<span class="pill" style="background:var(--lime)">+ ${escapeHTML(short(s.name))}</span>`),
-      `<span class="pill" style="background:var(--violet);color:var(--cream)">${svg("lock", 13, 2.4)} 체험 ${bookingTime} 유지</span>`,
+      ...(booking ? [`<span class="pill" style="background:var(--violet);color:var(--cream)">${svg("lock", 13, 2.4)} 체험 ${bookingTime} 유지</span>`] : []),
     ].join("");
     $$(".pill", chg).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateX(-30px) scale(.7)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + i * 100 }));
     btn.setLabel("처음부터 다시 보기");
@@ -1656,9 +1831,16 @@ function openStory(v, id) {
 }
 
 /* ---------- conflict sheet ---------- */
-function showConflict() {
+function showConflict(explanation = null) {
   const v = view.lastElementChild;
   if (!v || v._sheet) return;
+  if(explanation){
+    const C=explanation;
+    const sh=openSheet(v,`<div class="b sheet-head" style="--bg:var(--red);color:var(--cream)"><span class="grab"></span><div class="row between"><span class="cap-up">조건 충돌</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>이대로는 일정이 안 나와요</div></div><div class="b cream"><div class="story-tx">${escapeHTML(typeof C==="string"?C:C.reason || "조건을 조금 바꿔주세요")}</div>${(C.relaxations || []).map(r=>`<div class="info-line">${escapeHTML(typeof r==="string"?r:r.label)}</div>`).join("")}</div><div class="b lime" style="padding:6px"><button class="btn navy" id="editTry"><span>말 바꿔보기</span><span class="go">${svg("arrow",22)}</span></button></div>`);
+    $(".sheet-close",sh.el).onclick=sh.close;
+    $("#editTry",sh.el).onclick=async()=>{await sh.close();openTry(v);};
+    log("mip",`infeasible → ${typeof C==="string"?C:C.reason || "조건 충돌"}`);return;
+  }
   const C = D.conflict, to = parseFloat((C.relaxations[0] || "").match(/→ ([\d.]+)km/)?.[1] || 3);
   const sh = openSheet(v, `
     <div class="b cut" style="--bg:var(--red);color:var(--cream);padding-top:30px"><span class="grab"></span>
@@ -1682,6 +1864,7 @@ function go(i) {
   if (i < 0 || i >= STEPS.length) return;
   const back = i < cur;
   $("#capLogo").hidden = i !== 0;
+  view.lastElementChild?._sheet?.close();
   cur = i; token++;
   island.hide();
   [...view.children].forEach(o => {
@@ -1698,8 +1881,8 @@ function go(i) {
   $$("#dots i").forEach((d, k) => d.classList.toggle("on", k === i));
   $$("#capP i").forEach((d, k) => { d.classList.toggle("on", k === i); d.classList.toggle("done", k < i); });
   $("#capN").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${String(STEPS.length).padStart(2, "0")}`;
-  setTitle($("#capT"), CAPS[i][0]);
-  $("#capS").textContent = CAPS[i][1];
+  setTitle($("#capT"), trying ? ["내 두 문장으로\n함께 만드는 여행","내 말에서\n찾아낸 조건","한 말이 지켜진\n만큼의 만족도","체험도\n함께 골라보기","둘이 승인한\n지금 이 일정","여행 중에도\n다시 계산"][i] : CAPS[i][0]);
+  $("#capS").textContent = trying ? "" : CAPS[i][1];
   E($("#capS"), [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], 500, { delay: 250 });
 }
 view.addEventListener("scroll", e => { if (e.target.classList?.contains("scr")) $("#screen").classList.toggle("scrolled", e.target.scrollTop > 24); }, true);
@@ -1740,7 +1923,7 @@ async function autoplay() {
 }
 
 addEventListener("keydown", e => {
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.("input,textarea,select,[contenteditable]")) return;
   const k = e.key, v = view.lastElementChild;
   if (k !== "a" && k !== "A") { autoId++; autoPlaying = false; }
   if (k === "ArrowRight" || k === " ") { e.preventDefault(); if (v?._sheet) v._sheet.close(); else go(cur + 1); }
@@ -1752,7 +1935,7 @@ addEventListener("keydown", e => {
   else if (k === "," && v?._scaleBy) v._scaleBy(-1);
   else if (k === "." && v?._scaleBy) v._scaleBy(1);
   else if (k === "e" || k === "E") { document.body.classList.toggle("no-eng"); fit(); }
-  else if (k === "r" || k === "R") { $$("#egLog .eg-row").forEach(r => r.remove()); log("mip", modeText); resetConcessions(); go(0); }
+  else if (k === "r" || k === "R") { $$("#egLog .eg-row").forEach(r => r.remove()); log("mip", modeText); returnToSample(); }
 });
 
 /* ---------- mobile engine sheet (reuse the live engine, including its logs) ---------- */

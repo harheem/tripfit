@@ -1,0 +1,49 @@
+[
+  {
+    "sampleAutoplay": "A reaches stage5",
+    "sat": {
+      "지민": 79.4,
+      "서연": 83.1
+    },
+    "errors": 0
+  },
+  {
+    "width": 1440,
+    "stages": "0→1→2→3→4→5, R sample reset",
+    "sat": {
+      "지민": 100,
+      "서연": 100
+    },
+    "errors": 0,
+    "api": [
+      "/api/demo",
+      "/api/try",
+      "/api/what-if",
+      "pay/index.html",
+      "/api/replan"
+    ]
+  },
+  {
+    "width": 390,
+    "stages": "0→1→2→3→4→5, R sample reset",
+    "sat": {
+      "지민": 100,
+      "서연": 100
+    },
+    "errors": 0,
+    "api": [
+      "/api/demo",
+      "/api/try",
+      "/api/what-if",
+      "pay/index.html",
+      "/api/replan"
+    ]
+  },
+  {
+    "errors": "needsMore, 429, network, infeasible, unmatched, no activity and 0-item payment checked",
+    "file": "notice shown"
+  },
+  {
+    "checked": "chips/clear, maxlength, keyboard typing, pending progress and 30s cancellation, session-expired sample response, visualViewport keyboard resize handler, session plan toggle, sample pill, payment adapter + injected current summary"
+  }
+]

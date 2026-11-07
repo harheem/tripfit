@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "limitation": "DOM flow validation only; no pixel layout or real pointer/touch validation",
+  "results": [
+    {
+      "flow": "normal, short-hold cancellation, persistent countdown, snapshot fallback, receipt/supplier hash, merchant rejection",
+      "passed": true
+    },
+    {
+      "flow": "price increase → payment locked → reapproval → 76,000 receipt",
+      "passed": true
+    },
+    {
+      "flow": "live API response + external TRIPFIT_PAY_INPUT names, time, price",
+      "passed": true
+    },
+    {
+      "flow": "expired mandate locks payment and allows renewed delegation",
+      "passed": true
+    },
+    {
+      "flow": "sold-out response → red failed availability check + locked payment",
+      "passed": true
+    }
+  ]
+}

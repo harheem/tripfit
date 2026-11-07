@@ -1,0 +1,128 @@
+{
+  "method": "FastAPI TestClient + actual CBC; DOM tests consume these responses (not a browser E2E)",
+  "source": {
+    "provider": "rules",
+    "model": "rules-v1",
+    "parseMs": 70,
+    "solveMs": 5414
+  },
+  "marks": {
+    "지민": [
+      {
+        "phrase": "골목 산책",
+        "chip": "골목",
+        "kind": "soft"
+      },
+      {
+        "phrase": "느긋하게",
+        "chip": "느긋하게",
+        "kind": "soft"
+      },
+      {
+        "phrase": "소품샵은 꼭",
+        "chip": "소품샵",
+        "kind": "soft"
+      }
+    ],
+    "서연": [
+      {
+        "phrase": "걷는 건 괜찮아 전시 위주로",
+        "chip": "전시",
+        "kind": "soft"
+      }
+    ]
+  },
+  "balanced": {
+    "satisfaction": {
+      "지민": 100.0,
+      "서연": 100.0
+    },
+    "stops": [
+      {
+        "name": "성수역 소품샵 골목",
+        "start": 782,
+        "end": 812
+      },
+      {
+        "name": "대림창고 전시",
+        "start": 819,
+        "end": 879
+      },
+      {
+        "name": "성수 수제화거리",
+        "start": 887,
+        "end": 917
+      }
+    ]
+  },
+  "withExperience": {
+    "satisfaction": {
+      "지민": 100.0,
+      "서연": 100.0
+    },
+    "stops": [
+      {
+        "name": "디뮤지엄 기획전",
+        "start": 800,
+        "end": 890
+      },
+      {
+        "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+        "start": 900,
+        "end": 1020
+      },
+      {
+        "name": "성수 수제화거리",
+        "start": 1042,
+        "end": 1072
+      }
+    ]
+  },
+  "replanned": {
+    "satisfaction": {
+      "지민": 100.0,
+      "서연": 100.0
+    },
+    "stops": [
+      {
+        "name": "대림창고 전시",
+        "start": 791,
+        "end": 851
+      },
+      {
+        "name": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요! 15:00",
+        "start": 900,
+        "end": 1020
+      },
+      {
+        "name": "성수 수제화거리",
+        "start": 1042,
+        "end": 1072
+      }
+    ]
+  },
+  "unmatched": {
+    "지민": [],
+    "서연": []
+  },
+  "followupResponses": {
+    "plan": [
+      "series",
+      "defaultIdx",
+      "diffs",
+      "solveMs",
+      "live"
+    ],
+    "whatif": [
+      "pick",
+      "product",
+      "infeasible",
+      "plan",
+      "diff",
+      "replan"
+    ],
+    "replan": [
+      "plan"
+    ]
+  }
+}

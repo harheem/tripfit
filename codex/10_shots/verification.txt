@@ -1,0 +1,19 @@
+2026-11-07 / SKT 같이 결제 렌더링 개선
+
+PASS (cd agentic-pay && node --test test/*.test.mjs): 25 tests, 25 pass, 0 fail
+PASS .venv/bin/python -m pytest server/test_pay_router.py -q: 12 passed in 0.40s
+PASS node --check web/pay/app.js
+PASS node --check codex/10_browser_check.cjs
+PASS node --check codex/10_dom_check.cjs
+PASS git diff --check -- web/pay/app.js web/pay/index.html web/pay/styles.css
+PASS node codex/10_dom_check.cjs: 5 scenario groups; see dom-results.json
+
+NOT RUN pixel/viewport assertions and PNG capture:
+Playwright launch failed with macOS MachPortRendezvous bootstrap_check_in Permission denied (1100).
+See playwright-status.json. No screenshots were generated.
+
+Static color calculation (navy text vs solid token background, WCAG contrast):
+cream 13.17, lime 11.78, mint 11.72, pink 10.65, sky 8.06,
+peach 10.80, butter 11.66, red 4.85, lilac 8.69.
+White on navy: 14.88. Violet hatching carries navy plaques for readable text.
+This is a token calculation, not a full rendered accessibility audit.

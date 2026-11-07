@@ -27,11 +27,15 @@
 ## 추가 A. 4단계 → SKT "같이 결제" 연결
 
 `web/pay/`(SKT 트랙, 정적 화면, `/pay/?embed=1`로 열면 제목 영역 숨김)와 `server/pay_router.py`(`POST /api/pay/recheck`)가 붙어 있다. `web/pay/engine/tripfit.js`의 `fromTripFit({pay, plan, people, snapshot})`가 TripFit 데이터 → 결제 입력을 만들고, 페이지는 열리기 전 `window.TRIPFIT_PAY_INPUT`이 있으면 그걸 쓴다(없으면 `web/pay/data/trip.json`). `agentic-pay/README.md`와 `web/pay/` 코드를 먼저 읽어라.
-- 4단계 합의 화면의 결제 블록 아래 CTA를 "예약하고 결제하기"로 하고, 누르면 전체 화면 시트 안 `<iframe src="pay/?embed=1">`로 연다(같은 출처라 `iframe.contentWindow.TRIPFIT_PAY_INPUT`을 load 전에 넣거나, `postMessage`/쿼리로 전달 — `web/pay/`가 지원하는 방식을 확인하고 필요한 최소 수정만). 입력은 **지금 화면의 합의 plan**(직접 해보기 세션이면 그 plan, 체험이 없으면 결제 항목 0개 안내).
+- 4단계 합의 화면의 결제 블록 아래 CTA를 "예약하고 결제하기"로 하고, 누르면 전체 화면 시트 안 `<iframe src="pay/?embed=1">`로 연다(같은 출처이므로 `web/pay/`가 이미 지원하는 `window.TRIPFIT_PAY_INPUT`을 iframe 문서 스크립트 실행 전에 넣는다. 예: `fetch('pay/index.html')` 후 `srcdoc`에 `<base href="pay/">`와 입력 주입 스크립트를 앞에 붙이는 방식 등. **`web/pay/` 파일은 고치지 마라** — 다른 작업이 동시에 고친다). 입력은 **지금 화면의 합의 plan**(직접 해보기 세션이면 그 plan, 체험이 없으면 결제 항목 0개 안내).
 - 시트 닫기 → 4단계로 복귀, [여행 중 화면 보기]로 5단계 진행은 그대로. 자동재생(`_run`)은 결제 시트를 열지 않는다(발표 흐름 유지). 
 - 엔진 로그: `AGENTIC PAY · 위임 2건 → 재조회 → 분담 결제(모의)`.
-- `web/pay/`를 고쳤다면 `(cd agentic-pay && node --test test/*.test.mjs)` 25개 통과 유지.
+- `web/pay/`는 수정 금지. `(cd agentic-pay && node --test test/*.test.mjs)` 25개 통과 유지.
 
 ## 추가 B. 기다리는 시간
 
 `/api/try`는 실측 13초(OpenAI 파싱 약 8.7초 + 전체 계산 약 4.3초) 걸린다. 그동안 빈 화면이 되지 않게: 시트 위에 단계형 진행(① 말을 조건으로 바꾸는 중 · OpenAI → ② 꼭 지킬 것과 되면 좋은 것 나누기 → ③ 가능한 순서 비교 중 · CBC)과 경과 초. 30초 넘으면 취소 버튼. `series`가 1개(두 사람 모두 100%처럼 충돌이 없을 때)여도 저울이 깨지지 않게 "충돌 없음 · 둘 다 다 지켰어요" 상태로.
+
+## 참고
+
+09 작업으로 POI 시트·만족도 식·양보 추천·로고·`fitNumber()`가 들어갔다(`codex/09_poi_score_fit.result.md`). 이것들을 깨지 말고, 직접 해보기 데이터에서도 그대로 동작하게 하라(`/api/try` 응답에 `fills`, `facts`, `recommended`, `preview`가 실린다).

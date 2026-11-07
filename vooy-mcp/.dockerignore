@@ -1,0 +1,12 @@
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+codex
+tests
+scripts
+ui/_shots
+*.md
+!ui/README.md
+.env
+.env.*

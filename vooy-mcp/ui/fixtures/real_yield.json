@@ -1,0 +1,468 @@
+{
+  "structuredContent": {
+    "v": 1,
+    "status": "ok",
+    "problem_id": "HJ3bpe8QZ7sIIUQmguPXFBDR74lAS7pI",
+    "rev": 2,
+    "board_url": "https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/b/5nqdEFb8MRrg2lpLGTsgwwKlFRAYRwnb",
+    "area": "성수",
+    "window": {
+      "start": "13:00",
+      "end": "18:00"
+    },
+    "members": [
+      {
+        "name": "민지",
+        "color": "pink"
+      },
+      {
+        "name": "지훈",
+        "color": "sky"
+      },
+      {
+        "name": "서연",
+        "color": "peach"
+      }
+    ],
+    "search_space": 6337216,
+    "solve_ms": 6969,
+    "plans": [
+      {
+        "plan_id": "balanced",
+        "label": "균형",
+        "stops": [
+          {
+            "place_id": "shop_atelier",
+            "name": "성수역 소품샵 골목",
+            "category": "shop",
+            "arrive": "13:02",
+            "leave": "13:32",
+            "walk_m": 135,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "cafe_onion",
+            "name": "어니언 성수",
+            "category": "cafe",
+            "arrive": "13:35",
+            "leave": "14:25",
+            "walk_m": 208,
+            "price": 6500,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "food_noodle",
+            "name": "성수 국수집(샘플)",
+            "category": "food",
+            "arrive": "14:26",
+            "leave": "15:26",
+            "walk_m": 108,
+            "price": 9000,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "cafe_grandpa",
+            "name": "할아버지공장",
+            "category": "cafe",
+            "arrive": "15:31",
+            "leave": "16:21",
+            "walk_m": 339,
+            "price": 6500,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "exh_daelim",
+            "name": "대림창고 전시",
+            "category": "exhibit",
+            "arrive": "16:27",
+            "leave": "17:27",
+            "walk_m": 397,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          }
+        ],
+        "per_person": [
+          {
+            "name": "민지",
+            "pct": 100.0,
+            "items": [
+              {
+                "text": "전시 하나는 꼭",
+                "fill": 1.0,
+                "weight": 1.0,
+                "status": "met"
+              }
+            ]
+          },
+          {
+            "name": "지훈",
+            "pct": 100.0,
+            "items": [
+              {
+                "text": "많이 걷기 싫어",
+                "fill": 1.0,
+                "weight": 1.0,
+                "status": "met"
+              },
+              {
+                "text": "3시 전엔 밥",
+                "fill": 1.0,
+                "weight": 0.7,
+                "status": "met"
+              }
+            ]
+          },
+          {
+            "name": "서연",
+            "pct": 100.0,
+            "items": [
+              {
+                "text": "카페에서 좀 쉬고 싶어",
+                "fill": 1.0,
+                "weight": 0.7,
+                "status": "met"
+              },
+              {
+                "text": "2만원 안으로",
+                "fill": 1.0,
+                "weight": 0.0,
+                "status": "yielded"
+              }
+            ]
+          }
+        ],
+        "min_pct": 100.0,
+        "walk_km": 1.187,
+        "cost_per_person": 22000,
+        "end": "17:27",
+        "flags": []
+      },
+      {
+        "plan_id": "favor:민지",
+        "label": "민지 우선",
+        "stops": [
+          {
+            "place_id": "food_soup",
+            "name": "성수 국밥집(샘플)",
+            "category": "food",
+            "arrive": "13:01",
+            "leave": "14:01",
+            "walk_m": 73,
+            "price": 10000,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "alley_shoe",
+            "name": "성수 수제화거리",
+            "category": "alley",
+            "arrive": "14:06",
+            "leave": "14:36",
+            "walk_m": 329,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "shop_atelier",
+            "name": "성수역 소품샵 골목",
+            "category": "shop",
+            "arrive": "14:42",
+            "leave": "15:12",
+            "walk_m": 422,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "cafe_grandpa",
+            "name": "할아버지공장",
+            "category": "cafe",
+            "arrive": "15:18",
+            "leave": "16:08",
+            "walk_m": 422,
+            "price": 6500,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "alley_yeonmu",
+            "name": "연무장길 골목 산책",
+            "category": "alley",
+            "arrive": "16:12",
+            "leave": "16:52",
+            "walk_m": 264,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "exh_daelim",
+            "name": "대림창고 전시",
+            "category": "exhibit",
+            "arrive": "16:55",
+            "leave": "17:55",
+            "walk_m": 214,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          }
+        ],
+        "per_person": [
+          {
+            "name": "민지",
+            "pct": 100.0,
+            "items": [
+              {
+                "text": "전시 하나는 꼭",
+                "fill": 1.0,
+                "weight": 1.0,
+                "status": "met"
+              }
+            ]
+          },
+          {
+            "name": "지훈",
+            "pct": 93.5,
+            "items": [
+              {
+                "text": "많이 걷기 싫어",
+                "fill": 0.89,
+                "weight": 1.0,
+                "status": "partial"
+              },
+              {
+                "text": "3시 전엔 밥",
+                "fill": 1.0,
+                "weight": 0.7,
+                "status": "met"
+              }
+            ]
+          },
+          {
+            "name": "서연",
+            "pct": 100.0,
+            "items": [
+              {
+                "text": "카페에서 좀 쉬고 싶어",
+                "fill": 1.0,
+                "weight": 0.7,
+                "status": "met"
+              },
+              {
+                "text": "2만원 안으로",
+                "fill": 1.0,
+                "weight": 0.0,
+                "status": "yielded"
+              }
+            ]
+          }
+        ],
+        "min_pct": 93.5,
+        "walk_km": 1.724,
+        "cost_per_person": 16500,
+        "end": "17:55",
+        "flags": []
+      },
+      {
+        "plan_id": "favor:지훈",
+        "label": "지훈 우선",
+        "stops": [
+          {
+            "place_id": "shop_atelier",
+            "name": "성수역 소품샵 골목",
+            "category": "shop",
+            "arrive": "13:02",
+            "leave": "13:32",
+            "walk_m": 135,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "food_noodle",
+            "name": "성수 국수집(샘플)",
+            "category": "food",
+            "arrive": "13:33",
+            "leave": "14:33",
+            "walk_m": 104,
+            "price": 9000,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "cafe_grandpa",
+            "name": "할아버지공장",
+            "category": "cafe",
+            "arrive": "14:38",
+            "leave": "15:28",
+            "walk_m": 339,
+            "price": 6500,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "alley_yeonmu",
+            "name": "연무장길 골목 산책",
+            "category": "alley",
+            "arrive": "15:32",
+            "leave": "16:12",
+            "walk_m": 264,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          },
+          {
+            "place_id": "exh_daelim",
+            "name": "대림창고 전시",
+            "category": "exhibit",
+            "arrive": "16:15",
+            "leave": "17:15",
+            "walk_m": 214,
+            "price": 0,
+            "source": "sample",
+            "flags": [
+              "샘플 데이터",
+              "예약가능 미확인"
+            ]
+          }
+        ],
+        "per_person": [
+          {
+            "name": "민지",
+            "pct": 100.0,
+            "items": [
+              {
+                "text": "전시 하나는 꼭",
+                "fill": 1.0,
+                "weight": 1.0,
+                "status": "met"
+              }
+            ]
+          },
+          {
+            "name": "지훈",
+            "pct": 100.0,
+            "items": [
+              {
+                "text": "많이 걷기 싫어",
+                "fill": 1.0,
+                "weight": 1.0,
+                "status": "met"
+              },
+              {
+                "text": "3시 전엔 밥",
+                "fill": 1.0,
+                "weight": 0.7,
+                "status": "met"
+              }
+            ]
+          },
+          {
+            "name": "서연",
+            "pct": 100.0,
+            "items": [
+              {
+                "text": "카페에서 좀 쉬고 싶어",
+                "fill": 1.0,
+                "weight": 0.7,
+                "status": "met"
+              },
+              {
+                "text": "2만원 안으로",
+                "fill": 1.0,
+                "weight": 0.0,
+                "status": "yielded"
+              }
+            ]
+          }
+        ],
+        "min_pct": 100.0,
+        "walk_km": 1.056,
+        "cost_per_person": 15500,
+        "end": "17:15",
+        "flags": []
+      }
+    ],
+    "default_plan_id": "balanced",
+    "diff": {
+      "added": [
+        "어니언 성수"
+      ],
+      "dropped": [],
+      "pct_delta": {
+        "민지": 0.0,
+        "지훈": 0.0,
+        "서연": 0.0
+      }
+    },
+    "concessions": [],
+    "unmapped": [],
+    "warnings": [],
+    "data_labels": {
+      "solver": "실제 계산",
+      "places": "샘플(성수)",
+      "mrt": "미사용",
+      "walk": "직선거리×1.3 추정"
+    },
+    "flags": [],
+    "message": null
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "3안 · 계산 6969ms · 후보 순서 조합 약 6,337,216개\n균형 · \"민지\" 100% · \"지훈\" 100% · \"서연\" 100% · \"성수역 소품샵 골목\"(13:02) → \"어니언 성수\"(13:35) → \"성수 국수집(샘플)\"(14:26) → \"할아버지공장\"(15:31) → \"대림창고 전시\"(16:27)\n\"민지\" 우선 · \"민지\" 100% · \"지훈\" 93.5% · \"서연\" 100% · \"성수 국밥집(샘플)\"(13:01) → \"성수 수제화거리\"(14:06) → \"성수역 소품샵 골목\"(14:42) → \"할아버지공장\"(15:18) → \"연무장길 골목 산책\"(16:12) → \"대림창고 전시\"(16:55)\n\"지훈\" 우선 · \"민지\" 100% · \"지훈\" 100% · \"서연\" 100% · \"성수역 소품샵 골목\"(13:02) → \"성수 국수집(샘플)\"(13:33) → \"할아버지공장\"(14:38) → \"연무장길 골목 산책\"(15:32) → \"대림창고 전시\"(16:15)\n미반영: 없음 · 실제 계산 / 샘플(성수) / MRT 미사용 / 직선거리×1.3 추정 · 보드 https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/b/5nqdEFb8MRrg2lpLGTsgwwKlFRAYRwnb"
+    }
+  ]
+}
