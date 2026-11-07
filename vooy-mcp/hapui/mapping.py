@@ -47,7 +47,7 @@ def candidates_to_places(raw, proposal, source='vooy'):
             candidate=Candidate.model_validate(c)
         except (ValueError,TypeError):
             notes.append({'name':'','text':clean(c.get('name',''))[:200] if isinstance(c,dict) else '',
-                          'reason':'좌표 없음 또는 후보 필드 형식·범위 오류로 제외'})
+                          'reason':'좌표 없음 또는 후보 필드 형식, 범위 오류로 제외'})
             continue
         c=candidate; cat=category(c.category) or 'other'; pid=f'{source}_{i}'
         p=Place(pid,clean(c.name)[:200],c.lat,c.lng,cat,c.stay_min or PUBLIC_DEFAULTS['stay_minutes'].get(cat,30),
@@ -108,7 +108,7 @@ def map_request(proposal: Proposal, places, state):
             match={cat:1.0} if cat and not w.place_name else {'place:'+p.id:1.0 for p in matches}
             pref=None; reason=None; is_hard=False
             if w.kind in {'visit','rest','avoid'} and not match:
-                reason='모르는 장소 종류·이름: 계산에서 제외'
+                reason='모르는 장소 종류, 이름: 계산에서 제외'
             elif w.kind=='other': reason='장소 데이터로 확인할 수 없는 말'
             elif w.kind=='visit':
                 pref=Pref(w.text,'visit',weight,w.text,match,full=w.count)

@@ -121,7 +121,7 @@ def adjust(problem_id,action):
                     if member is None:_error('member_not_found','해당 이름을 찾을 수 없습니다','action.name')
                     exact=[i for i,w in enumerate(member.wants) if w.text==text]
                     matches=exact or [i for i,w in enumerate(member.wants) if text in w.text]
-                    if len(matches)!=1:_error('want_not_found','양보할 말이 없거나 여러 말과 겹칩니다. 더 길게 적어 주세요','action.text')
+                    if len(matches)!=1:_error('want_not_found','이번엔 뺄 말이 없거나 여러 말과 겹칩니다. 더 길게 적어 주세요','action.text')
                     nextstate['yielded'].add((name,matches[0]))
             elif a.type=='weights':
                 if any(n not in {m.name for m in p.proposal.members} for n in a.weights):_error('member_not_found','weights의 이름을 확인해 주세요','action.weights')
@@ -275,8 +275,8 @@ def _diagnose(p,mapped,deadline):
                     wants=[(name,p.proposal.members[[m.name for m in p.proposal.members].index(name)].wants[i].text) for name,i in combo]
                     action={'type':'yield','name':wants[0][0],'text':wants[0][1]}
                     if len(wants)>1:action['also']=[{'name':wants[1][0],'text':wants[1][1]}]
-                    concessions.append({'id':f'c{len(concessions)+1}','who':' · '.join(dict.fromkeys(n for n,t in wants)),
-                        'give_up':[f'{n}: {t} 조건 해제' for n,t in wants],'then_min_pct':score,'apply':action})
+                    concessions.append({'id':f'c{len(concessions)+1}','who':', '.join(dict.fromkeys(n for n,t in wants)),
+                        'give_up':[f"{n}의 '{t[3:-3] + ' 이내' if t.startswith('걷기 ') and t.endswith(' 하드') else t}'를 빼면" for n,t in wants],'then_min_pct':score,'apply':action})
                     if len(concessions)>=4:break
             if concessions or time.monotonic()>deadline-.12:break
     finally:p.state=initial
@@ -320,7 +320,7 @@ def _compute(p,deadline):
             if status not in {'INFEASIBLE','MISSING_MUST','MISSING_LOCK','INT_INFEASIBLE'}:
                 raise HapuiError('solver_timeout','제한 시간 안에 조건을 지키는 코스를 찾지 못했습니다',hint='후보나 필수 조건을 줄여 다시 시도해 주세요')
             output['status']='infeasible';output['concessions']=_diagnose(p,mapped,deadline)
-            if not output['concessions']:output['message']='시간 안에 검증된 양보안을 찾지 못했습니다. 필수 조건이나 시간창을 조정해 주세요'
+            if not output['concessions']:output['message']='시간 안에 검증된 선택지를 찾지 못했습니다. 필수 조건이나 시간창을 조정해 주세요'
         output['solve_ms']=round((time.monotonic()-started)*1000)
         return Result.model_validate(output).model_dump()
     finally:SOLVER_LOCK.release()

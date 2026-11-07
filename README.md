@@ -19,7 +19,8 @@
 | 무엇 | 링크 | 비고 |
 |---|---|---|
 | TripFit 데모(재생) | https://harheem.github.io/tripfit/ | 키, 서버 없이 1～5단계 재생. 휴대폰에서도 열림. 발표용 키: `→` `A`(자동재생) `1`～`6` |
-| SKT 같이 결제 | https://harheem.github.io/tripfit/pay/ | 저장된 조회 결과로 위임 → 재조회 → 승인 근거 → 영수증 |
+| SKT 같이 결제 | https://harheem.github.io/tripfit/pay/ | 위임, 재조회, 승인 근거, Articul8 Bivia 마지막 판단, 영수증(공개 링크는 서버가 없어 저장된 조회 결과와 규칙 판단) |
+| vooy 단톡방 데모 | https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/chat | 단톡방에서 @TripFit을 부르면 실제 MCP 도구가 호출되고 결과 카드가 대화에 뜹니다 |
 | Vooy MCP 서버 | `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` | vooy에 사용자 지정 MCP로 등록 |
 | 우리 대화로 바꿔 보기(두 사람 문장 → 일정) | 로컬 서버 `http://localhost:8000/` | OpenAI 실호출 + CBC 실계산. 아래 실행법 |
 
@@ -204,6 +205,7 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 
 - **원격 MCP 엔드포인트(Streamable HTTP, 인증 없음):** `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp`, [헬스체크](https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/healthz)
 - **vooy 레시피(지침, 예시 대화):** [`vooy-mcp/RECIPE.md`](vooy-mcp/RECIPE.md), 자세한 설명: [`vooy-mcp/README.md`](vooy-mcp/README.md)
+- **단톡방 데모(vooy 계정 없이 보기):** https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/chat 시작을 누르면 세 사람의 대화 뒤에 @TripFit 호출이 나가고, 실제 `tools/call`(약 4초)과 MCP Apps 카드가 대화 속에 뜹니다.
 
 | 도구 | 하는 일 |
 |---|---|

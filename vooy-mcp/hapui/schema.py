@@ -19,7 +19,7 @@ def minutes(value: Any) -> int:
     ko, h, m, km, en = match.groups(); h, m = int(h), int(m or km or 0)
     if ko or en:
         if not 1 <= h <= 12:
-            raise ValueError('오전·오후 시간은 1~12시로 입력해 주세요')
+            raise ValueError('오전, 오후 시간은 1~12시로 입력해 주세요')
         h = h % 12 + (12 if ko == '오후' or en == 'pm' else 0)
     if m > 59 or h > 24 or (h == 24 and m):
         raise ValueError('시간은 00:00~24:00 범위로 입력해 주세요')
@@ -77,8 +77,8 @@ class Want(Model):
     kind: str = Field(default='other', description='visit/avoid/walk_less/rest/slow/eat_by/leave_by/budget/other. 예: visit. 모르는 값은 other')
     what: str | None = Field(default=None, description='장소 종류 또는 이름. 예: 전시, 디뮤지엄')
     place_name: str | None = Field(default=None, description='특정 장소명. 예: 디뮤지엄 기획전')
-    strength: str = Field(default='보통', description='강/보통/약 또는 strong/normal/weak. 생략·없음은 보통')
-    must: bool = Field(default=False, description='필수 방문·걷기 상한이면 true. 예: 전시 꼭 → true')
+    strength: str = Field(default='보통', description='강/보통/약 또는 strong/normal/weak. 생략, 없음은 보통')
+    must: bool = Field(default=False, description='필수 방문, 걷기 상한이면 true. 예: 전시 꼭 → true')
     count: int = Field(default=1, ge=1, le=40, description='방문 희망 수. 예: 골목 2곳 → 2')
     max_km: float | None = Field(default=None, ge=0, le=100, description='걷기 기준 또는 필수 상한 km. 예: 1.5')
     minutes: int = Field(default=50, ge=1, le=720, description='휴식 희망 분. 예: 50')
@@ -121,7 +121,7 @@ class Want(Model):
 
 
 class Member(Model):
-    name: str = Field(default='', description='사람 이름. 예: 민지. 빈 이름·중복은 자동 보정, 20자 이내')
+    name: str = Field(default='', description='사람 이름. 예: 민지. 빈 이름, 중복은 자동 보정, 20자 이내')
     wants: list[Want] = Field(default_factory=list, description='그 사람이 한 말 목록. 예: [{text: 전시 꼭, kind: visit, what: 전시, must: true}]. 최대 8개')
 
 
@@ -222,18 +222,18 @@ class Proposal(Model):
 
 
 class YieldItem(Model):
-    name: str = Field(description='양보할 사람. 예: 서연')
-    text: str = Field(description='양보할 말의 전부 또는 일부. 예: 2만원')
+    name: str = Field(description='이번엔 말을 뺄 사람. 예: 서연')
+    text: str = Field(description='이번엔 뺄 말의 전부 또는 일부. 예: 2만원')
 
 
 class Action(Model):
     type: Literal['yield','weights','add','remove','undo'] = Field(description='변경 종류. 예: yield')
-    name: str | None = Field(default=None, description='양보할 사람의 정규화된 이름. 예: 서연')
-    text: str | None = Field(default=None, description='양보할 말. 부분 일치 허용. 예: 2만원')
+    name: str | None = Field(default=None, description='이번엔 말을 뺄 사람의 정규화된 이름. 예: 서연')
+    text: str | None = Field(default=None, description='이번엔 뺄 말. 부분 일치 허용. 예: 2만원')
     weights: dict[str,float] | None = Field(default=None, description='사람별 중요도 0~1. 예: {민지: 0.5, 지훈: 1.0}')
     place_name: str | None = Field(default=None, description='추가 또는 제외할 후보 장소명. 예: 디뮤지엄')
     rev: int | None = Field(default=None, description='클라이언트가 본 버전. 예: 2. 최신 상태에 적용')
-    also: list[YieldItem] = Field(default_factory=list, max_length=1, description='서버가 제안한 2개 양보의 두 번째 항목. 예: [{name: 민지, text: 공방}]')
+    also: list[YieldItem] = Field(default_factory=list, max_length=1, description='서버가 제안한 함께 뺄 두 말 중 두 번째 항목. 예: [{name: 민지, text: 공방}]')
 
     @field_validator('name','text','place_name',mode='before')
     @classmethod
@@ -245,7 +245,7 @@ class Action(Model):
         if self.type=='yield' and (not self.name or not self.text): raise ValueError('yield에는 name과 text가 필요합니다')
         if self.type in {'add','remove'} and not self.place_name: raise ValueError('장소 이름 place_name이 필요합니다')
         if self.type=='weights' and (not self.weights or any(not 0<=x<=1 for x in self.weights.values())): raise ValueError('weights는 사람 이름별 0~1 값이어야 합니다')
-        if self.also and self.type!='yield': raise ValueError('also는 양보 조합에서만 사용합니다')
+        if self.also and self.type!='yield': raise ValueError('also는 빼기 조합에서만 사용합니다')
         return self
 
 
@@ -337,6 +337,6 @@ def error_from(exc):
         if field=='window' and 'window.end' in e['msg']:field='window.end'
         msg=e['msg']
         if msg.startswith('Value error, '): msg=msg[13:]
-        if not re.search('[가-힣]',msg): msg='필수 값이 없거나 입력 형식·범위가 맞지 않습니다'
+        if not re.search('[가-힣]',msg): msg='필수 값이 없거나 입력 형식, 범위가 맞지 않습니다'
         return Error(code='invalid_input',message=msg,field=field,hint='필드 설명의 예시에 맞춰 주세요. 시간창은 시작보다 늦게 끝나야 합니다').model_dump()
     return Error(code='internal_error',message='계산을 마치지 못했습니다',hint='잠시 뒤 다시 시도해 주세요').model_dump()

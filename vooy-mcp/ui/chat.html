@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content='width=device-width, initial-scale=1'>
+<meta name="referrer" content='no-referrer'>
+<title>TripFit 대화 데모</title>
+<style>
+
+:root{font-family:-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;color:#1b3545;background:#f3f5f6;font-size:14px;line-height:1.4;font-variant-numeric:tabular-nums}*{box-sizing:border-box}body{margin:0;padding:24px 12px 40px}h1,p{margin:0}button,select{font:inherit;color:inherit;min-height:40px;border:1px solid #c7d2da;border-radius:20px;background:#fff;padding:0 12px;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #536b11;outline-offset:2px}button:disabled{opacity:.5;cursor:wait}[hidden]{display:none!important}.intro{max-width:700px;margin:0 auto 18px;text-align:center}.intro p{font-size:12px;color:#536673}.intro h1{font-size:24px;letter-spacing:-.05em;margin:7px 0 15px}.controls{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.controls label{display:flex;align-items:center;gap:5px;font-size:12px}.phone{--chat-bg:#bfd0de;--face:#fff;--ink:#1b3545;--muted:#526571;--line:#ccd7df;--mine:#dce7f6;width:min(390px,100%);height:844px;max-height:calc(100dvh - 195px);min-height:540px;background:var(--chat-bg);color:var(--ink);border:1px solid var(--line);border-radius:30px;box-shadow:0 16px 50px #243d5215;margin:auto;position:relative;overflow:hidden}.phone.dark{--chat-bg:#000;--face:#262626;--ink:#f6f6f6;--muted:#b3b3b3;--line:#333;--mine:#6454d9}.phone.dark .mine .bubble{color:#fff}.phone-head{height:65px;padding:13px 17px;border-bottom:1px solid var(--line);background:var(--face);display:flex;gap:11px;align-items:center}.group-icon{width:34px;height:34px;border-radius:12px;background:#d6f23b;color:#193244;display:grid;place-items:center;font-weight:700}.phone-head strong{display:block;font-size:15px}.phone-head small{font-size:12px;color:var(--muted)}.conversation{height:calc(100% - 119px);overflow-y:auto;padding:16px 13px 22px;scrollbar-width:thin}.day{font-size:12px;text-align:center;color:var(--muted);margin-bottom:18px}.message{display:flex;gap:8px;align-items:flex-start;margin-bottom:15px;min-width:0}.avatar{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;flex:none;color:#203849;font-size:12px;font-weight:650;background:#f3cfe1}.avatar.sky{background:#bcd8ef}.avatar.peach{background:#f0d7c3}.message-main{max-width:calc(100% - 38px);min-width:0}.who{font-size:12px;margin-bottom:4px;color:var(--muted)}.bubble{padding:9px 11px;background:var(--face);border-radius:4px 16px 16px 16px;font-size:14px;line-height:1.4;overflow-wrap:anywhere}.mine{justify-content:flex-end}.mine .bubble{background:var(--mine);border-radius:16px 4px 16px 16px}.bot-text{white-space:pre-line;background:var(--face);padding:10px 11px;border-radius:12px;margin-bottom:6px;font-size:14px;overflow-wrap:anywhere}.widget-slot{width:100%;min-width:0;margin-bottom:14px}iframe{width:100%;height:140px;display:block;border:0;background:transparent}.composer{height:54px;border-top:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:8px;background:var(--face);color:var(--muted);font-size:12px}.composer input{border:1px solid var(--line);border-radius:20px;padding:7px 12px;flex:1}.host-state{max-width:700px;margin:12px auto 0;min-height:18px;font-size:12px;text-align:center;color:#526571}.fullscreen-cover{position:absolute;inset:0;background:#0e2a3a;z-index:10}.fullscreen-bar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:5px 10px;color:#f3f1ea;z-index:30;font-size:13px}.fullscreen-bar button{background:#f3f1ea;color:#1b3545}.phone.fullscreen .conversation{overflow:visible}.phone.fullscreen .conversation>*{visibility:hidden}.phone.fullscreen .is-fullscreen iframe{visibility:visible;position:absolute;left:0;top:52px;width:100%;height:calc(100% - 52px)!important;z-index:20}.phone.fullscreen .composer{visibility:hidden}@media(max-width:430px){body{padding-top:14px}.intro h1{font-size:21px}.phone{max-height:calc(100dvh - 210px);border-radius:24px}.controls{gap:4px}.controls label{gap:3px}button,select{padding:0 9px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+.bot-message{display:flex;align-items:flex-start;gap:8px;margin:6px 0 15px}.bot-avatar{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:#d6f23b;color:#0e2a3a;font-size:12px;font-weight:650}.bot-stack{width:var(--card-width,280px);min-width:0}.bot-stack .widget-slot{margin-bottom:0}.bot-stack .bot-text{font-size:12px;line-height:1.4}.skin-toggle{display:flex;gap:4px}.skin-toggle button[aria-pressed="true"]{background:#0e2a3a;color:#f3f1ea;border-color:#0e2a3a}
+
+.intro{margin-bottom:12px}.intro .honesty{color:#344d5c;line-height:1.6}.intro h1{margin:4px 0 10px;font-size:22px}.phone-head strong{display:flex;gap:7px;font-size:14px}.phone-head small{display:flex;gap:8px}.composer input{min-width:0;font:inherit;background:var(--face);color:var(--ink);height:36px}.composer button{min-height:36px;padding:0 10px;background:var(--mine);color:var(--ink);border:0}.phone{max-height:none;height:720px;min-height:500px}.conversation{height:calc(100% - 125px)}.composer{height:60px}.system-chip{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;width:fit-content;max-width:100%;margin:12px auto;padding:5px 10px;background:#dce2e8;color:#405260;border-radius:20px;font-size:11px}.dark .system-chip{background:#30343a;color:#d3dbe3}.demo-actions{max-width:460px;margin:10px auto;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.technical{max-width:700px;margin:12px auto;font-size:12px}.technical summary{cursor:pointer;padding:8px 0}.technical pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;background:#e8edf0;border-radius:12px;max-height:300px;overflow:auto}.technical table{width:100%;border-collapse:collapse;text-align:left}.technical th,.technical td{padding:5px;border-bottom:1px solid #d5dee4}.technical .note{margin:6px 0}.retry-button{margin-top:6px;font-size:12px}.bot-stack{max-width:calc(100% - 38px)}.intro .host-state{margin-top:8px}.composer input:focus-visible{outline:2px solid #536b11}.phone.fullscreen .conversation .is-fullscreen{visibility:visible}@media(max-width:430px){body{padding:10px 8px 24px}.phone{height:640px;max-height:75dvh;min-height:440px}.intro h1{font-size:20px}.controls{gap:5px}.honesty{font-size:11px!important}}
+
+</style>
+</head>
+<body>
+<header class="intro">
+<p class="honesty">vooy 연결 화면을 재현한 데모. 계산은 공개 MCP 서버 실호출. 장소는 성수 샘플</p>
+<h1>말풍선 사이, 함께 가는 코스</h1>
+<div class="controls"><label>폰 폭 <select id="width"><option value="390">390px</option><option value="364">카드 약 260px</option><option value="419">카드 약 300px</option><option value="475">카드 약 340px</option></select></label><div class="skin-toggle" role="group" aria-label="대화 스킨"><button id="skin-light" type="button" aria-pressed="true">단톡 라이트</button><button id="skin-dark" type="button" aria-pressed="false">DM 다크</button></div></div>
+<p class="host-state" id="host-state" role="status">시작을 누르거나 @TripFit 코스 짜줘를 입력해 보세요.</p>
+</header>
+<main class="phone" id="phone" aria-label="단톡 라이트 데모">
+<header class="phone-head"><span class="group-icon" aria-hidden="true">3</span><div><strong><span>성수 토요일 나들이</span><span>3명</span></strong><small><span>민지</span><span>지훈</span><span>서연</span></small></div></header>
+<div class="conversation" id="conversation" role="log" aria-label="단톡방 대화" aria-live="polite"><p class="day">토요일 오후를 정하는 중</p></div>
+<form class="composer" id="composer"><input id="input" aria-label="메시지" placeholder="@TripFit 코스 짜줘" maxlength="2400" autocomplete="off"><button id="send" type="submit">보내기</button></form>
+<div class="fullscreen-cover" id="fullscreen-cover" hidden></div><div class="fullscreen-bar" id="fullscreen-bar" hidden><span>TripFit 전체 보드</span><button id="close-fullscreen" type="button">닫기</button></div>
+</main>
+<div class="demo-actions"><button id="start" type="button">시작</button><button id="next" type="button" disabled>다음, 서연 예산 빼기</button><button id="conflict" type="button">조건 충돌 시나리오</button></div>
+<details class="technical"><summary>기술 정보</summary><p class="note">대화는 데모 대본입니다. 계산과 위젯은 같은 출처의 실제 MCP 서버(/mcp)에서 가져옵니다.</p><p class="note">말→조건 변환은 vooy LLM 몫이라 데모에선 미리 정한 arguments를 씁니다. 이름과 함께 이번엔 빼도 된다고 말하면 그 사람의 첫 번째 조건을 빼요. 예산을 말하면 예산을 빼요.</p><table><caption>최근 호출 10개</caption><thead><tr><th>메서드</th><th>도구</th><th>ms</th><th>HTTP 상태</th></tr></thead><tbody id="call-log"></tbody></table><details><summary>실제 arguments JSON 보기</summary><pre id="arguments">아직 호출하지 않았어요.</pre></details></details>
+<script nonce='__CSP_NONCE__'>
+'use strict';
+(() => {
+  const SCENARIO={"area": "성수", "window": {"start": "13:00", "end": "18:00"}, "members": [{"name": "민지", "wants": [{"text": "전시 하나는 꼭", "kind": "visit", "what": "전시", "must": true, "strength": "강"}]}, {"name": "지훈", "wants": [{"text": "많이 걷기 싫어", "kind": "walk_less", "strength": "강"}, {"text": "3시 전엔 밥", "kind": "eat_by", "time": "15:00"}]}, {"name": "서연", "wants": [{"text": "카페에서 좀 쉬고 싶어", "kind": "rest"}, {"text": "2만원 안으로", "kind": "budget", "amount": 20000}]}]};
+  const IMPOSSIBLE={"area": "성수", "window": {"start": "13:00", "end": "18:00"}, "members": [{"name": "민지", "wants": [{"text": "디뮤지엄 꼭", "kind": "visit", "what": "디뮤지엄", "must": true}, {"text": "공방 14시 꼭", "kind": "visit", "place_name": "가죽공방 원데이클래스 14:00", "must": true}]}, {"name": "지훈", "wants": [{"text": "걷기 1km 하드", "kind": "walk_less", "max_km": 1, "must": true}]}]};
+  const $=id=>document.getElementById(id),phone=$('phone'),conversation=$('conversation');
+  const object=x=>x!==null&&typeof x==='object'&&!Array.isArray(x)?x:{};
+  const nonce=document.currentScript.nonce, mime='text/html;profile=mcp-app';
+  let sequence=0,protocol='2025-06-18',connection=null,source='',current=null,scenario=SCENARIO;
+  let instances=[],active=null,scrollBefore=0,theme='light',working=false;
+  const logs=[];
+  function element(tag,cls,copy){const e=document.createElement(tag);if(cls)e.className=cls;if(copy!==undefined)e.textContent=copy;return e;}
+  function spans(node,parts){node.replaceChildren(...parts.map(x=>element('span','',String(x))));}
+  function scroll(){conversation.scrollTop=conversation.scrollHeight;}
+  function human(name,phrase,mine=false){
+    const row=element('div','message'+(mine?' mine':'')),main=element('div','message-main');
+    if(!mine)row.append(element('span','avatar'+(name==='지훈'?' sky':name==='서연'?' peach':''),name.slice(0,1)));
+    main.append(element('p','who',name),element('p','bubble',phrase));row.append(main);conversation.append(row);scroll();
+  }
+  function bot(phrase){
+    const row=element('div','bot-message'),stack=element('div','bot-stack');
+    stack.append(element('p','who','TripFit'),element('p','bot-text',phrase));row.append(element('span','bot-avatar','T'),stack);conversation.append(row);scroll();return stack;
+  }
+  function firstText(result){return (result.content||[]).find(x=>x.type==='text'&&typeof x.text==='string')?.text.split('\n').find(x=>x.trim())||'코스를 계산했어요.';}
+  function log(method,params,ms,status){
+    logs.unshift({method,tool:params.name||'',ms,status});logs.splice(10);
+    $('call-log').replaceChildren(...logs.map(x=>{const row=element('tr');[x.method,x.tool||'해당 없음',x.ms,x.status].forEach(v=>row.append(element('td','',v)));return row;}));
+    $('host-state').textContent=[method,params.name,ms+'ms','HTTP '+status].filter(Boolean).join(' ');
+  }
+  function parseRPC(raw,id){
+    try{return JSON.parse(raw);}catch{}
+    // SSE events may contain multiple data lines and comments/keepalives.
+    for(const event of raw.replace(/\r\n/g,'\n').split(/\n\n+/)){
+      const data=event.split('\n').filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trimStart()).join('\n');
+      if(!data||data==='[DONE]')continue;
+      try{const message=JSON.parse(data);if(message.id===id)return message;}catch{}
+    }
+    throw new Error('서버 응답 형식을 읽지 못했어요.');
+  }
+  async function rpc(method,params={},notification=false){
+    const id=++sequence,request={jsonrpc:'2.0',method,params};if(!notification)request.id=id;
+    const began=performance.now(),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),25000);let status='연결 실패';
+    if(method==='tools/call')$('arguments').textContent=JSON.stringify({name:params.name,arguments:params.arguments},null,2);
+    try{
+      const response=await fetch('/mcp',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json, text/event-stream','MCP-Protocol-Version':protocol},body:JSON.stringify(request),signal:controller.signal,credentials:'same-origin',cache:'no-store',redirect:'error'});
+      status=response.status;const raw=await response.text();
+      if(!response.ok){
+        if(status===429)throw new Error('요청 한도에 도달했어요(HTTP 429). 잠시 뒤 다시 시도해 주세요.');
+        if(status===401)throw new Error('서버가 인증을 요구해요(HTTP 401). 공개 데모 서버 설정을 확인해 주세요.');
+        throw new Error('서버 요청에 실패했어요(HTTP '+status+').');
+      }
+      if(notification)return {};
+      const envelope=parseRPC(raw,id);
+      if(envelope.jsonrpc!=='2.0'||envelope.id!==id)throw new Error('서버 응답 ID가 요청과 맞지 않아요.');
+      if(envelope.error)throw new Error('MCP 오류: '+(envelope.error.message||'요청을 처리하지 못했어요.'));
+      if(!Object.hasOwn(envelope,'result'))throw new Error('서버 응답에 결과가 없어요.');
+      return envelope.result;
+    }catch(error){
+      if(error.name==='AbortError')throw new Error('서버 응답 시간이 초과됐어요. 요청이 반영되었을 수 있으니 이전 결과를 확인해 주세요.');
+      if(error instanceof TypeError)throw new Error('서버에 연결하지 못했어요. 네트워크 연결을 확인해 주세요.');
+      throw error;
+    }finally{clearTimeout(timer);log(method,params,Math.round(performance.now()-began),status);}
+  }
+  async function connect(){
+    if(connection)return connection;
+    connection=(async()=>{
+      const initialized=await rpc('initialize',{protocolVersion:'2025-06-18',capabilities:{extensions:{'io.modelcontextprotocol/ui':{mimeTypes:[mime]}}},clientInfo:{name:'tripfit-chat-host',version:'1.0'}});
+      protocol=initialized.protocolVersion;
+      await rpc('notifications/initialized',{},true);
+      const listed=await rpc('tools/list'),tool=(listed.tools||[]).find(t=>t.name==='propose_plans');
+      const uri=object(object(tool?._meta).ui).resourceUri;
+      if(typeof uri!=='string'||!uri.startsWith('ui://'))throw new Error('propose_plans의 MCP Apps 리소스 주소가 없어요.');
+      const resource=await rpc('resources/read',{uri}),html=(resource.contents||[]).find(c=>c.uri===uri&&c.mimeType===mime&&typeof c.text==='string');
+      if(!html)throw new Error('위젯 HTML 또는 MCP Apps MIME 형식이 맞지 않아요.');
+      // The server already stamps resource nonces. Rebind both executable and boot
+      // scripts to this page's nonce because srcdoc inherits the parent's CSP.
+      const doc=new DOMParser().parseFromString(html.text,'text/html');
+      doc.querySelectorAll('script').forEach(script=>script.setAttribute('nonce',nonce));
+      source='<!doctype html>\n'+doc.documentElement.outerHTML;
+    })();
+    try{await connection;}catch(error){connection=null;throw error;}
+  }
+  function send(view,method,params={}){view.frame.contentWindow.postMessage({jsonrpc:'2.0',method,params},'*');}
+  function reply(view,id,result,error){const m={jsonrpc:'2.0',id};if(error)m.error=error;else m.result=result;view.frame.contentWindow.postMessage(m,'*');}
+  function hostContext(view){return {theme,displayMode:active===view?'fullscreen':'inline',availableDisplayModes:['inline','fullscreen'],containerDimensions:{maxWidth:active===view?phone.clientWidth:view.slot.clientWidth},locale:'ko-KR',platform:'mobile',safeAreaInsets:{top:0,right:0,bottom:0,left:0}};}
+  function changeMode(view,mode){
+    if(mode==='fullscreen'&&active!==view){if(active)changeMode(active,'inline');scrollBefore=conversation.scrollTop;active=view;view.slot.classList.add('is-fullscreen');phone.classList.add('fullscreen');$('fullscreen-cover').hidden=false;$('fullscreen-bar').hidden=false;$('close-fullscreen').focus();}
+    else if(mode==='inline'&&active===view){view.slot.classList.remove('is-fullscreen');active=null;phone.classList.remove('fullscreen');$('fullscreen-cover').hidden=true;$('fullscreen-bar').hidden=true;view.frame.style.height=view.height+'px';conversation.scrollTop=scrollBefore;view.frame.focus();}
+    send(view,'ui/notifications/host-context-changed',hostContext(view));
+  }
+  function card(result,args,scriptScenario){
+    if(active)changeMode(active,'inline');
+    const stack=bot(firstText(result)),slot=element('div','widget-slot'),frame=element('iframe');
+    frame.title='TripFit '+result.structuredContent.rev+'차 계산 카드';frame.setAttribute('sandbox','allow-scripts');
+    const view={frame,slot,result,args,scenario:scriptScenario,ready:false,height:140};instances.push(view);slot.append(frame);stack.append(slot);frame.srcdoc=source;scroll();
+  }
+  function controls(){['start','conflict','send'].forEach(id=>$(id).disabled=working);$('input').disabled=working;$('next').disabled=working||!current||scenario!==SCENARIO;}
+  async function exclusive(task){
+    if(working){bot('이전 요청을 처리하고 있어요. 잠시 뒤 다시 보내 주세요.');return;}
+    working=true;controls();try{return await task();}finally{working=false;controls();}
+  }
+  function failure(label,error,retry){
+    const stack=bot(label+'에 실패했어요. '+error.message),button=element('button','retry-button','다시 시도');button.type='button';stack.append(button);
+    button.addEventListener('click',()=>{if(working)return;button.disabled=true;exclusive(retry).catch(()=>{}).finally(()=>{button.disabled=false;});});scroll();
+  }
+  async function calculate(name,args,options={}){
+    const scriptScenario=options.scenario||scenario,chip=element('p','system-chip');spans(chip,['TripFit',name,'호출 중…']);conversation.append(chip);scroll();
+    const began=performance.now();let callBegan;
+    try{
+      await connect();callBegan=performance.now();
+      const result=await rpc('tools/call',{name,arguments:args});
+      spans(chip,['TripFit',name,((performance.now()-callBegan)/1000).toFixed(1)+'초']);
+      if(result.isError){
+        const error=new Error(firstText(result));
+        if(options.view){spans(chip,['TripFit',name,'실패']);failure(name,error,()=>calculate(name,args,options));return result;}
+        throw error;
+      }
+      if(!object(result.structuredContent).problem_id)throw new Error('계산 결과에 문제 ID가 없어요.');
+      if(!options.view||current?.problem_id===args.problem_id){current=result.structuredContent;scenario=scriptScenario;}
+      if(options.view){options.view.result=result;send(options.view,'ui/notifications/tool-result',result);}
+      else{current=result.structuredContent;scenario=scriptScenario;card(result,args,scriptScenario);}
+      return result;
+    }catch(error){
+      spans(chip,['TripFit',name,'실패',((performance.now()-(callBegan||began))/1000).toFixed(1)+'초']);
+      failure(name,error,()=>calculate(name,args,options));throw error;
+    }
+  }
+  // Event handlers consume failures after calculate has rendered its retry UI.
+  function run(task){return exclusive(task).catch(()=>{});}
+  async function processText(phrase,view=null,apply=null){
+    const target=view?view.result.structuredContent:current,scriptScenario=view?view.scenario:scenario;
+    if(apply){
+      if(!target)throw new Error('먼저 코스를 만들어 주세요.');
+      await calculate('adjust_plan',{problem_id:target.problem_id,action:apply},{scenario:scriptScenario});return;
+    }
+    const decision=phrase.match(/^(.+안)으로 (?:하자|정하기|정할게)$/);
+    if(decision){bot('좋아요, '+decision[1]+'으로 정할게요. 예약은 vooy가 이어서 도와요(데모 문구)');return;}
+    if(phrase.includes('@TripFit')&&/짜줘|정해줘|코스/.test(phrase)){await calculate('propose_plans',scriptScenario,{scenario:scriptScenario});return;}
+    const member=scriptScenario.members.find(m=>phrase.includes(m.name));
+    if(member&&/\uC591\uBCF4|빼도|넘어도|괜찮아|다음에/.test(phrase)){
+      if(!target){bot('먼저 @TripFit 코스 짜줘로 코스를 만들어 주세요.');return;}
+      const want=(/예산|2만원/.test(phrase)&&member.wants.find(w=>w.kind==='budget'))||member.wants[0];
+      await calculate('adjust_plan',{problem_id:target.problem_id,action:{type:'yield',name:member.name,text:want.text}},{scenario:scriptScenario});return;
+    }
+    bot("'○○은 이번엔 빼도 돼'처럼 말해 보세요. 실제 vooy에서는 vooy가 말을 조건으로 바꿔 줍니다");
+  }
+  async function play(conflict=false){
+    scenario=conflict?IMPOSSIBLE:SCENARIO;current=null;
+    const lines=conflict?[['민지','디뮤지엄 꼭, 공방 14시도 꼭'],['지훈','1km 넘게는 못 걸어']]:[['민지','난 전시 하나는 꼭'],['지훈','많이 걷기 싫어. 3시 전엔 밥'],['서연','카페에서 좀 쉬고 싶고 2만원 안으로']];
+    lines.push(['서연','@TripFit 성수 13시부터 18시까지 코스 짜줘']);
+    for(let i=0;i<lines.length;i++){if(i)await new Promise(resolve=>setTimeout(resolve,800));human(...lines[i]);}
+    await calculate('propose_plans',scenario);
+  }
+  function applyAction(raw){
+    const a=object(raw);if(a.type==='undo')return {type:'undo'};
+    if(a.type!=='yield'||typeof a.name!=='string'||typeof a.text!=='string'||!a.name||!a.text)throw new Error('빼기 액션 형식이 맞지 않아요.');
+    const also=a.also===undefined?[]:a.also;
+    if(!Array.isArray(also)||also.length>1||also.some(x=>typeof object(x).name!=='string'||typeof object(x).text!=='string'))throw new Error('추가 빼기 형식이 맞지 않아요.');
+    return {type:'yield',name:a.name,text:a.text,...(also.length?{also}: {})};
+  }
+  window.addEventListener('message',async event=>{
+    const view=instances.find(v=>event.source===v.frame.contentWindow);if(!view)return;
+    const m=object(event.data);if(m.jsonrpc!=='2.0'||typeof m.method!=='string')return;
+    const p=object(m.params),hasID=Object.hasOwn(m,'id');
+    try{
+      if(m.method==='ui/initialize'&&hasID)reply(view,m.id,{protocolVersion:'2026-01-26',hostInfo:{name:'tripfit-chat-host',version:'1.0'},hostCapabilities:{serverTools:{},message:{text:{}},openLinks:{}},hostContext:hostContext(view)});
+      else if(m.method==='ui/notifications/initialized'){
+        if(view.ready)return;view.ready=true;send(view,'ui/notifications/tool-input',{arguments:view.args});send(view,'ui/notifications/tool-result',view.result);
+      }
+      else if(m.method==='ui/notifications/size-changed'){
+        if(Number.isFinite(p.height)&&p.height>0&&p.height<20000){view.height=Math.ceil(p.height);if(active!==view)view.frame.style.height=view.height+'px';}
+      }
+      else if(m.method==='ui/request-display-mode'&&hasID){if(!['inline','fullscreen'].includes(p.mode))throw new Error('지원하지 않는 표시 모드예요.');changeMode(view,p.mode);reply(view,m.id,{mode:active===view?'fullscreen':'inline'});}
+      else if(m.method==='ui/message'&&hasID){
+        const phrase=(Array.isArray(p.content)?p.content:[]).filter(x=>object(x).type==='text'&&typeof x.text==='string').map(x=>x.text).join('\n').slice(0,2400);
+        if(p.role!=='user'||!phrase)throw new Error('사용자 텍스트가 필요해요.');
+        // Acknowledge accepted messages even while busy so the app cannot silently
+        // fall back to a second tool call after the user message has been recorded.
+        const raw=object(p._meta)['hapui/apply'],action=raw===undefined?null:applyAction(raw);
+        human('나',phrase,true);reply(view,m.id,{});
+        if(working){bot('이전 요청을 처리하고 있어요. 완료된 뒤 다시 보내 주세요.');return;}
+        await run(()=>processText(phrase,view,action));
+      }
+      else if(m.method==='tools/call'&&hasID){
+        if(!['adjust_plan','explain_infeasible'].includes(p.name))throw new Error('위젯은 adjust_plan과 explain_infeasible만 호출할 수 있어요.');
+        if(object(p.arguments).problem_id!==view.result.structuredContent.problem_id)throw new Error('이 카드의 문제 ID가 아니에요.');
+        if(working)throw new Error('이전 요청 처리 중이에요. 잠시 뒤 다시 시도해 주세요.');
+        const result=await exclusive(()=>calculate(p.name,p.arguments,{view,scenario:view.scenario}));reply(view,m.id,result);
+      }
+      else if(m.method==='ui/open-link'&&hasID){
+        const url=new URL(p.url);if(!['http:','https:'].includes(url.protocol)||url.username||url.password||p.url!==view.result.structuredContent.board_url||!/^\/b\/[^/]+\/?$/.test(url.pathname))throw new Error('잘못된 보드 링크예요.');
+        window.open(url.href,'_blank','noopener,noreferrer');reply(view,m.id,{});
+      }
+      else if(hasID)reply(view,m.id,null,{code:-32601,message:'지원하지 않는 요청이에요.'});
+    }catch(error){if(hasID)reply(view,m.id,null,{code:-32000,message:error.message});}
+  });
+  $('start').addEventListener('click',()=>run(()=>play()));
+  $('conflict').addEventListener('click',()=>run(()=>play(true)));
+  $('next').addEventListener('click',()=>run(async()=>{const phrase='서연은 예산은 좀 넘어도 괜찮아';human('서연','예산은 좀 넘어도 괜찮아',true);await processText(phrase);}));
+  $('composer').addEventListener('submit',event=>{event.preventDefault();const phrase=$('input').value.trim();if(!phrase||working)return;$('input').value='';human('나',phrase,true);run(()=>processText(phrase));});
+  $('close-fullscreen').addEventListener('click',()=>{if(active)changeMode(active,'inline');});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&active)changeMode(active,'inline');});
+  function broadcast(){phone.style.setProperty('--card-width',Math.min(340,phone.clientWidth*.72)+'px');instances.filter(v=>v.ready).forEach(v=>send(v,'ui/notifications/host-context-changed',hostContext(v)));}
+  function setSkin(value){theme=value;phone.classList.toggle('dark',theme==='dark');$('skin-light').setAttribute('aria-pressed',String(theme==='light'));$('skin-dark').setAttribute('aria-pressed',String(theme==='dark'));phone.setAttribute('aria-label',theme==='dark'?'DM 다크 데모':'단톡 라이트 데모');broadcast();}
+  $('skin-light').addEventListener('click',()=>setSkin('light'));$('skin-dark').addEventListener('click',()=>setSkin('dark'));
+  $('width').addEventListener('change',()=>{phone.style.width='min('+$('width').value+'px,100%)';broadcast();});
+  window.addEventListener('resize',broadcast);broadcast();
+
+})();
+</script>
+</body>
+</html>

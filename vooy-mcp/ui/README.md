@@ -1,73 +1,49 @@
-# TripFit 보드와 대화 카드
+# TripFit 채팅 카드와 전체 보드
 
-`board.html`은 외부 리소스가 없는 단일 HTML이다. App inline은 대화 카드, App fullscreen·Web(`/b/<token>`)·Demo는 기존 전체 보드를 표시한다. 상태·안 선택·rev 검증·통신은 공유한다. 전체 보드의 마크업과 전용 CSS는 이번 변경에서 그대로 유지했다.
+`board.html`은 App inline에서 네이비 벤토 카드, App fullscreen과 Web(`/b/<token>`)에서 전체 보드를 표시한다. 카드 디자인, 파스텔 타일, 안 선택, 숫자 모션과 전체 보드의 저울은 유지한다. 외부 폰트, 이미지, 라이브러리는 로드하지 않는다.
 
-## 미리보기
+## 공개 대화 데모
+
+프로젝트 루트에서 실행한다.
 
 ```sh
-cd ui && python3 -m http.server 8791
+HAPUI_HOST=127.0.0.1 .venv/bin/python -m hapui.server --port 8770
 ```
 
-`http://localhost:8791/preview.html`을 연다. 폰 320/390px 외에 **카드 300/360px** 프리셋, 라이트/다크, 정상/불가능 시나리오를 선택할 수 있다. 카드 폭 프리셋은 대화창 좌우 패딩과 폰 테두리를 포함한 폰 폭 326/386px을 사용한다.
+`http://127.0.0.1:8770/chat`을 연다. 공개 배포에서도 같은 서버의 `/chat` 링크를 사용한다. `/preview` 경로와 로컬 fixture 미리보기는 없다. `/chat`은 데이터 없는 정적 페이지이며 인증 없이 열린다. `/mcp`는 기존 Guard의 Host, Origin, 선택적 Bearer, 요청 제한을 그대로 따른다. 공개 데모 배포는 익명 MCP 호출이 가능한 기존 서버 설정을 사용한다.
 
-초기화 뒤 `tool-input` → 600ms → 실제 fixture 결과가 도착한다. **다음 대화 재생 · 예산 양보**를 누르면 사용자 말, 짧은 vooy 요약, **새 iframe 카드**가 대화 맨 아래에 생긴다. 첫 카드와 선택한 안은 유지한다. 모델의 새 도구 호출은 새 메시지와 새 위젯 인스턴스에 대응한다.
+- **시작**: 민지, 지훈, 서연의 대본을 0.8초 간격으로 재생한 뒤 실제 코스를 계산한다.
+- **다음, 서연 예산 빼기**: `adjust_plan`으로 예산 조건을 풀고 새 메시지에 새 카드를 붙인다.
+- **조건 충돌 시나리오**: `scripts/smoke_mcp.py`의 `IMPOSSIBLE`과 같은 인자로 계산한다. 카드의 빼기 선택지도 실제 재계산으로 이어진다.
+- **직접 입력**: `@TripFit`과 `짜줘`, `정해줘`, `코스` 중 하나가 있으면 현재 대본 인자로 호출한다. 이름과 `빼도`, `넘어도`, `괜찮아`, `다음에` 또는 기존에 맞춰 주겠다는 표현이 있으면 이번엔 빼기(`yield`)로 첫 번째 want를 빼고, 예산을 명시하면 budget want를 선택한다. 자유로운 자연어 해석이나 LLM 호출은 하지 않는다.
+- **단톡 라이트 / DM 다크**: 기존 스킨을 전환한다. 카드 폭은 폰 폭의 72%, 최대 340px이다.
 
-카드 안 버튼의 `tools/call`만 요청한 iframe에 응답한다. 각 iframe은 독립된 결과·높이·준비 상태·타이머를 가진다. 호스트는 등록된 iframe의 `contentWindow`와 `event.source`가 일치하는 메시지만 처리한다. sandbox는 `allow-scripts`만 허용한다.
+상단에 데모의 범위와 실제 호출 여부를 표시한다. 기술 정보에는 최근 10개 요청의 메서드, 도구, 실제 왕복 ms, HTTP 상태와 마지막 도구 인자 JSON이 남는다. 네트워크 실패, 서버 오류, HTTP 429는 한국어 말풍선과 다시 시도 버튼으로 표시한다. 기존 카드는 유지한다. 시간 초과 뒤 수동 재시도는 이미 반영된 요청을 다시 적용할 수 있으므로 화면에 이를 안내한다.
 
-**크게 보기 ›**, **+N곳 더**는 해당 인스턴스에 fullscreen을 요청한다. 미리보기는 선택한 iframe에만 오버레이 위치와 크기를 적용하며 문서를 재생성하거나 DOM에서 옮기지 않는다. **닫기** 또는 Escape로 카드 높이와 대화 스크롤 위치를 복원한다. 테마·폭 변경은 모든 준비된 인스턴스에 전달한다.
+## MCP 클라이언트와 Apps 호스트
 
-vooy 말풍선은 실제 `content`의 첫 비어 있지 않은 줄과 “아래 카드에서 비교해 보세요.”만 표시한다.
+첫 계산의 요청 순서는 다음과 같다.
 
-## 카드 디자인
+1. `initialize` (`2025-06-18`, `capabilities.extensions["io.modelcontextprotocol/ui"].mimeTypes`)
+2. `notifications/initialized`
+3. `tools/list`
+4. `propose_plans._meta.ui.resourceUri`를 사용한 `resources/read`
+5. `tools/call propose_plans`
 
-흰 면(다크 `#18212b`), 20px 라운드, 옅은 테두리와 이중 그림자, 16px 패딩을 사용한다. 머리줄은 18px 라임 저울 마크·TripFit·계산 시간이다. 상태 헤드라인은 20px/700이며 동네·시간·인원·장소 수·도보 거리로 보충한다. 좁은 폭에서는 보조 메타데이터를 한 줄로 말줄임하며 전체 내용은 title에 유지한다.
+모든 요청은 같은 출처의 `/mcp`로 보낸다. JSON 응답과 SSE `data:` 이벤트를 파싱한다. 위젯은 MIME `text/html;profile=mcp-app`를 확인한 서버 HTML만 사용한다. HTML을 DOMParser로 읽어 모든 script의 nonce를 `/chat`의 nonce로 맞춘 뒤 `sandbox="allow-scripts"` iframe의 `srcdoc`에 넣는다. `allow-same-origin`은 사용하지 않는다. iframe은 부모 CSP를 상속한다. 부모는 nonce 스크립트, 인라인 스타일, 같은 출처 연결과 프레임만 허용한다.
 
-사람별 52px 원형 게이지는 5px 진한 사람색 채움과 20%(다크 30%) 트랙, 이니셜, 이름, %로 구성한다. 4명까지 표시하고 나머지는 `+N`으로 요약한다. `pct:null`은 점선 트랙과 “조건 없음”, 양보한 항목이 있으면 작은 “양보” 칩을 표시한다. 게이지를 누르면 아이콘·텍스트 조건 목록을 최대 4줄 펼치고, 다시 누르면 접는다. 기호 카운트 대신 항목별 의미를 읽을 수 있다.
+위젯 초기화 뒤 호스트가 실제 인자를 `ui/notifications/tool-input`, 실제 MCP 결과 전체를 `ui/notifications/tool-result`로 전달한다. 새 계산의 공유 메시지는 새 iframe을 만든다. 이전 카드의 선택과 결과는 유지한다.
 
-안 선택은 회색 트랙과 흰 thumb을 가진 36px 세그먼트다. 동선은 시각·24px 원형 카테고리 배경·16px SVG·장소명으로 구성한 세로 리스트다. 전시·카페·식당·소품샵·골목·공원·체험은 서로 다른 배경과 아이콘을 가진다. 연결 점선 옆 보행 시간은 **다음 장소의 `walk_m / 70` 반올림** 값이다. 코스 이름의 반복 `(샘플)` 표기도 제거하고 데이터 출처를 푸터에 한 번만 모았다.
+위젯의 `tools/call`은 `adjust_plan`, `explain_infeasible`만 허용하고 해당 카드의 problem_id를 검사한 뒤 실제 서버에 전달한다. 성공과 도구 오류 응답은 위젯에 돌려준다. 직접 도구 조작은 요청한 카드만 갱신한다.
 
-재계산은 “다시 계산했어요”와 최대 3개 추가/제외 장소 칩으로 알린다. 추가는 초록, 제외는 회색 취소선이다. 저장된 이전 장소 이름으로 빠진 장소 ID도 해석한다. 라임은 앱 마크와 새 장소의 짧은 하이라이트에만 사용한다. 푸터의 크게 보기·되돌리기는 텍스트 버튼이다.
+빼기와 되돌리기는 `ui/message`에 사용자 문구와 `_meta: {"hapui/apply": action}`을 함께 보낸다. 호스트는 해당 카드의 problem_id와 action(두 조건을 함께 푸는 `also` 포함)으로 재계산하고 새 카드를 추가한다. 호스트가 메시지를 명시적으로 거절할 때만 위젯이 기존 도구 호출로 대체한다. 메시지 시간 초과는 자동 재호출하지 않는다.
 
-불가능이면 게이지·코스·세그먼트를 생략하고 “이대로는 안 돼요 / 한 가지만 양보하면 돼요”와 최대 세 회색 양보 선택지를 보여 준다. `이걸로`는 기존 검증된 `apply` 액션을 전달한다. 미반영 말·근사해·오류도 텍스트로 알린다.
+안 확정은 계산 없이 대화에 예약 안내 데모 문구만 남긴다. 실제 예약 도구는 없다. 확대는 `ui/request-display-mode`, 웹 보드는 `ui/open-link`를 사용한다. 닫기와 Escape는 같은 iframe과 대화 스크롤을 복원한다. 메시지의 source가 등록된 iframe인지 검사한다.
 
-## 크기와 모션
+## 독립 보드와 검증
 
-카드 안 스크롤은 없다. 장소는 최대 4곳이다. 440px 또는 더 작은 호스트 높이 예산에 맞춰 장소를 줄이고 `+N곳 더`로 연결한다. 그래도 넘치면 섹션 사이를 4px로 압축한다. 조건 펼침이 공간을 요구하면 코스를 일시 생략하고 조건을 줄인다. 긴 경우 조건 제목·보조 메타데이터도 접어 최소 한 조건을 남긴다. 전체 정보는 크게 보기에서 확인한다.
+`sample_state.json`, `sample_state_infeasible.json`은 `board.html`의 독립 Demo 모드에서만 사용한다. `/chat`은 이 파일들을 읽지 않는다. `ui/fixtures/`와 `scripts/make_fixtures.py`는 삭제했고 텍스트 테스트도 실제 planner 결과를 사용한다.
 
-**300px 폭: 약 420–440px, 360px 폭: 약 410–440px 예상**이다. 52px 게이지와 세로 보행 시간을 모두 두므로 한도 내에서 보이는 장소 수가 줄어들 수 있다. 이는 CSS 치수와 요약 정책 기준의 예상이며 실제 브라우저 실측값은 아니다. 호스트의 큰 safe area·폰트·매우 작은 maxHeight는 별도 환경 확인이 필요하다.
+`.venv/bin/python -m pytest -q`로 서버, 보드, MCP와 텍스트 계약을 검증한다. `tests/test_chat.py`는 정적 페이지 보안 헤더, 잘못된 Host, 기존 요청 제한, 실제 초기화/리소스/계산/빼기/충돌 해결 교환, 대본 인자 일치와 금지 문구를 확인한다.
 
-- 첫 등장: 카드 전체 8px 페이드 업 200ms.
-- 원형 채움과 숫자: 첫 표시 0→값 500ms, 이후 현재값→새값 400ms. 같은 `cubic-bezier(.2,.8,.2,1)` 진행률로 동기화한다.
-- 안 변경: thumb 220ms 슬라이드, 코스 160ms 크로스페이드, 게이지 재채움.
-- 결과 변경: 키 기반 동선 FLIP, 들어온 곳의 하이라이트와 빠진 곳의 접힘.
-- 조건 펼침/접힘: 카드 높이 200ms, 완료 뒤 크기 보고.
-- 계산 중: 이전 결과를 유지하고 머리줄에 점 세 개.
-- ResizeObserver 50ms 디바운스, 진행 중인 JS 모션이 끝난 뒤 최종 `size-changed`만 보고한다. reduced motion은 모두 즉시 처리한다.
-
-## 실제 fixture와 통신
-
-`scripts/make_fixtures.py`는 `scripts/smoke_result_remote.json`에서 수정하지 않은 기록을 추출한다.
-
-| 파일 | 기록 step |
-|---|---|
-| `fixtures/real_propose.json` | 3인 시나리오 |
-| `fixtures/real_yield.json` | 서연 예산 양보 |
-| `fixtures/real_infeasible.json` | 불가능 시나리오 |
-
-장소는 성수 샘플이며 도보는 추정이다. 원래 `board_url`을 유지하지만 만료될 수 있다. 미리보기는 계산 서버가 아니다. 첫 정상 카드에서 서연의 `2만원 안으로` 양보만 실제 다음 fixture로 응답한다. **undo·불가능 선택지 적용은 후속 기록이 없어 JSON-RPC error를 반환하고 해당 카드의 이전 결과를 유지한다.** 임의 계산이나 rev를 만들지 않는다.
-
-App boot는 `{"mode":"app"}`, Web boot는 `{"mode":"web","token":"…"}`이다. 서버가 `<!--HAPUI_BOOT-->`에 비실행 JSON 태그를 넣고 `__CSP_NONCE__`를 치환한다. App은 `ui/initialize` → `initialized` → tool-result로 시작하며 자체 fetch 없이 호스트 `tools/call`로 변경한다. Web은 기존 GET `/api/board/<token>`과 POST `/adjust`를 사용한다. boot 없이 최상위에서 연 보드는 Demo이며, `?infeasible=1`로 가상 불가능 예시를 연다.
-
-낮은 rev·문제 변경 뒤 늦은 응답 차단, 부모 창 source 검증, 10초 RPC 제한, 기존 액션 검증을 유지했다. fullscreen 요청이 거절되거나 지원되지 않으면 검증된 `board_url`로 `ui/open-link`, 두 방법이 모두 없으면 확대 버튼을 숨긴다. undo는 `can_undo`를 우선하고 없으면 rev > 1 또는 이 화면의 성공한 변경으로 판단한다.
-
-호스트의 theme·safeAreaInsets·containerDimensions와 허용된 폰트/면/글자색/라운드 리터럴을 반영한다. CSS URL·규칙·변수 참조는 거부한다. 데이터는 `textContent`/`setAttribute`로만 넣고 제어·양방향 제어문자를 제거한다. 외부 리소스·eval·Function 생성자·인라인 이벤트 속성은 없다. 보드 실행 스크립트는 nonce 있는 한 개다.
-
-## 검증과 제한
-
-- Python 테스트: **54 passed**.
-- 실행 스크립트 `node --check` 통과, 보안 패턴 검색 0건.
-- 기존 전체 보드/Demo/Web 임시 JSDOM 회귀 검사: **63개 통과**.
-- 새 카드 임시 JSDOM 검사: **45개 통과**. 게이지·null·4명+N·조건 펼침·헤드라인·diff·인젝션 방어·크기 알림·모드 복귀·링크 fallback을 확인했다.
-- 다중 위젯 미리보기 임시 JSDOM 검사: **37개 통과**. 새 카드 생성·기존 카드 유지·source 검증·인스턴스별 tools/call·fullscreen/닫기·테마/폭 전파·fixture 오류를 확인했다.
-
-실제 브라우저 레이아웃·높이·모션·fullscreen의 시각적 완성도는 미검증이다. 로컬 HTTP 서버는 소켓 bind 권한 거부, 브라우저 연결 호스트는 unavailable, Chrome 컴퓨터 접근은 승인되지 않아 실측하지 못했다. JSDOM은 레이아웃 엔진이 아니므로 위 동작 검사로 스크린샷 검증을 대체할 수 없다. 실제 vooy/MCP Apps CSP·display mode 통합, 실제 서버 undo·불가능 선택지 적용도 별도 확인이 필요하다.
+현재 작업 환경은 TCP 포트 열기와 Chrome 실행/접근을 허용하지 않아 실제 브라우저 CSP와 시각 검증은 완료하지 못했다. TestClient 검증은 HTTP 소켓을 사용하지 않는다. 배포 전 `/chat`에서 카드가 표시되고 확대 및 빼기가 동작하는지 실제 브라우저로 확인해야 한다.
