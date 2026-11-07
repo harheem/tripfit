@@ -88,6 +88,27 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .eg-src { font: 600 10px/1.9 var(--gr); letter-spacing: .08em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
 .eg-ms { font: 500 12.5px var(--gr); color: var(--lime); white-space: nowrap; }
 .eg-rule { background: var(--pink); border-radius: 30px; padding: 18px 20px; font: 500 17px/1.35 var(--kr); letter-spacing: -.03em; }
+.vooy-link { display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--navy); font: 600 12px/1.4 var(--kr); text-decoration: none; }
+.eg-vooy { align-self: flex-start; margin: 4px 14px; padding: 8px 13px; border-radius: 99px; background: var(--lilac); }
+.try-vooy { display: flex; min-height: 44px; margin-top: 6px; text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+.endcard.scr { padding-bottom: 30px; }
+.endcard .end-hero { padding-bottom: 24px; }
+.endcard .end-logo { display: flex; height: auto; gap: 10px; font-size: 54px; margin: 10px 0 14px; }
+.endcard .end-logo .brand-mark { width: 70px; height: 45px; }
+.end-intro { margin: 0; font: 500 15px/1.55 var(--kr); letter-spacing: -.03em; }
+.end-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 144px; padding: 16px; text-decoration: none; }
+.end-link h2 { margin: 0 0 7px; font: 600 19px/1.3 var(--kr); letter-spacing: -.04em; }
+.end-link p { margin: 0 0 6px; font: 500 12px/1.5 var(--kr); }
+.end-url { display: block; font: 500 11px/1.4 var(--gr); overflow-wrap: anywhere; }
+.end-code { background: var(--navy-2); color: var(--cream); }
+.end-qr { display: none; width: 112px; height: 112px; padding: 8px; background: #fff; border-radius: 10px; flex: none; }
+.end-qr.ready { display: block; }
+.end-qr canvas, .end-qr img { display: block; width: 96px; height: 96px; }
+.end-credits { display: flex; flex-wrap: wrap; gap: 5px; padding: 10px 8px; }
+.end-credits .pill { height: 25px; padding: 0 9px; font-size: 10px; }
+.end-restart { display: block; min-height: 32px; margin: 3px auto 0; color: var(--cream); font: 500 12px var(--kr); text-decoration: underline; text-underline-offset: 3px; }
+.endcard > .end-restart { min-height: 44px; }
+.vooy-link:focus-visible, .end-link:focus-visible, .end-restart:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
 .eg-keys { color: rgba(243, 241, 234, .5); font-size: 11px; line-height: 1.9; padding: 6px 14px 8px; }
 .eg-keys kbd { font: 600 10px var(--gr); border: 1px solid rgba(243, 241, 234, .3); color: var(--cream); border-radius: 5px; padding: 0 5px; }
 
@@ -429,15 +450,19 @@ body.mobile .try-clear { min-height:36px; }
       </div>
       <div class="eg-log" id="egLog"><div class="cap-up" style="color:var(--cream)">화면 뒤에서 실제로 돈 것</div></div>
       <div class="eg-rule">LLM은 말만 바꾸고,<br>숫자는 전부 솔버가 만듭니다.</div>
-      <div class="eg-keys"><kbd>→</kbd> 다음 <kbd>←</kbd> 이전 <kbd>A</kbd> 자동재생 <kbd>C</kbd> 조건 충돌 <kbd>,</kbd><kbd>.</kbd> 저울 <kbd>H</kbd> 숨은 한 곳 <kbd>E</kbd> 패널 <kbd>R</kbd> 처음</div>
+      <a class="vooy-link eg-vooy" id="vooyEntry" target="_blank" rel="noopener noreferrer">vooy 단톡방에서 보기 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      <div class="eg-keys"><kbd>1</kbd> ~ <kbd>7</kbd> 이동 <kbd>→</kbd> 다음 <kbd>←</kbd> 이전 <kbd>A</kbd> 자동재생 <kbd>C</kbd> 조건 충돌 <kbd>,</kbd><kbd>.</kbd> 저울 <kbd>H</kbd> 숨은 한 곳 <kbd>E</kbd> 패널 <kbd>R</kbd> 처음</div>
     </aside>
   </div>
 </div>
 
 <script src="demo_data.js"></script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" id="qrLibrary"></script>
 <script>
 "use strict";
 (async () => {
+const VOOY_CHAT_URL = "https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/chat";
+document.getElementById("vooyEntry").href = VOOY_CHAT_URL;
 let LIVE = false, expiredNotice = false;
 async function api(path, body, timeout = 30000, allowInfeasible = false) {
   if (body && /^\/api\/(plan|what-if|replan)$/.test(path) && window.DEMO?.sessionId && !body.sessionId) body = {sessionId:window.DEMO.sessionId, ...body};
@@ -1006,6 +1031,7 @@ const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
   ["넣으면, 뭘\n빼야 하는지", "“숲체험을 넣으면? 지금 조건으론 안 된다고, 대신 누가 무엇을 이번만 빼면 되는지 바로 계산해요.”"],
   ["둘 다 OK면\n결제까지", "“둘 다 승인하면 분담 결제 요청까지.”"],
   ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 숲체험은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
+  ["둘 다 OK인 하루", "같은 엔진이 앱, 단톡방, 결제를 함께 움직여요. 투표 부탁드려요."],
 ];
 
 /* ---------- own words: commit a complete session only after a successful solve ---------- */
@@ -1138,7 +1164,7 @@ async function s0(v, t) {
   const card = add(`<div style="font:500 23px/1.35 var(--kr);letter-spacing:-.045em;margin:12px 0 18px">둘이 한 말을 조건으로 바꿔서,<br>둘 다 OK인 일정을 찾아볼게요</div><button class="btn navy"><span>같이 정하기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button>`, "lime");
   card.style.paddingTop = "26px";
   $(".btn", card).addEventListener("click", () => go(1));
-  card.insertAdjacentHTML("beforeend", `<button class="btn ghost try-open"><span>우리 대화로 바꿔 보기</span><span class="go">${svg("people", 20, 2.2)}</span></button>`);
+  card.insertAdjacentHTML("beforeend", `<button class="btn ghost try-open"><span>우리 대화로 바꿔 보기</span><span class="go">${svg("people", 20, 2.2)}</span></button><a class="vooy-link try-vooy" href="${VOOY_CHAT_URL}" target="_blank" rel="noopener noreferrer">단톡방에서 부르는 모습 보기(vooy)</a>`);
   $(".try-open",card).onclick=()=>openTry(v);
   { const sc = card.closest(".scr"); if (sc) requestAnimationFrame(() => sc.scrollTo({ top: sc.scrollHeight, behavior: "smooth" })); }
 }
@@ -1802,7 +1828,7 @@ async function s5(v, t) {
   if (!flexible || (!LIVE && !savedReplan)) {
     v.innerHTML=`<div class="scr">${topBlock("여행 중", "지금 합의한 일정", "lime")}<div id="tl"></div></div>`;
     setTitle($("#ttl",v),"합의한 일정을\n이어서 즐겨요");new Timeline($("#tl",v)).render(before,{animate:false});
-    cta(v,"처음부터 다시 보기",()=>go(0));v._run=async()=>{};return;
+    endcardCTA(v);v._run=async()=>{};return;
   }
   let R={...(savedReplan || {now:Math.min(D.window.start+5,D.window.end),crowded:flexible.id})};
   R.keep=booking?.id || null;
@@ -1873,11 +1899,47 @@ async function s5(v, t) {
       ...(booking ? [`<span class="pill" style="background:var(--violet);color:var(--cream)">${svg("lock", 13, 2.4)} 체험 ${bookingTime} 유지</span>`] : []),
     ].join("");
     $$(".pill", chg).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateX(-30px) scale(.7)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + i * 100 }));
-    btn.setLabel("처음부터 다시 보기");
-    btn.disabled = false;
-    btn.onclick = () => { resetConcessions(); go(0); };
+    btn.closest(".cta-wrap").remove();
+    endcardCTA(v);
   }
   v._run = replan;
+}
+
+/* ---------- step 6: endcard ---------- */
+function endcardCTA(v) {
+  const btn = cta(v, "둘 다 OK인 하루, 직접 만나 보세요", () => go(6));
+  const restart = document.createElement("button");
+  restart.className = "end-restart";
+  restart.textContent = "처음부터 다시 보기";
+  restart.onclick = () => { resetConcessions(); go(0); };
+  btn.parentElement.appendChild(restart);
+}
+function s6(v) {
+  status(hhmm(D.window.end));
+  const links = [
+    {title: "직접 해 보기", cls: "lime tab", url: "https://harheem.github.io/tripfit/", text: "harheem.github.io/tripfit/"},
+    {title: "단톡방에서 부르기", cls: "lilac", url: VOOY_CHAT_URL, text: VOOY_CHAT_URL, sub: "vooy에서 @TripFit을 부르면 같은 엔진이 답해요"},
+    {title: "코드", cls: "end-code", url: "https://github.com/harheem/tripfit", text: "github.com/harheem/tripfit"},
+  ];
+  v.innerHTML = `<div class="scr endcard">
+    <div class="b top cream cut end-hero"><div class="row between"><span class="cap-up gr">07 / 07</span><span class="lab">피플스 초이스 투표 부탁드려요</span></div><div class="brand end-logo" aria-label="TripFit">${LOGO}</div><p class="end-intro">여행 성향은 달라도 함께이고 싶은 두 사람을 위해, 둘 다 OK인 하루를 계산합니다</p></div>
+    ${links.map(link => `<a class="b end-link ${link.cls}" href="${link.url}" target="_blank" rel="noopener noreferrer"><div><h2>${link.title}</h2>${link.sub ? `<p>${link.sub}</p>` : ""}<span class="end-url">${link.text}</span></div><div class="end-qr" data-url="${link.url}" aria-hidden="true"></div></a>`).join("")}
+    <div class="end-credits" aria-label="함께 쓴 것">${["마이리얼트립 MCP", "SKT Agentic Pay", "vooy MCP", "Articul8 Bivia", "OpenAI"].map(name => `<span class="pill on-dark">${name}</span>`).join("")}</div>
+    <button class="end-restart">처음부터 다시 보기</button>
+  </div>`;
+  $(".end-restart", v).onclick = () => { resetConcessions(); go(0); };
+  const drawQR = () => {
+    if (!window.QRCode || !v.isConnected) return;
+    $$(".end-qr", v).forEach(el => {
+      if (el.classList.contains("ready")) return;
+      try {
+        new window.QRCode(el, {text: el.dataset.url, width: 96, height: 96, colorDark: "#0E2A3A", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M});
+        el.classList.add("ready");
+      } catch (_) { el.replaceChildren(); }
+    });
+  };
+  drawQR();
+  if (!window.QRCode) $("#qrLibrary").addEventListener("load", drawQR, {once: true});
 }
 
 /* ---------- story card for a heritage spot ---------- */
@@ -1927,7 +1989,7 @@ function showConflict(explanation = null) {
 }
 
 /* ---------- navigation ---------- */
-const STEPS = [s0, s1, s2, s3, s4, s5];
+const STEPS = [s0, s1, s2, s3, s4, s5, s6];
 function go(i) {
   if (i < 0 || i >= STEPS.length) return;
   const back = i < cur;
@@ -1949,8 +2011,8 @@ function go(i) {
   $$("#dots i").forEach((d, k) => d.classList.toggle("on", k === i));
   $$("#capP i").forEach((d, k) => { d.classList.toggle("on", k === i); d.classList.toggle("done", k < i); });
   $("#capN").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${String(STEPS.length).padStart(2, "0")}`;
-  setTitle($("#capT"), trying ? ["내 두 문장으로\n함께 만드는 여행","내 말에서\n찾아낸 조건","한 말이 지켜진\n만큼의 만족도","체험도\n함께 골라보기","둘이 승인한\n지금 이 일정","여행 중에도\n다시 계산"][i] : CAPS[i][0]);
-  $("#capS").textContent = trying ? "" : CAPS[i][1];
+  setTitle($("#capT"), trying && i < 6 ? ["내 두 문장으로\n함께 만드는 여행","내 말에서\n찾아낸 조건","한 말이 지켜진\n만큼의 만족도","체험도\n함께 골라보기","둘이 승인한\n지금 이 일정","여행 중에도\n다시 계산"][i] : CAPS[i][0]);
+  $("#capS").textContent = trying && i < 6 ? "" : CAPS[i][1];
   E($("#capS"), [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], 500, { delay: 250 });
 }
 view.addEventListener("scroll", e => { if (e.target.classList?.contains("scr")) $("#screen").classList.toggle("scrolled", e.target.scrollTop > 24); }, true);
@@ -1996,7 +2058,7 @@ addEventListener("keydown", e => {
   if (k !== "a" && k !== "A") { autoId++; autoPlaying = false; }
   if (k === "ArrowRight" || k === " ") { e.preventDefault(); if (v?._sheet) v._sheet.close(); else go(cur + 1); }
   else if (k === "ArrowLeft") go(cur - 1);
-  else if (/^[1-6]$/.test(k)) go(+k - 1);
+  else if (/^[1-7]$/.test(k)) go(+k - 1);
   else if (k === "a" || k === "A") autoplay();
   else if (k === "c" || k === "C") showConflict();
   else if ((k === "h" || k === "H") && v?._toggleHidden) v._toggleHidden();
@@ -2048,7 +2110,10 @@ engine.addEventListener("keydown", e => {
   if (!document.body.classList.contains("engine-open")) return;
   e.stopPropagation();
   if (e.key === "Escape") { e.stopPropagation(); toggleEngine(false); }
-  if (e.key === "Tab") { e.preventDefault(); engineClose.focus(); }
+  if (e.key === "Tab") {
+    e.preventDefault();
+    (document.activeElement === engineClose ? $("#vooyEntry") : engineClose).focus();
+  }
 });
 mobileQuery.addEventListener("change", fit);
 
