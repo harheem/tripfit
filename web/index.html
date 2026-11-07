@@ -1,0 +1,1291 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TripFit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ===== tokens (from the bento references: flat colour, no blur, no gradient) ===== */
+:root {
+  --navy: #0E2A3A; --navy-2: #173A4C; --cream: #F3F1EA;
+  --lime: #D6F23B; --mint: #BDEFDB; --pink: #FFCCE5; --sky: #8EC5EE; --peach: #F8D5BC; --butter: #F4E58E; --leaf: #A8E2C3;
+  --violet: #7B5CFF; --red: #FF5B4A; --lilac: #CBBDFF;
+  --stage: #E7F1EC;
+  --kr: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
+  --gr: "Inter Tight", "Helvetica Neue", Helvetica, Arial, "Pretendard Variable", sans-serif;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --spring: cubic-bezier(.34, 1.4, .64, 1);
+  --spring-ms: 700ms;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--stage); font-family: var(--kr); color: var(--navy); -webkit-font-smoothing: antialiased; overflow: hidden; word-break: keep-all; }
+button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.gr { font-family: var(--gr); font-feature-settings: "tnum", "ss01"; font-variant-numeric: tabular-nums; }
+
+/* ===== stage ===== */
+.stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+.rig { display: flex; align-items: center; gap: 44px; transform-origin: center center; }
+.cap { width: 330px; display: flex; flex-direction: column; gap: 24px; }
+.cap-n { font: 500 15px var(--gr); letter-spacing: .02em; opacity: .5; }
+.cap-n b { opacity: 1; font-weight: 600; }
+.cap-t { font: 500 52px/1.08 var(--kr); letter-spacing: -.055em; min-height: 2.2em; }
+.cap-t .tl-line { display: block; } .cap-t .w { display: inline-block; white-space: nowrap; } .cap-t .c { display: inline-block; }
+.cap-s { font: 400 17px/1.6 var(--kr); color: #3E5563; min-height: 5em; }
+.cap-prog { display: flex; gap: 4px; }
+.cap-prog i { height: 6px; width: 18px; border-radius: 6px; background: rgba(14, 42, 58, .15); transition: width .5s var(--spring), background .3s; }
+.cap-prog i.on { width: 48px; background: var(--navy); }
+.cap-prog i.done { background: rgba(14, 42, 58, .45); }
+
+.device { position: relative; width: 417px; height: 876px; border-radius: 68px; padding: 12px; background: #0A0D10; flex: none;
+  box-shadow: 0 0 0 1.5px #4D5560, 0 0 0 3.5px #9AA2AC, 0 0 0 5px #39404A, 0 50px 90px -40px rgba(14, 42, 58, .5); }
+.screen { position: relative; width: 393px; height: 852px; border-radius: 56px; overflow: hidden; background: var(--navy); isolation: isolate; }
+.sb { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 6px 34px 0 48px; z-index: 40; font: 600 16.5px var(--gr); color: var(--navy); pointer-events: none; transition: color .3s; }
+.sb.lt, .screen.scrolled .sb { color: var(--cream); }
+.sb::before { content: ""; position: absolute; inset: 0; background: var(--navy); opacity: 0; transition: opacity .2s; z-index: -1; }
+.screen.scrolled .sb::before { opacity: 1; }
+.sb svg { display: block; }
+.sb .r { display: flex; gap: 6px; align-items: center; }
+#view { position: absolute; inset: 0; }
+.home-ind { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; border-radius: 3px; background: var(--cream); transform: translateX(-50%); z-index: 45; pointer-events: none; }
+
+/* dynamic island */
+.island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 126px; height: 37px; border-radius: 19px; background: #000; z-index: 50; overflow: hidden; color: #fff; }
+.is-c { position: absolute; inset: 0; display: flex; align-items: center; gap: 12px; padding: 0 18px 0 14px; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+.island.open .is-c { opacity: 1; transition: opacity .25s .12s; }
+.is-ic { width: 40px; height: 40px; border-radius: 50%; background: var(--t, var(--lime)); color: var(--navy); display: grid; place-items: center; flex: none; }
+.is-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.is-tx b { font: 600 15px var(--kr); letter-spacing: -.02em; overflow: hidden; text-overflow: ellipsis; }
+.is-tx small { font: 400 12.5px var(--kr); color: rgba(255, 255, 255, .6); overflow: hidden; text-overflow: ellipsis; }
+.is-r { font: 500 15px var(--gr); color: var(--lime); flex: none; }
+.spin { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid rgba(14, 42, 58, .25); border-top-color: var(--navy); animation: rot .7s linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+.dev-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.dots { display: flex; gap: 5px; }
+.dots i { width: 6px; height: 6px; border-radius: 4px; background: rgba(14, 42, 58, .2); transition: width .5s var(--spring), background .3s; cursor: pointer; }
+.dots i.on { width: 26px; background: var(--navy); }
+
+/* engine: a second "device" made of the same blocks */
+.engine { width: 336px; height: 852px; border-radius: 48px; background: var(--navy); padding: 6px; display: flex; flex-direction: column; gap: 4px; flex: none; color: var(--navy); }
+.eg-hero { background: var(--lime); border-radius: 42px 42px 30px 30px; padding: 24px 22px 20px; }
+.eg-hero .row { display: flex; justify-content: space-between; align-items: center; }
+.eg-big { font: 500 76px/.9 var(--gr); letter-spacing: -.05em; margin-top: 18px; display: flex; align-items: baseline; gap: 4px; }
+.eg-big em { font: 500 20px var(--gr); font-style: normal; letter-spacing: 0; }
+.eg-cap { font-size: 13.5px; font-weight: 500; margin-top: 10px; min-height: 2.6em; line-height: 1.35; }
+.eg-log { flex: 1; background: var(--navy-2); border-radius: 30px; padding: 18px 18px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; color: var(--cream); }
+.eg-row { display: grid; grid-template-columns: 74px 1fr auto; gap: 8px; font-size: 12.5px; line-height: 1.4; color: rgba(243, 241, 234, .55); }
+.eg-row.new { color: var(--cream); }
+.eg-src { font: 600 10px/1.9 var(--gr); letter-spacing: .08em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
+.eg-ms { font: 500 12.5px var(--gr); color: var(--lime); white-space: nowrap; }
+.eg-rule { background: var(--pink); border-radius: 30px; padding: 18px 20px; font: 500 17px/1.35 var(--kr); letter-spacing: -.03em; }
+.eg-keys { color: rgba(243, 241, 234, .5); font-size: 11px; line-height: 1.9; padding: 6px 14px 8px; }
+.eg-keys kbd { font: 600 10px var(--gr); border: 1px solid rgba(243, 241, 234, .3); color: var(--cream); border-radius: 5px; padding: 0 5px; }
+
+/* ===== bento primitives ===== */
+.scr { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 4px 4px 150px; scrollbar-width: none; background: var(--navy); }
+.scr::-webkit-scrollbar { display: none; }
+.b { position: relative; border-radius: 30px; padding: 18px 20px; margin-bottom: 4px; color: var(--navy); background: var(--bg, var(--cream)); }
+.top { border-radius: 52px 52px 30px 30px; padding-top: 62px; }
+.lilac { --bg: var(--lilac); } .lime { --bg: var(--lime); } .mint { --bg: var(--mint); } .pink { --bg: var(--pink); } .sky { --bg: var(--sky); } .cream { --bg: var(--cream); } .peach { --bg: var(--peach); }
+/* interlocking tab/notch (reference 1): .cut paints a navy slot, the next block's .tab rises into it */
+.cut::after { content: ""; position: absolute; bottom: 0; left: 50%; width: 104px; height: 14px; margin-left: -52px; background: var(--navy); border-radius: 10px 10px 0 0; }
+.cut.cr::after { left: auto; right: 40px; margin: 0; }
+.cut.cl::after { left: 40px; margin: 0; }
+.tab::before { content: ""; position: absolute; top: -14px; left: 50%; width: 96px; height: 18px; margin-left: -48px; background: var(--bg, var(--cream)); border-radius: 10px 10px 0 0; }
+.tab.tr::before { left: auto; right: 44px; margin: 0; }
+.tab.tl::before { left: 44px; margin: 0; }
+.row { display: flex; align-items: center; gap: 12px; }
+.between { justify-content: space-between; }
+.lab { font: 500 12.5px var(--kr); opacity: .8; }
+.cap-up { font: 600 11px var(--gr); letter-spacing: .09em; text-transform: uppercase; opacity: .75; }
+.h { font: 600 25px/1.24 var(--kr); letter-spacing: -.045em; margin-top: 10px; min-height: 2.48em; }
+.h .tl-line { display: block; } .h .w { display: inline-block; white-space: nowrap; } .h .c { display: inline-block; }
+.ico { width: 46px; height: 46px; border-radius: 50%; background: var(--navy); color: var(--lime); display: grid; place-items: center; flex: none; }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 15px; border-radius: 99px; border: 1.5px solid var(--navy); font: 600 13px var(--kr); white-space: nowrap; }
+.pill.fill { background: var(--navy); color: var(--cream); }
+.pill.on-dark { border-color: rgba(243, 241, 234, .35); color: var(--cream); }
+.flag { position: relative; z-index: 3; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border-radius: 99px; background: var(--navy); color: var(--cream); font: 600 13.5px var(--kr); margin: -20px 0 -20px 12px; box-shadow: 0 0 0 4px var(--navy); }
+.av { width: var(--s, 36px); height: var(--s, 36px); border-radius: 50%; background: var(--c); color: var(--navy); display: grid; place-items: center; font: 600 calc(var(--s, 36px) * .4) var(--kr); flex: none; box-shadow: 0 0 0 2px var(--navy); }
+.av.n { background: var(--navy); color: var(--c); box-shadow: none; }
+.av-stack { display: flex; } .av-stack .av + .av { margin-left: -10px; }
+
+.cta-wrap { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px 10px 28px; background: linear-gradient(to top, var(--navy) 60%, rgba(14, 42, 58, 0)); z-index: 20; }
+.btn { width: 100%; height: 64px; border-radius: 99px; background: var(--lime); color: var(--navy); font: 600 17px var(--kr); letter-spacing: -.03em; display: flex; align-items: center; justify-content: space-between; padding: 0 8px 0 28px; transition: transform .2s var(--ease), opacity .3s; }
+.btn .go { width: 48px; height: 48px; border-radius: 50%; background: var(--navy); color: var(--lime); display: grid; place-items: center; }
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .25; cursor: default; }
+.btn.navy { background: var(--navy); color: var(--cream); }
+.btn.navy .go { background: var(--lime); color: var(--navy); }
+
+/* odometer */
+.odo { display: inline-flex; }
+.od-c { display: inline-block; height: 1em; overflow: hidden; }
+.od-s { display: flex; flex-direction: column; transition: transform var(--spring-ms) var(--spring); }
+.od-s span { height: 1em; line-height: 1em; display: block; text-align: center; }
+.od-x { display: inline-block; line-height: 1em; }
+
+/* chat */
+.msg { display: flex; gap: 12px; align-items: flex-start; }
+.msg.me { flex-direction: row-reverse; text-align: right; }
+.msg .tx { font: 500 19px/1.42 var(--kr); letter-spacing: -.035em; flex: 1; }
+.msg .who { font: 600 11px var(--gr); letter-spacing: .09em; text-transform: uppercase; opacity: .55; margin-bottom: 4px; }
+.typing { display: flex; gap: 5px; padding: 12px 0; }
+.typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--navy); opacity: .3; animation: typ 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+.msg.me .typing { justify-content: flex-end; }
+@keyframes typ { 30% { opacity: 1; transform: translateY(-3px); } }
+.date-c { width: 54px; height: 54px; border-radius: 50%; background: var(--navy); color: var(--cream); display: flex; flex-direction: column; align-items: center; justify-content: center; flex: none; }
+.date-c b { font: 500 20px/1 var(--gr); } .date-c small { font: 600 9px var(--gr); letter-spacing: .08em; text-transform: uppercase; opacity: .7; margin-top: 2px; }
+
+/* understand */
+.quote { font: 500 20px/1.5 var(--kr); letter-spacing: -.035em; margin: 12px 0 14px; }
+.ph { position: relative; z-index: 0; transition: color .3s; }
+.ph::before { content: ""; position: absolute; left: -3px; right: -3px; top: 3px; bottom: 1px; background: var(--navy); border-radius: 7px; z-index: -1; transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
+.ph.on { color: var(--bg); }
+.ph.on::before { transform: scaleX(1); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 34px; }
+.chip.hide { visibility: hidden; }
+.fly { position: absolute; z-index: 30; pointer-events: none; }
+.src-row { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 6px 10px; }
+.fn-n { font: 500 76px/.9 var(--gr); letter-spacing: -.055em; margin-top: 22px; height: 72px; display: flex; align-items: baseline; gap: 8px; transform-origin: left center; }
+.fn-n em { font: 500 20px var(--kr); font-style: normal; letter-spacing: -.03em; }
+
+/* plans: timer-style numbers + dot slider */
+.big2 { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; margin-top: 18px; }
+.bn { font: 500 92px/.86 var(--gr); letter-spacing: -.06em; display: flex; align-items: baseline; }
+.bn em { font: 500 22px var(--gr); font-style: normal; letter-spacing: 0; margin-left: 3px; }
+.bn.r { justify-content: flex-end; }
+.colon { font: 500 64px/.86 var(--gr); padding: 0 4px 6px; }
+.bn-lab { display: flex; justify-content: space-between; margin-top: 12px; font: 600 12.5px var(--kr); }
+.bn-lab span { display: flex; align-items: center; gap: 6px; }
+.bn-lab i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1.5px var(--navy); }
+.sc-track { position: relative; height: 46px; margin: 18px 10px 0; touch-action: none; cursor: grab; }
+.sc-rail { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: var(--navy); transform: translateY(-50%); }
+.sc-det { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--navy); transform: translate(-50%, -50%); }
+.sc-thumb { position: absolute; top: 50%; width: 42px; height: 42px; border-radius: 50%; background: var(--navy); color: var(--lime); transform: translate(-50%, -50%); display: grid; place-items: center; }
+.sc-thumb.snap { transition: left .55s var(--spring); }
+.sc-lab { display: flex; justify-content: space-between; font: 600 11px var(--gr); letter-spacing: .08em; text-transform: uppercase; margin-top: 4px; opacity: .75; }
+.mapblk { padding: 0; }
+.mapblk > div:first-child { border-radius: 30px; overflow: hidden; }
+.map { display: block; width: 100%; height: auto; }
+.map-ov { position: absolute; left: 14px; top: 14px; }
+.map-ov .pill { background: var(--mint); height: 30px; font-size: 12.5px; }
+.mk-pin { transform-box: fill-box; transform-origin: center; }
+.pulse { transform-box: fill-box; transform-origin: center; animation: pulse 1.4s var(--ease) infinite; }
+@keyframes pulse { from { transform: scale(.6); opacity: .9; } to { transform: scale(2.2); opacity: 0; } }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 20px 20px 22px; }
+.stats .v { font: 500 34px/1 var(--gr); letter-spacing: -.045em; margin-top: 8px; display: flex; align-items: baseline; gap: 2px; }
+.stats .v em { font: 500 14px var(--gr); font-style: normal; letter-spacing: 0; }
+
+/* timeline: each stop is a block */
+.tl { position: relative; }
+.ti { position: relative; }
+.stop { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 16px 18px 16px 16px; }
+.stop .nm { font: 600 17px/1.25 var(--kr); letter-spacing: -.04em; }
+.stop .mt { font: 500 12.5px var(--kr); opacity: .8; margin-top: 3px; }
+.stop .tm { text-align: right; }
+.stop .tm b { display: block; font: 500 30px/1 var(--gr); letter-spacing: -.05em; }
+.stop .tm small { display: block; font: 500 12px var(--gr); opacity: .55; margin-top: 4px; }
+.stop .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+.stop .tags:empty { display: none; }
+.stop .pill { height: 26px; padding: 0 10px; font-size: 11.5px; }
+.stop .pill i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1.5px var(--navy); }
+.stop.lock { --bg: var(--violet); color: var(--cream); background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, .13) 0 8px, transparent 8px 16px); }
+.stop.lock .ico { background: var(--cream); color: var(--violet); }
+.stop.lock .pill { border-color: var(--cream); }
+.stop.lock .mt { opacity: 1; }
+.stop.crowd { --bg: var(--red); color: var(--navy); }
+.stop.crowd .ico { background: var(--navy); color: var(--red); }
+.stop.out .nm { text-decoration: line-through; text-decoration-thickness: 2.5px; }
+.endrow { display: flex; gap: 6px; padding: 10px 2px 6px; }
+.endrow .pill { border-color: rgba(243, 241, 234, .35); color: var(--cream); }
+.endrow .pill .gr { color: var(--lime); }
+
+/* 한 말 체크리스트 (사람별 만족도의 근거) */
+.cl .b { padding: 16px 16px 14px; }
+.cl .head { display: flex; justify-content: space-between; align-items: baseline; }
+.cl .head b { font: 500 26px/1 var(--gr); letter-spacing: -.04em; }
+.ci { display: grid; grid-template-columns: 1fr 44px 34px; gap: 6px; align-items: center; margin-top: 9px; font: 600 12.5px var(--kr); }
+.ci i { display: block; height: 8px; border-radius: 6px; background: rgba(14, 42, 58, .15); overflow: hidden; }
+.ci i b { display: block; height: 100%; background: var(--navy); border-radius: 6px; transition: width var(--spring-ms) var(--spring); }
+.ci em { font: 500 12.5px var(--gr); font-style: normal; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* 숨은 한 곳 +1 (서울미래유산) */
+.hid { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.hid .t { flex: 1; }
+.hid .t b { display: block; font: 600 18px/1.2 var(--kr); letter-spacing: -.04em; }
+.hid .t small { display: block; font: 500 12.5px var(--kr); opacity: .65; margin-top: 4px; }
+.sw { width: 58px; height: 34px; border-radius: 99px; border: 1.5px solid var(--navy); position: relative; flex: none; transition: background .3s; }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 25px; height: 25px; border-radius: 50%; background: var(--navy); transition: transform .5s var(--spring), background .3s; }
+.hid.on .sw { background: var(--navy); }
+.hid.on .sw::after { transform: translateX(24px); background: var(--lilac); }
+.sc-track.off { opacity: .3; pointer-events: none; }
+.stop .pill.story { cursor: pointer; background: var(--navy); color: var(--lilac); border-color: var(--navy); }
+.story-name { font: 500 34px/1.1 var(--kr); letter-spacing: -.055em; margin-top: 16px; }
+.story-tx { font: 500 19px/1.55 var(--kr); letter-spacing: -.035em; }
+.credit { font-size: 11.5px; line-height: 1.5; color: rgba(243, 241, 234, .6); padding: 12px 16px 14px; }
+
+/* what-if */
+.deltas { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 16px; }
+.deltas .v { font: 500 38px/1 var(--gr); letter-spacing: -.05em; display: flex; align-items: baseline; gap: 2px; }
+.deltas .v em { font: 500 14px var(--gr); font-style: normal; letter-spacing: 0; }
+.deltas .lab { margin-top: 6px; display: flex; align-items: center; gap: 5px; }
+.deltas .lab i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1.5px var(--navy); }
+.tray .row2 { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.tray .pill { text-decoration: line-through; text-decoration-thickness: 1.5px; opacity: .75; }
+.note { font-size: 12.5px; color: rgba(243, 241, 234, .55); padding: 6px 12px 0; line-height: 1.5; }
+
+/* sheet = a stack of blocks */
+.dim { position: absolute; inset: 0; background: rgba(5, 14, 20, .6); z-index: 30; }
+.sheet { position: absolute; left: 6px; right: 6px; bottom: 6px; background: var(--navy); border-radius: 50px; padding: 4px; z-index: 31; }
+.sheet > .b:first-child { border-radius: 46px 46px 30px 30px; }
+.sheet > .b:last-child { margin-bottom: 0; border-radius: 30px 30px 46px 46px; }
+.grab { position: absolute; top: 10px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: currentColor; opacity: .3; }
+.prod { --bg: var(--violet); color: var(--cream); padding-top: 30px; min-height: 186px; overflow: hidden; }
+.prod .pr { font: 500 64px/.9 var(--gr); letter-spacing: -.055em; margin-top: 30px; display: flex; align-items: baseline; gap: 4px; }
+.prod .pr small { font: 500 14px var(--kr); letter-spacing: 0; }
+.prod .pill { border-color: var(--cream); }
+.prod .ring { position: absolute; right: -40px; top: -40px; width: 170px; height: 170px; animation: rot 18s linear infinite; }
+.slots { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; }
+.slot { border-radius: 30px; padding: 18px 18px 16px; text-align: left; background: var(--cream); transition: background .25s, color .25s, transform .2s var(--ease); }
+.slot b { font: 500 40px/1 var(--gr); letter-spacing: -.05em; display: block; margin-top: 6px; }
+.slot small { display: flex; align-items: center; gap: 6px; font: 600 12px var(--kr); margin-top: 10px; }
+.slot small i { width: 8px; height: 8px; border-radius: 50%; background: #1DBF73; }
+.slot small i.a { background: #F2A10C; }
+.slot.on { background: var(--lime); }
+.slot:active { transform: scale(.97); }
+
+/* agree */
+.venn { display: block; margin: 4px auto 0; overflow: visible; }
+.venn .who-t { font: 600 28px var(--kr); fill: var(--navy); }
+.vg { transition: transform .9s var(--spring); }
+.apps { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; }
+.app { height: 52px; border-radius: 99px; border: 1.5px solid var(--navy); font: 600 15px var(--kr); display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .3s, color .3s; }
+.app.ok { background: var(--navy); color: var(--c); }
+.chain { display: flex; align-items: center; }
+.chain .ico { width: 40px; height: 40px; }
+.chain .ln { flex: 1; height: 2px; background: var(--navy); min-width: 8px; }
+.rc { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 0; font: 500 14.5px var(--kr); }
+.rc.t { border-top: 1.5px solid var(--navy); margin-top: 6px; padding-top: 14px; font-weight: 600; }
+.rc .gr { font-size: 22px; font-weight: 500; letter-spacing: -.04em; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.split .b { margin: 0; }
+.pay-split .gr, #split .gr { font: 500 34px/1 var(--gr); letter-spacing: -.05em; margin-top: 10px; display: flex; align-items: baseline; gap: 2px; }
+#split .gr em { font: 500 14px var(--kr); font-style: normal; }
+.mock { font-size: 11.5px; color: rgba(243, 241, 234, .5); padding: 8px 12px 0; }
+
+/* live */
+.top { transition: background-color .5s var(--ease), color .5s; }
+.top.alert { --bg: var(--red); }
+.chg { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 4px 4px; }
+.chg:empty { display: none; }
+.chg .pill { height: 36px; border: 0; }
+
+/* conflict */
+.cf-big { display: flex; align-items: baseline; gap: 12px; font: 500 72px/.9 var(--gr); letter-spacing: -.06em; margin-top: 12px; }
+.cf-big .from { opacity: .3; } .cf-big .arr { font-size: 40px; opacity: .45; }
+.cf-big em { font: 500 18px var(--gr); font-style: normal; letter-spacing: 0; }
+.cf-bar { position: relative; height: 14px; border-radius: 10px; background: rgba(14, 42, 58, .12); margin: 18px 0 4px; overflow: hidden; }
+.cf-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 10px; background: var(--navy); }
+.cf-bar b { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--red); }
+
+/* mobile: the browser is the phone */
+body.m { background: var(--navy); }
+body.m .cap, body.m .engine, body.m .dots { display: none !important; }
+body.m .stage { display: block; }
+body.m .rig { display: block; transform: none !important; }
+body.m .device { width: 100vw; height: 100dvh; padding: 0; border-radius: 0; box-shadow: none; background: var(--navy); }
+body.m .screen { width: 100vw; height: 100dvh; border-radius: 0; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="rig" id="rig">
+    <div class="cap" id="cap">
+      <div class="cap-n" id="capN"></div>
+      <div class="cap-t" id="capT"></div>
+      <div class="cap-s" id="capS"></div>
+      <div class="cap-prog" id="capP"></div>
+    </div>
+    <div class="dev-wrap">
+      <div class="device">
+        <div class="screen" id="screen">
+          <div class="sb" id="sb"><span id="sbTime">12:58</span><span class="r">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.2c2.4 0 4.6.9 6.2 2.5l1.2-1.2A10.3 10.3 0 0 0 8 .5 10.3 10.3 0 0 0 .6 3.5l1.2 1.2A8.6 8.6 0 0 1 8 2.2zm0 3.4c1.5 0 2.9.6 4 1.6l1.2-1.2A7.3 7.3 0 0 0 8 3.9a7.3 7.3 0 0 0-5.2 2.1L4 7.2a5.6 5.6 0 0 1 4-1.6zm0 3.4c.6 0 1.1.2 1.5.6L8 11.1 6.5 9.6c.4-.4.9-.6 1.5-.6z"/></svg>
+            <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x=".5" y=".5" width="23" height="12" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="18" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill="currentColor" opacity=".4"/></svg>
+          </span></div>
+          <div class="island" id="island"><div class="is-c" id="isC"></div></div>
+          <div id="view"></div>
+          <div class="home-ind"></div>
+        </div>
+      </div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <aside class="engine" id="engine">
+      <div class="eg-hero">
+        <div class="row"><span class="cap-up" style="opacity:.7">Python-MIP · solve</span><span class="cap-up" style="opacity:.7">Live ●</span></div>
+        <div class="eg-big gr"><span class="odo" id="egBig">0</span><em>ms</em></div>
+        <div class="eg-cap" id="egCap">대기 중</div>
+      </div>
+      <div class="eg-log" id="egLog"><div class="cap-up" style="color:var(--cream)">화면 뒤에서 실제로 돈 것</div></div>
+      <div class="eg-rule">LLM은 말만 바꾸고,<br>숫자는 전부 솔버가 만듭니다.</div>
+      <div class="eg-keys"><kbd>→</kbd> 다음 <kbd>←</kbd> 이전 <kbd>A</kbd> 자동재생 <kbd>C</kbd> 조건 충돌 <kbd>,</kbd><kbd>.</kbd> 저울 <kbd>H</kbd> 숨은 한 곳 <kbd>E</kbd> 패널 <kbd>R</kbd> 처음</div>
+    </aside>
+  </div>
+</div>
+
+<script src="demo_data.js"></script>
+<script>
+"use strict";
+const D = window.DEMO, P = D.people;
+P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const sleep = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+const hhmm = m => { m = Math.round(m); return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+const km = m => (m / 1000).toFixed(1);
+const won = n => n.toLocaleString("ko-KR");
+const short = n => n.replace(/ \d\d:\d\d$/, "");
+const placeById = Object.fromEntries(D.places.map(p => [p.id, p]));
+const NICK = { cafe_onion: "어니언", cafe_bluebottle: "블루보틀", cafe_grandpa: "할아버지공장", exh_daelim: "대림창고", exh_dmuseum: "디뮤지엄",
+  alley_yeonmu: "연무장길", alley_shoe: "수제화거리", shop_atelier: "소품샵 골목", shop_understand: "언더스탠드에비뉴",
+  park_seoulforest: "서울숲", heritage_gongs: "공씨책방" };
+const nick = s => NICK[s.id] || (s.id.startsWith("mrt_leather") ? "가죽공방" : short(s.name));
+const diffLine = d => [...d.added.map(s => "+" + nick(s)), ...d.dropped.map(s => "−" + nick(s))].join(" ");
+const diffTitle = d => [d.added.length && `${d.added.length}곳 들어오고`, d.dropped.length && `${d.dropped.length}곳 빠져요`].filter(Boolean).join(" ") || "순서만 바뀌어요";
+const signed = (v, d = 0) => { const r = +Math.abs(v).toFixed(d); return (r === 0 ? "±" : v > 0 ? "+" : "−") + r.toFixed(d); };
+
+/* ---------- motion: real spring curves via CSS linear() ---------- */
+const LINEAR_OK = CSS.supports("transition-timing-function", "linear(0, 1)");
+function makeSpring(k, c) {
+  const w0 = Math.sqrt(k), z = c / (2 * Math.sqrt(k)), wd = w0 * Math.sqrt(Math.max(1e-6, 1 - z * z));
+  const x = t => z < 1 ? 1 - Math.exp(-z * w0 * t) * (Math.cos(wd * t) + (z * w0 / wd) * Math.sin(wd * t)) : 1 - Math.exp(-w0 * t) * (1 + w0 * t);
+  let T = .25;
+  for (let t = 0; t < 4; t += 1 / 120) if (Math.abs(1 - x(t)) > .003) T = t + 1 / 120;
+  const pts = [];
+  for (let i = 0; i <= 48; i++) pts.push(+x(T * i / 48).toFixed(4));
+  pts[48] = 1;
+  return { easing: LINEAR_OK ? `linear(${pts.join(",")})` : "cubic-bezier(.34,1.4,.64,1)", duration: Math.round(T * 1000) };
+}
+const SP = { snap: makeSpring(420, 34), pop: makeSpring(320, 15), soft: makeSpring(170, 20) };
+document.documentElement.style.setProperty("--spring", SP.pop.easing);
+document.documentElement.style.setProperty("--spring-ms", SP.pop.duration + "ms");
+const EASE = "cubic-bezier(.2,.8,.2,1)";
+const A = (el, kf, kind = "snap", o = {}) => el.animate(kf, { duration: reduce ? 1 : SP[kind].duration, easing: SP[kind].easing, fill: "backwards", ...o });
+const E = (el, kf, dur = 380, o = {}) => el.animate(kf, { duration: reduce ? 1 : dur, easing: EASE, fill: "backwards", ...o });
+const rise = (el, delay = 0) => A(el, [{ opacity: 0, transform: "translateY(36px) scale(.96)" }, { opacity: 1, transform: "none" }], "pop", { delay });
+
+/* ---------- icons ---------- */
+const IC = {
+  exhibit: '<rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M3.5 15.5l4.5-4.5 4 4 2.5-2.5 6 5"/><circle cx="15.5" cy="9.5" r="1.6"/>',
+  cafe: '<path d="M4.5 9h11.5v4.5a5 5 0 0 1-5 5h-1.5a5 5 0 0 1-5-5z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8.5 3.5c-.8 1 .8 2-.1 3M12 3.5c-.8 1 .8 2-.1 3"/>',
+  alley: '<path d="M12 3v18"/><path d="M5.5 5.5h10l2.5 2.5-2.5 2.5h-10z"/><path d="M18.5 12.5h-10L6 15l2.5 2.5h10z"/>',
+  shop: '<path d="M5 8.5h14l-1.2 11a1.5 1.5 0 0 1-1.5 1.3H7.7a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/>',
+  park: '<path d="M12 21v-5"/><path d="M12 3.5a5 5 0 0 0-4.6 7A4 4 0 0 0 8.5 18h7a4 4 0 0 0 1.1-7.5A5 5 0 0 0 12 3.5z"/>',
+  activity: '<path d="M12 3.5l1.9 4.8 4.8 1.9-4.8 1.9L12 16.9l-1.9-4.8-4.8-1.9 4.8-1.9z"/><path d="M18.5 16v4M16.5 18h4"/>',
+  lock: '<rect x="5" y="11" width="14" height="9.5" rx="2.5"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  heart: '<path d="M12 19.5s-7-4.3-7-9.5a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.2-7 9.5-7 9.5z"/>',
+  arrow: '<path d="M7 17L17 7M9 7h8v8"/>',
+  people: '<circle cx="9" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.5"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M14 19a4.5 4.5 0 0 1 7 0"/>',
+  warn: '<path d="M12 4l9 15.5H3z"/><path d="M12 10v4M12 17v.2"/>',
+  bolt: '<path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/>',
+  card: '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10.5h18M7 15h4"/>',
+  heritage: '<circle cx="12" cy="9" r="3.4"/><path d="M10.4 12l-1.4 8h6l-1.4-8"/>',
+};
+const svg = (n, s = 20, w = 2) => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${IC[n]}</svg>`;
+const CAT = { exhibit: "var(--mint)", cafe: "var(--peach)", alley: "var(--cream)", shop: "var(--butter)", park: "var(--leaf)", activity: "var(--violet)", heritage: "var(--lilac)" };
+const av = (i, s = 36, n = false) => `<span class="av ${n ? "n" : ""}" style="--c:${P[i].color};--s:${s}px">${P[i].initial}</span>`;
+const whyOf = s => {
+  const keys = [s.cat, ...(s.tags || [])], out = [];
+  P.forEach((p, i) => (D.prefs[p.name] || []).forEach(it => {
+    const a = Math.max(0, ...keys.map(k => (it.match || {})[k] || 0));
+    if (a >= .5 && (it.kind === "visit" || it.kind === "dwell")) out.push({ i, label: it.label });
+  }));
+  return out.slice(0, 2);
+};
+const pickOf = s => { const sc = s.scores; if (!sc) return null; const d = sc[P[0].name] - sc[P[1].name]; return d >= 3 ? 0 : d <= -3 ? 1 : null; };
+const LOGO = `<svg width="30" height="20" viewBox="0 0 30 20"><circle cx="10" cy="10" r="8.5" fill="#FFCCE5" stroke="#0E2A3A" stroke-width="1.8"/><circle cx="20" cy="10" r="8.5" fill="#8EC5EE" stroke="#0E2A3A" stroke-width="1.8"/><path d="M15 3.1A8.5 8.5 0 0 1 15 16.9 8.5 8.5 0 0 1 15 3.1z" fill="#D6F23B" stroke="#0E2A3A" stroke-width="1.8"/></svg>`;
+
+/* ---------- odometer (rolling digits) ---------- */
+function odo(el, str) {
+  str = String(str);
+  if (el.dataset.v === str) return;
+  let cols = [...el.children];
+  const isD = ch => /\d/.test(ch);
+  if (cols.length !== str.length || [...str].some((ch, i) => isD(ch) !== cols[i].classList.contains("od-c"))) {
+    el.innerHTML = [...str].map(ch => isD(ch) ? `<span class="od-c"><span class="od-s">${[..."0123456789"].map(d => `<span>${d}</span>`).join("")}</span></span>` : `<span class="od-x">${ch}</span>`).join("");
+    cols = [...el.children];
+    void el.offsetWidth;
+  }
+  [...str].forEach((ch, i) => {
+    if (!isD(ch)) { cols[i].textContent = ch; return; }
+    const s = cols[i].firstChild;
+    s.style.transitionDelay = (str.length - 1 - i) * 45 + "ms";
+    s.style.transform = `translateY(${-ch * 10}%)`;
+  });
+  el.dataset.v = str;
+}
+
+/* ---------- headline: per-character blur-in ---------- */
+function setTitle(el, text, delay = 0) {
+  if (el.dataset.text === text) return;
+  el.dataset.text = text;
+  el.innerHTML = text.split("\n").map(line => `<span class="tl-line">${line.split(" ").map(w => `<span class="w">${[...w].map(c => `<span class="c">${c}</span>`).join("")}</span>`).join(" ")}</span>`).join("");
+  $$(".c", el).forEach((c, i) => E(c, [{ opacity: 0, transform: "translateY(.45em)", filter: "blur(5px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], 520, { delay: delay + i * 18 }));
+}
+
+/* ---------- dynamic island: every system event speaks through it ---------- */
+const island = {
+  el: $("#island"), c: $("#isC"), timer: 0,
+  size(w, h, r) {
+    const cs = getComputedStyle(this.el);
+    const from = { width: cs.width, height: cs.height, borderRadius: cs.borderRadius };
+    Object.assign(this.el.style, { width: w + "px", height: h + "px", borderRadius: r + "px" });
+    A(this.el, [from, { width: w + "px", height: h + "px", borderRadius: r + "px" }], "pop", { fill: "none" });
+  },
+  show({ icon = "check", tone = "var(--lime)", title, sub = "", right = "", hold = 2600, spin = false }) {
+    clearTimeout(this.timer);
+    this.c.innerHTML = `<div class="is-ic" style="--t:${tone}">${spin ? '<span class="spin"></span>' : svg(icon, 20, 2.4)}</div><div class="is-tx"><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right ? `<div class="is-r">${right}</div>` : ""}`;
+    if (!this.el.classList.contains("open")) this.size(Math.min(369, $("#screen").offsetWidth - 24), 70, 35);
+    else E(this.c, [{ opacity: 0, filter: "blur(4px)" }, { opacity: 1, filter: "none" }], 260);
+    this.el.classList.add("open");
+    if (hold) this.timer = setTimeout(() => this.hide(), hold);
+  },
+  hide() { clearTimeout(this.timer); if (!this.el.classList.contains("open")) return; this.el.classList.remove("open"); this.size(126, 37, 19); },
+};
+
+/* ---------- engine log ---------- */
+const SRC = {
+  llm: ["LLM", "#C9B8FF"], tmap: ["TMAP", "#8EC5EE"], mrt: ["MyRealTrip", "#FFCCE5"],
+  city: ["Seoul data", "#BDEFDB"], heritage: ["Heritage", "#CBBDFF"], mip: ["MIP", "#D6F23B"], pay: ["Agentic Pay", "#F8D5BC"],
+};
+function log(src, text, ms) {
+  const box = $("#egLog");
+  $$(".eg-row.new", box).forEach(r => r.classList.remove("new"));
+  const row = document.createElement("div");
+  row.className = "eg-row new";
+  row.innerHTML = `<span class="eg-src" style="--c:${SRC[src][1]}">${SRC[src][0]}</span><span>${text}</span><span class="eg-ms">${ms != null ? won(ms) + "ms" : ""}</span>`;
+  box.appendChild(row);
+  E(row, [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], 420);
+  while (box.children.length > 12) box.children[1].remove();
+  if (src === "mip" && ms != null) {
+    odo($("#egBig"), won(ms));
+    $("#egCap").textContent = text;
+    A($(".eg-hero"), [{ transform: "scale(.97)" }, { transform: "none" }], "pop");
+  }
+}
+
+/* ---------- map ---------- */
+const ROADS = [
+  [[37.5471, 127.0350], [37.5458, 127.0460], [37.5446, 127.0557], [37.5437, 127.0660]],
+  [[37.5418, 127.0350], [37.5409, 127.0500], [37.5402, 127.0660]],
+  [[37.5520, 127.0565], [37.5380, 127.0559]],
+  [[37.5520, 127.0452], [37.5380, 127.0442]],
+  [[37.5520, 127.0521], [37.5380, 127.0515]],
+  [[37.5426, 127.0525], [37.5441, 127.0640]],
+  [[37.5488, 127.0400], [37.5474, 127.0520], [37.5463, 127.0640]],
+  [[37.5520, 127.0600], [37.5380, 127.0597]],
+];
+const PARK = [[37.5480, 127.0330], [37.5486, 127.0395], [37.5452, 127.0418], [37.5410, 127.0405], [37.5404, 127.0335]];
+function smooth(pts) {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2, t = .18;
+    d += `C${(p1[0] + (p2[0] - p0[0]) * t).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) * t).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) * t).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) * t).toFixed(1)} ${p2[0]},${p2[1]}`;
+  }
+  return d;
+}
+const NS = "http://www.w3.org/2000/svg";
+const idleMark = pl => pl.hidden ? "" : `<circle r="4" fill="#0E2A3A" opacity=".25"/>`;
+class TFMap {
+  constructor(host, H = 210) {
+    const W = 385;
+    const all = [...D.places, D.start, D.end];
+    const la = all.map(p => p.lat), ln = all.map(p => p.lng);
+    const lat0 = (Math.min(...la) + Math.max(...la)) / 2, lng0 = (Math.min(...ln) + Math.max(...ln)) / 2, kx = Math.cos(lat0 * Math.PI / 180);
+    const pad = 30, s = Math.min((W - 2 * pad) / ((Math.max(...ln) - Math.min(...ln)) * kx), (H - 2 * pad) / (Math.max(...la) - Math.min(...la)));
+    this.p = (lat, lng) => [+(W / 2 + (lng - lng0) * kx * s).toFixed(1), +(H / 2 + 8 - (lat - lat0) * s).toFixed(1)];
+    const line = r => `M${r.map(([a, b]) => this.p(a, b).join(",")).join("L")}`;
+    host.innerHTML = `<svg class="map" viewBox="0 0 ${W} ${H}">
+      <rect width="${W}" height="${H}" fill="#BDEFDB"/>
+      <path d="${line(PARK)}Z" fill="#A3E0C3"/>
+      <g fill="none" stroke="#E6F8EF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">${ROADS.map(r => `<path d="${line(r)}"/>`).join("")}</g>
+      <g class="flick" fill="none" stroke="#0E2A3A" stroke-width="1.2" stroke-linecap="round"></g>
+      <g class="route"></g><g class="mks"></g>
+      <g class="walker" opacity="0"><circle r="12" fill="#D6F23B" class="pulse"/><circle r="7" fill="#D6F23B" stroke="#0E2A3A" stroke-width="2.5"/></g>
+    </svg>`;
+    this.svg = $("svg", host);
+    this.start = this.p(D.start.lat, D.start.lng); this.end = this.p(D.end.lat, D.end.lng);
+    const mks = $(".mks", this.svg);
+    this.mk = {};
+    for (const pl of D.places) {
+      if (pl.group && this.mk[pl.group]) { this.mk[pl.id] = this.mk[pl.group]; continue; }
+      const [x, y] = this.p(pl.lat, pl.lng);
+      const g = document.createElementNS(NS, "g");
+      g.setAttribute("transform", `translate(${x},${y})`);
+      g.innerHTML = idleMark(pl);
+      g.dataset.pid = pl.id;
+      mks.appendChild(g);
+      this.mk[pl.id] = g;
+      if (pl.group) this.mk[pl.group] = g;
+    }
+    mks.insertAdjacentHTML("beforeend", `<g transform="translate(${this.start})"><circle r="8" fill="#BDEFDB" stroke="#0E2A3A" stroke-width="3"/><circle r="2.6" fill="#0E2A3A"/></g>
+      <g transform="translate(${this.end})"><rect x="-9" y="-9" width="18" height="18" rx="5" fill="#0E2A3A"/><rect x="-4" y="-4" width="8" height="8" rx="2" fill="#D6F23B"/></g>`);
+    this.loop();
+  }
+  async flicker(n = 18) {
+    const g = $(".flick", this.svg), pts = D.places.map(p => this.p(p.lat, p.lng));
+    for (let i = 0; i < n; i++) {
+      const a = pts[(i * 7) % pts.length], b = pts[(i * 5 + 3) % pts.length];
+      const l = document.createElementNS(NS, "line");
+      Object.entries({ x1: a[0], y1: a[1], x2: b[0], y2: b[1] }).forEach(([k, v]) => l.setAttribute(k, v));
+      g.appendChild(l);
+      l.animate([{ opacity: 0 }, { opacity: .55 }, { opacity: 0 }], { duration: 420, fill: "forwards" }).onfinish = () => l.remove();
+      await sleep(36);
+    }
+  }
+  setRoute(stops, { crowd = null, delay = 0 } = {}) {
+    const pts = [this.start, ...stops.map(s => { const pl = placeById[s.id]; return this.p(pl.lat, pl.lng); }), this.end];
+    const rg = $(".route", this.svg);
+    [...rg.children].forEach(o => o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" }).onfinish = () => o.remove());
+    const g = document.createElementNS(NS, "g");
+    const d = smooth(pts);
+    g.innerHTML = `<path d="${d}" fill="none" stroke="#BDEFDB" stroke-width="11" stroke-linecap="round"/><path class="ln" d="${d}" fill="none" stroke="#0E2A3A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    rg.appendChild(g);
+    const ln = $(".ln", g), L = ln.getTotalLength();
+    for (const p of g.children) { p.style.strokeDasharray = L; E(p, [{ strokeDashoffset: L }, { strokeDashoffset: 0 }], 950, { delay }); }
+    this.path = ln; this.len = L;
+    const order = new Map(stops.map((s, i) => [this.mk[s.id], { i, s }]));
+    for (const g2 of new Set(Object.values(this.mk))) {
+      const o = order.get(g2);
+      const state = o ? `${o.i}|${o.s.id}|${crowd === o.s.id}` : "idle";
+      if (g2.dataset.state === state) continue;
+      g2.dataset.state = state;
+      if (!o) { g2.innerHTML = idleMark(placeById[g2.dataset.pid]); continue; }
+      const s = o.s, hot = crowd === s.id, her = (s.tags || []).includes("heritage");
+      const fill = hot ? "#FF5B4A" : her ? "#CBBDFF" : s.cat === "activity" ? "#7B5CFF" : "#0E2A3A";
+      const txt = hot || s.cat === "activity" ? "#F3F1EA" : her ? "#0E2A3A" : "#D6F23B";
+      g2.innerHTML = `${hot ? '<circle r="13" fill="#FF5B4A" class="pulse"/>' : ""}<g class="mk-pin"><circle r="13" fill="${fill}" stroke="#BDEFDB" stroke-width="2.5"/><text text-anchor="middle" dy="4.4" font-family="Inter Tight, Helvetica, sans-serif" font-weight="600" font-size="13" fill="${txt}">${o.i + 1}</text></g>`;
+      A($(".mk-pin", g2), [{ transform: "scale(0)" }, { transform: "scale(1)" }], "pop", { delay: delay + 180 + o.i * 70 });
+    }
+  }
+  loop() {
+    const w = $(".walker", this.svg), t0 = performance.now();
+    const tick = now => {
+      if (!this.svg.isConnected) return;
+      if (this.path && this.path.isConnected && !reduce) {
+        const pt = this.path.getPointAtLength((((now - t0) / 7000) % 1) * this.len);
+        w.setAttribute("transform", `translate(${pt.x},${pt.y})`);
+        w.setAttribute("opacity", 1);
+      }
+      requestAnimationFrame(tick);
+    };
+    setTimeout(() => requestAnimationFrame(tick), reduce ? 0 : 1100);
+  }
+}
+
+/* ---------- timeline: each stop is a block, FLIP between plans ---------- */
+class Timeline {
+  constructor(host, o = {}) {
+    this.host = host; this.o = o; this.items = new Map();
+    host.classList.add("tl");
+    host.innerHTML = `<div class="endrow"><span class="pill"><span class="gr">13:00</span>${D.start.name} 출발</span></div><div class="endrow end-row"><span class="pill"><span class="gr fin"></span>${D.end.name} 도착</span></div>`;
+    this.endRow = $(".end-row", host);
+  }
+  html(s, o) {
+    const crowd = o.crowd === s.id, lock = s.fixed;
+    const tags = [];
+    if (crowd) tags.push(`<span class="pill fill">${svg("people", 13, 2.4)} 지금 붐빔 · 웨이팅 40분</span>`);
+    if (lock) tags.push(`<span class="pill">${svg("lock", 12, 2.4)} ${hhmm(s.start)} 예약 고정</span>`);
+    if (s.availability === "unverified") tags.push(`<span class="pill">자리 확인 필요</span>`);
+    if ((s.tags || []).includes("heritage") && this.o.stories) tags.push(`<span class="pill story" data-story="${s.id}">${svg("heritage", 12, 2.4)} 미래유산 · 이야기</span>`);
+    if (!crowd && !lock && this.o.picks) {
+      for (const who of whyOf(s)) tags.push(`<span class="pill" style="--c:${P[who.i].color}"><i></i>${who.label}</span>`);
+      const q = placeById[s.id].q || {};
+      if (q.uniqueness === 1 && !(s.tags || []).includes("heritage")) tags.push(`<span class="pill">여기서만</span>`);
+      else if (q.uniqueness === 0) tags.push(`<span class="pill">체인점</span>`);
+    }
+    const meta = `${s.catKo} · ${s.end - s.start}분 · 도보 ${Math.max(1, Math.round(s.walkMin))}분${s.price ? ` · ${won(s.price)}원` : ""}`;
+    return `<div class="b stop ${lock ? "lock" : ""} ${crowd ? "crowd" : ""}" style="--bg:${crowd ? "var(--red)" : CAT[s.cat]}">
+        <div class="ico">${svg(s.cat, 21, 2)}</div>
+        <div><div class="nm">${short(s.name)}</div><div class="mt">${meta}</div><div class="tags">${tags.join("")}</div></div>
+        <div class="tm gr"><b>${hhmm(s.start)}</b><small>~${hhmm(s.end)}</small></div>
+      </div>`;
+  }
+  render(plan, o = {}) {
+    const animate = o.animate !== false && !reduce;
+    const h0 = this.host.offsetHeight;
+    const first = new Map([...this.items].map(([id, el]) => [id, el.offsetTop]));
+    const keep = new Set(plan.stops.map(s => s.id));
+    const outs = [];
+    for (const [id, el] of this.items) if (!keep.has(id)) {
+      Object.assign(el.style, { position: "absolute", top: el.offsetTop + "px", left: 0, right: 0, zIndex: 0 });
+      outs.push(el); this.items.delete(id);
+    }
+    const list = plan.stops.map(s => {
+      let el = this.items.get(s.id);
+      const fresh = !el;
+      if (fresh) { el = document.createElement("div"); el.className = "ti"; el.dataset.id = s.id; this.items.set(s.id, el); }
+      el._fresh = fresh; el._moved = !fresh && el.dataset.t !== String(s.start);
+      el.dataset.t = s.start;
+      el.innerHTML = this.html(s, o);
+      this.host.insertBefore(el, this.endRow);
+      return el;
+    });
+    $(".fin", this.endRow).textContent = hhmm(plan.finish);
+    if (!animate) { outs.forEach(e => e.remove()); return; }
+    const h1 = this.host.offsetHeight;
+    if (h0 && h0 !== h1) A(this.host, [{ height: h0 + "px" }, { height: h1 + "px" }], "snap", { fill: "none" });
+    let k = 0;
+    list.forEach(el => {
+      if (el._fresh) {
+        A(el, [{ opacity: 0, transform: "translateX(50px) scale(.92)" }, { opacity: 1, transform: "none" }], "pop", { delay: (o.inDelay ?? 160) + k++ * 70 });
+        if (o.glowNew) E($(".stop", el), [{ boxShadow: "inset 0 0 0 0 #D6F23B" }, { boxShadow: "inset 0 0 0 5px #D6F23B" }, { boxShadow: "inset 0 0 0 0 #D6F23B" }], 1400, { delay: (o.inDelay ?? 160) + 300 });
+      } else {
+        const dy = first.get(el.dataset.id) - el.offsetTop;
+        if (dy) A(el, [{ transform: `translateY(${dy}px)` }, { transform: "none" }], "soft");
+        if (el._moved) E($(".tm b", el), [{ transform: "scale(1.2)", opacity: .4 }, { transform: "none", opacity: 1 }], 700);
+      }
+    });
+    outs.forEach((el, i) => {
+      $(".stop", el)?.classList.add("out");
+      el.animate([{ opacity: 1, transform: "none" }, { opacity: 1, transform: "rotate(-2deg) scale(.98)", offset: .3 }, { opacity: 0, transform: "translateX(-80px) rotate(-8deg) scale(.8)" }],
+        { duration: reduce ? 1 : 620, delay: i * 60, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }).onfinish = () => el.remove();
+    });
+  }
+}
+
+/* ---------- shared chrome ---------- */
+let cur = 0, token = 0, S = 1;
+const alive = t => t === token;
+const view = $("#view");
+const status = (t, light = false) => { $("#sbTime").textContent = t; $("#sb").classList.toggle("lt", light); };
+const topBlock = (eyebrow, extra = "", cls = "lime cut") => `<div class="b top ${cls}" id="top"><div class="row between"><span class="cap-up">${eyebrow}</span>${extra}</div><div class="h" id="ttl"></div></div>`;
+function cta(v, label, onClick) {
+  const w = document.createElement("div");
+  w.className = "cta-wrap";
+  w.innerHTML = `<button class="btn"><span>${label}</span><span class="go">${svg("arrow", 22, 2.4)}</span></button>`;
+  const b = w.firstChild;
+  b.onclick = onClick;
+  b.setLabel = t => { $("span", b).textContent = t; };
+  v.appendChild(w);
+  return b;
+}
+function relRect(el) {
+  const r = el.getBoundingClientRect(), s = $("#screen").getBoundingClientRect();
+  return { x: (r.left - s.left) / S, y: (r.top - s.top) / S, w: r.width / S, h: r.height / S };
+}
+function openSheet(v, html) {
+  const dim = document.createElement("div"), sh = document.createElement("div");
+  dim.className = "dim"; sh.className = "sheet";
+  sh.innerHTML = html;
+  v.append(dim, sh);
+  E(dim, [{ opacity: 0 }, { opacity: 1 }], 300);
+  A(sh, [{ transform: "translateY(105%)" }, { transform: "none" }], "soft");
+  [...sh.children].forEach((b, i) => A(b, [{ transform: `translateY(${40 + i * 30}px)` }, { transform: "none" }], "soft", { delay: 40 + i * 50 }));
+  let closed = false;
+  const close = async () => {
+    if (closed) return; closed = true;
+    if (v._sheet && v._sheet.el === sh) v._sheet = null;
+    dim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: "forwards" });
+    await sh.animate([{ transform: "none" }, { transform: "translateY(110%)" }], { duration: reduce ? 1 : 340, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }).finished;
+    dim.remove(); sh.remove();
+  };
+  dim.addEventListener("click", close);
+  return { el: sh, close };
+}
+
+/* ---------- presenter caption (desktop only) ---------- */
+const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
+  ["결국 한 명이\n참는 여행", "“‘전시는 꼭 봐야 해’, ‘나 많이 못 걸어’. 같이 여행 가면 결국 한 명이 참죠.”"],
+  ["한 문장이면\n조건이 된다", "“각자 한 문장이면 꼭 지킬 것과 되면 좋은 것으로 나눠요. 77만 가지 순서 중 둘 다 OK인 일정 3개.”"],
+  ["만족도는\n한 말의 체크리스트", "“만족도는 각자 한 말이 지켜진 비율이에요. 저울을 밀면 지민 100·서연 75부터 지민 59·서연 89까지. 가운데가 79 대 83.”"],
+  ["넣으면, 뭘\n빼야 하는지", "“공방을 넣으면? 두 곳이 빠지고 서연 씨가 더 걸어야 한다고 바로 다시 계산해요.”"],
+  ["둘 다 OK면\n결제까지", "“둘 다 승인하면 분담 결제 요청까지.”"],
+  ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 공방은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
+];
+
+/* ---------- step 0: group chat as stacked blocks ---------- */
+async function s0(v, t) {
+  status("12:58");
+  v.innerHTML = `<div class="scr" id="sc" style="padding-bottom:24px">
+    <div class="b top lime cut cl"><div class="row between"><span class="cap-up">토요일 성수</span><span class="cap-up">둘이서</span></div>
+      <div class="row between" style="margin-top:14px;align-items:flex-end"><div style="font:500 40px/1.05 var(--kr);letter-spacing:-.055em">성수<br>반나절</div><div class="av-stack">${av(0, 44)}${av(1, 44)}</div></div></div>
+    <div class="b pink tab tl row" style="padding:12px 14px 12px 12px"><div class="date-c"><b class="gr">14</b><small>Nov</small></div><div style="flex:1"><div class="lab">오늘 일정</div><div style="font:600 15px var(--kr);margin-top:2px">13:00 – 18:30 · 성수역 출발</div></div><span class="pill">미정</span></div>
+    <div id="chat"></div>
+  </div>`;
+  const sc = $("#sc", v), chat = $("#chat", v);
+  $$(".b", v).forEach((b, i) => rise(b, 80 + i * 90));
+  const add = (html, cls) => {
+    const el = document.createElement("div");
+    el.className = "b " + cls; el.innerHTML = html; chat.appendChild(el);
+    A(el, [{ opacity: 0, transform: "translateY(40px) scale(.94)" }, { opacity: 1, transform: "none" }], "pop");
+    sc.scrollTo({ top: sc.scrollHeight, behavior: reduce ? "auto" : "smooth" });
+    return el;
+  };
+  const say = async (i, text) => {
+    const me = i === 1, who = P[i].name;
+    const el = add(`<div class="msg ${me ? "me" : ""}">${av(i, 40, true)}<div class="tx"><div class="who">${who}</div><div class="typing"><i></i><i></i><i></i></div></div></div>`, me ? "sky" : "pink");
+    await sleep(750); if (!alive(t)) return;
+    const tx = $(".tx", el);
+    tx.innerHTML = `<div class="who">${who}</div>${text}`;
+    E(tx, [{ opacity: .3 }, { opacity: 1 }], 300);
+    await sleep(500);
+  };
+  await sleep(500); if (!alive(t)) return;
+  await say(0, P[0].text); if (!alive(t)) return;
+  await say(1, P[1].text); if (!alive(t)) return;
+  await say(0, "…그럼 전시 포기해야 돼?"); if (!alive(t)) return;
+  await say(1, "아니 그건 아닌데ㅠ"); if (!alive(t)) return;
+  await sleep(250); if (!alive(t)) return;
+  const fl = document.createElement("div");
+  fl.className = "flag"; fl.innerHTML = `${LOGO} TripFit`;
+  chat.appendChild(fl);
+  A(fl, [{ opacity: 0, transform: "scale(.6)" }, { opacity: 1, transform: "none" }], "pop");
+  const card = add(`<div style="font:500 23px/1.35 var(--kr);letter-spacing:-.045em;margin:12px 0 18px">둘이 한 말을 조건으로 바꿔서,<br>둘 다 OK인 일정을 찾아볼게요</div><button class="btn navy"><span>같이 정하기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button>`, "lime");
+  card.style.paddingTop = "26px";
+  $(".btn", card).addEventListener("click", () => go(1));
+}
+
+/* ---------- step 1: words → constraint chips → 773,665 → 5 ---------- */
+function markup(text, marks) {
+  const phrases = [...new Set(marks.map(m => m.phrase))].sort((a, b) => b.length - a.length);
+  const done = [];
+  let html = text;
+  for (const ph of phrases) {
+    if (done.some(w => w.includes(ph))) continue;
+    html = html.replace(ph, `<span class="ph" data-ph="${ph}">${ph}</span>`);
+    done.push(ph);
+  }
+  return { html, spanFor: ph => done.find(w => w.includes(ph)) };
+}
+const chipHTML = m => m.kind === "hard"
+  ? `<span class="pill fill chip">${svg("lock", 13, 2.4)}${m.chip}</span>`
+  : `<span class="pill chip">${svg("heart", 13, 2.4)}${m.chip}</span>`;
+
+async function s1(v, t) {
+  status("12:59");
+  const marks = P.flatMap(p => p.marks), nh = marks.filter(m => m.kind === "hard").length, ns = marks.length - nh;
+  v.innerHTML = `<div class="scr" id="sc">${topBlock("조건 정리", `<span class="cap-up">A.X K2</span>`)}</div>`;
+  const sc = $("#sc", v);
+  rise($("#top", v), 60);
+  setTitle($("#ttl", v), `꼭 지킬 ${nh}가지,\n되면 좋은 ${ns}가지`, 200);
+  log("llm", `자연어 → 조건 JSON (hard ${nh}, soft ${ns})`);
+  const cards = P.map((p, i) => {
+    const { html, spanFor } = markup(p.text, p.marks);
+    const el = document.createElement("div");
+    el.className = `b ${i ? "sky tab tr" : "pink tab cut cr"}`;
+    el.innerHTML = `<div class="row">${av(i, 34, true)}<span class="cap-up">${p.name}</span></div><div class="quote">“${html}”</div><div class="chips"></div>`;
+    sc.appendChild(el);
+    rise(el, 200 + i * 110);
+    return { p, el, spanFor };
+  });
+  const src = document.createElement("div");
+  src.className = "src-row";
+  sc.appendChild(src);
+  const fn = document.createElement("div");
+  fn.className = "b mint";
+  fn.innerHTML = `<div class="row between"><span class="lab" id="fnK" style="font-weight:600">6곳 이하로 가능한 방문 순서</span><span class="ico" style="width:38px;height:38px">${svg("bolt", 18, 2.2)}</span></div><div class="fn-n gr" id="fnN"><span class="odo" id="fnO">0</span><em>가지</em></div>`;
+  fn.style.visibility = "hidden";
+  sc.appendChild(fn);
+  const next = cta(v, "일정 보기", () => go(2));
+  next.disabled = true;
+  await sleep(900); if (!alive(t)) return;
+
+  for (const { p, el, spanFor } of cards) {
+    const chipsBox = $(".chips", el);
+    for (const m of p.marks) {
+      if (!alive(t)) return;
+      const span = $(`.ph[data-ph="${spanFor(m.phrase)}"]`, el);
+      span.classList.add("on");
+      chipsBox.insertAdjacentHTML("beforeend", chipHTML(m));
+      const target = chipsBox.lastElementChild;
+      target.classList.add("hide");
+      const from = relRect(span), to = relRect(target);
+      const fly = document.createElement("div");
+      fly.className = "fly"; fly.innerHTML = chipHTML(m);
+      fly.style.left = to.x + "px"; fly.style.top = to.y + "px";
+      $("#screen").appendChild(fly);
+      const dx = from.x + from.w / 2 - (to.x + to.w / 2), dy = from.y - to.y;
+      if (!reduce) await fly.animate([
+        { transform: `translate(${dx}px,${dy}px) scale(.4)`, opacity: 0 },
+        { transform: `translate(${dx * .5}px,${dy * .5 - 36}px) scale(1.12) rotate(-6deg)`, opacity: 1, offset: .5 },
+        { transform: "translate(0,0) scale(1)", opacity: 1 },
+      ], { duration: 560, easing: "cubic-bezier(.3,.7,.2,1)" }).finished;
+      fly.remove();
+      if (!alive(t)) return;
+      target.classList.remove("hide");
+      A(target, [{ transform: "scale(.8)" }, { transform: "none" }], "pop");
+      await sleep(110);
+    }
+  }
+  if (!alive(t)) return;
+  log("tmap", `성수 후보 ${D.sources.tmap}곳 (샘플 큐레이션)`);
+  log("mrt", `체험 시작 시각 14:00 확인 / 16:00 미확인 (예시 상품)`);
+  log("tmap", `도보 행렬 ${D.sources.pairs}쌍 (직선×1.3 추정)`);
+  log("city", `실시간 도시데이터 · 혼잡도 (샘플)`);
+  fn.style.visibility = "";
+  rise(fn, 250);
+  sc.scrollTo({ top: sc.scrollHeight, behavior: reduce ? "auto" : "smooth" });
+  await sleep(450); if (!alive(t)) return;
+  odo($("#fnO", v), won(D.sources.orderings));
+  await sleep(1700); if (!alive(t)) return;
+  island.show({ spin: true, title: "둘 다 OK인 일정 찾는 중", sub: "77만 가지 순서 비교 중", hold: 0 });
+  const nEl = $("#fnN", v);
+  await nEl.animate([{ filter: "blur(0)", transform: "none", opacity: 1 }, { filter: "blur(10px)", transform: "scale(.6)", opacity: 0 }], { duration: reduce ? 1 : 420, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }).finished;
+  if (!alive(t)) return;
+  $("#fnK", v).textContent = `${won(D.sources.orderings)}가지 중 둘 다 OK인 일정`;
+  nEl.innerHTML = `<span>${D.series.length}</span><em>개</em>`;
+  nEl.getAnimations().forEach(a => a.cancel());
+  A(nEl, [{ transform: "scale(2.2)", opacity: 0 }, { transform: "none", opacity: 1 }], "pop");
+  fn.style.setProperty("--bg", "var(--lime)");
+  log("mip", `ε-제약으로 파레토 일정 ${D.series.length}개`, D.series[0].solveMs);
+  island.show({ title: `${won(D.sources.orderings)}가지 중 ${D.series.length}개`, sub: "Python-MIP 실제 계산", right: `${(D.series[0].solveMs / 1000).toFixed(2)}s`, hold: 2600 });
+  next.disabled = false;
+}
+
+/* ---------- step 2: plans + consensus scale ---------- */
+function planDiff(a, b) {
+  const sa = new Set(a.stops.map(s => s.id)), sb = new Set(b.stops.map(s => s.id));
+  return { added: b.stops.filter(s => !sa.has(s.id)), dropped: a.stops.filter(s => !sb.has(s.id)), walk: b.walkM - a.walkM, j: b.sat[P[0].name] - a.sat[P[0].name], s: b.sat[P[1].name] - a.sat[P[1].name] };
+}
+function planTitle(p) {
+  if (p.id === "h") return `미래유산 한 곳 더,\n둘 다 ${Math.floor(Math.min(p.sat[P[0].name], p.sat[P[1].name]))}% 넘게`;
+  const j = Math.round(p.sat[P[0].name]), s = Math.round(p.sat[P[1].name]);
+  if (Math.abs(j - s) <= 8) return `둘 다 ${Math.floor(Math.min(p.sat[P[0].name], p.sat[P[1].name]))}% 넘게\n만족하는 일정`;
+  return j > s ? `지민을 위해\n서연이 양보한 일정` : `서연을 위해\n지민이 양보한 일정`;
+}
+async function s2(v, t) {
+  status("13:00");
+  const n = D.series.length;
+  let idx = D.defaultIdx, plan = D.series[idx];
+  v.innerHTML = `<div class="scr" id="sc">
+    <div class="b top lime cut cr" id="top">
+      <div class="row between"><span class="cap-up">합의 저울</span><span class="pill" id="lbl" style="height:28px;font-size:12px"></span></div>
+      <div class="h" id="ttl" style="font-size:21px;min-height:2.5em"></div>
+      <div class="big2"><div class="bn gr"><span class="odo" id="nJ">0</span><em>%</em></div><div class="colon gr">:</div><div class="bn r gr"><span class="odo" id="nS">0</span><em>%</em></div></div>
+      <div class="bn-lab"><span style="--c:${P[0].color}"><i></i>${P[0].name} 만족도</span><span style="--c:${P[1].color}">${P[1].name} 만족도<i></i></span></div>
+      <div class="sc-track" id="track"><div class="sc-rail"></div>${D.series.map((_, i) => `<span class="sc-det" style="left:${i / (n - 1) * 100}%"></span>`).join("")}<div class="sc-thumb snap" id="thumb">${svg("check", 20, 3)}</div></div>
+      <div class="sc-lab"><span>${P[0].name} 쪽</span><span>균형</span><span>${P[1].name} 쪽</span></div>
+    </div>
+    <div class="split cl" id="cl">${P.map((p, i) => `<div class="b ${i ? "sky tab tr" : "pink"}"><div class="head"><span class="cap-up">${p.name}이 한 말</span><b id="clp${i}"></b></div><div id="cli${i}"></div></div>`).join("")}</div>
+    <div class="b mint cut mapblk" id="mapB" style="margin-top:4px"><div id="map"></div><div class="map-ov"><span class="pill" id="mapPill"></span></div></div>
+    <div class="b lilac tab cut cl hid" id="hid"><span class="ico" style="color:var(--lilac)">${svg("heritage", 21, 2)}</span><div class="t"><b>${D.hidden.label}</b><small>서울미래유산에서 찾은 성수 이야기</small></div><span class="sw"></span></div>
+    <div class="b pink tab tl stats" id="stats">
+      <div><div class="lab">걷는 거리</div><div class="v gr"><span class="odo" id="stW">0.0</span><em>km</em></div></div>
+      <div><div class="lab">걷는 시간</div><div class="v gr"><span class="odo" id="stM">0</span><em>min</em></div></div>
+      <div><div class="lab">도착</div><div class="v gr"><span class="odo" id="stF">00:00</span></div></div>
+    </div>
+    <div id="tl"></div>
+  </div>`;
+  ["#top", "#cl", "#mapB", "#hid", "#stats"].forEach((s, i) => rise($(s, v), 60 + i * 90));
+  const map = new TFMap($("#map", v));
+  const tl = new Timeline($("#tl", v), { picks: true, stories: true });
+  const thumb = $("#thumb", v), track = $("#track", v);
+  const paint = (p, first) => {
+    setTitle($("#ttl", v), planTitle(p));
+    $("#lbl", v).textContent = p.label;
+    odo($("#nJ", v), Math.round(p.sat[P[0].name]));
+    odo($("#nS", v), Math.round(p.sat[P[1].name]));
+    odo($("#stW", v), km(p.walkM));
+    odo($("#stM", v), Math.round(p.walkMin));
+    odo($("#stF", v), hhmm(p.finish));
+    $("#mapPill", v).textContent = `${p.stops.length}곳 · ${km(p.walkM)}km`;
+    P.forEach((q, i) => renderChecklist($(`#cli${i}`, v), $(`#clp${i}`, v), p.checklist[q.name]));
+    map.setRoute(p.stops, { delay: first ? 700 : 0 });
+    tl.render(p, { animate: !first, inDelay: 60 });
+  };
+  thumb.style.left = idx / (n - 1) * 100 + "%";
+  await sleep(250); if (!alive(t)) return;
+  map.flicker();
+  paint(plan, true);
+  log("mip", `만족도 = 각자 한 말 체크리스트(가중평균) · 동점이면 장소 점수`);
+  const apply = i => {
+    if (i === idx) return;
+    const prev = plan; idx = i; plan = D.series[i];
+    paint(plan);
+    const d = planDiff(prev, plan);
+    island.show({ icon: "bolt", title: diffTitle(d), sub: `${diffLine(d)} · ${P[0].name} ${signed(d.j)} · ${P[1].name} ${signed(d.s)}`, hold: 2600 });
+    log("mip", `저울 → ${plan.label} · ${P[0].name} ${Math.round(plan.sat[P[0].name])}% / ${P[1].name} ${Math.round(plan.sat[P[1].name])}%`);
+  };
+  const scaleTo = i => { i = Math.max(0, Math.min(n - 1, i)); thumb.classList.add("snap"); thumb.style.left = i / (n - 1) * 100 + "%"; apply(i); };
+  let drag = false;
+  const at = e => { const r = track.getBoundingClientRect(); return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); };
+  track.addEventListener("pointerdown", e => { drag = true; track.setPointerCapture(e.pointerId); thumb.classList.remove("snap"); const f = at(e); thumb.style.left = f * 100 + "%"; apply(Math.round(f * (n - 1))); });
+  track.addEventListener("pointermove", e => { if (!drag) return; const f = at(e); thumb.style.left = f * 100 + "%"; apply(Math.round(f * (n - 1))); });
+  const up = () => { if (!drag) return; drag = false; scaleTo(idx); };
+  track.addEventListener("pointerup", up); track.addEventListener("pointercancel", up);
+  v._scaleTo = scaleTo;
+  v._scaleBy = d => scaleTo(Math.min(n - 1, Math.max(0, idx + d)));
+
+  // 숨은 한 곳 +1: heritage spots join the candidates and at least one must be visited
+  const H = D.hidden, hidBlk = $("#hid", v);
+  let hiddenOn = false;
+  const setHidden = on => {
+    if (on === hiddenOn) return;
+    hiddenOn = on;
+    hidBlk.classList.toggle("on", on);
+    A(hidBlk, [{ transform: "scale(.97)" }, { transform: "none" }], "pop");
+    const prev = plan;
+    if (on) {
+      idx = D.defaultIdx;
+      thumb.classList.add("snap"); thumb.style.left = idx / (n - 1) * 100 + "%";
+      plan = H.plan;
+      log("heritage", `서울미래유산 CSV · 성수 후보 ${H.candidates.length}곳 (공공누리 1유형)`);
+      log("mip", `tag_min(heritage ≥ 1) · 균형 목적 그대로`, H.plan.solveMs);
+    } else plan = D.series[idx];
+    track.classList.toggle("off", on);
+    paint(plan);
+    const d = planDiff(prev, plan);
+    island.show({ icon: "heritage", tone: "var(--lilac)", title: on ? "미래유산 후보를 더해 다시 계산" : "원래 후보로 돌아가요", sub: `${diffLine(d)} · ${P[0].name} ${signed(d.j)} · ${P[1].name} ${signed(d.s)}`, right: on ? `${H.plan.solveMs}ms` : "", hold: 2800 });
+  };
+  hidBlk.addEventListener("click", () => setHidden(!hiddenOn));
+  $("#tl", v).addEventListener("click", e => { const b = e.target.closest("[data-story]"); if (b) openStory(v, b.dataset.story); });
+  v._hidden = setHidden;
+  v._toggleHidden = () => setHidden(!hiddenOn);
+  v._story = () => openStory(v, H.plan.stops.find(s => placeById[s.id].hidden).id);
+  cta(v, "체험 하나 넣어보기", () => go(3));
+}
+
+/* checklist rows: label · bar · % (bars and numbers animate in place) */
+function renderChecklist(box, total, items) {
+  if (!box.children.length) box.innerHTML = items.map(it => `<div class="ci"><span>${it.label}</span><i><b style="width:0"></b></i><em></em></div>`).join("");
+  [...box.children].forEach((row, k) => {
+    const f = items[k].fulfilled;
+    $("b", row).style.width = f * 100 + "%";
+    $("em", row).textContent = Math.round(f * 100) + "%";
+  });
+  const w = items.reduce((a, it) => a + it.weight, 0);
+  total.textContent = Math.round(100 * items.reduce((a, it) => a + it.weight * it.fulfilled, 0) / w) + "%";
+}
+
+/* ---------- step 3: what-if ---------- */
+let chosen = null;
+async function s3(v, t) {
+  status("13:00");
+  const base = D.series[D.defaultIdx];
+  v.innerHTML = `<div class="scr" id="sc">${topBlock("마이리얼트립 체험", `<span class="cap-up">넣어보기</span>`, "lime")}<div id="tray"></div><div id="tl"></div><div class="note" id="note"></div></div>`;
+  rise($("#top", v), 60);
+  setTitle($("#ttl", v), "체험을 넣으면\n뭐가 빠질까?", 120);
+  const tl = new Timeline($("#tl", v));
+  tl.render(base, { animate: false });
+  rise($("#tl", v), 160);
+  const next = cta(v, "이대로 합의하기", () => go(4));
+  next.disabled = true;
+  await sleep(600); if (!alive(t)) return;
+  const sh = openSheet(v, `
+    <div class="b prod"><span class="grab"></span>
+      <svg class="ring" viewBox="0 0 170 170"><defs><path id="circ" d="M85 85m-62 0a62 62 0 1 1 124 0a62 62 0 1 1-124 0"/></defs><circle cx="85" cy="85" r="78" fill="#D6F23B"/><text font-family="Inter Tight, sans-serif" font-size="12.5" font-weight="600" letter-spacing="2.6" fill="#0E2A3A"><textPath href="#circ">MYREALTRIP · ONE-DAY CLASS · SEONGSU ·</textPath></text></svg>
+      <span class="pill">마이리얼트립</span>
+      <div style="font:600 22px/1.25 var(--kr);letter-spacing:-.045em;margin-top:14px">가죽공방<br>원데이클래스</div>
+      <div class="pr gr">55,000<small>원 / 1인 · 2시간</small></div>
+    </div>
+    <div class="slots"><button class="slot" data-k="alt"><span class="cap-up">시작</span><b class="gr">14:00</b><small><i></i>예약 가능</small></button><button class="slot" data-k="main"><span class="cap-up">시작</span><b class="gr">16:00</b><small><i class="a"></i>자리 확인 필요</small></button></div>
+    <div class="b lime" style="padding:6px"><button class="btn navy" id="addBtn" disabled><span>시작 시간을 골라주세요</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
+  log("mrt", `getTnaOptions → 16:00 "자동 조회 제한" → 자리 확인 필요 (예시 상품)`);
+  let pick = null, ran = false;
+  const addBtn = $("#addBtn", sh.el);
+  $$(".slot", sh.el).forEach(btn => btn.addEventListener("click", () => {
+    $$(".slot", sh.el).forEach(x => x.classList.remove("on"));
+    btn.classList.add("on"); pick = btn.dataset.k;
+    A(btn, [{ transform: "scale(.92)" }, { transform: "none" }], "pop");
+    $("span", addBtn).textContent = `${$("b", btn).textContent}로 넣고 다시 계산`;
+    addBtn.disabled = false;
+  }));
+  const run = async () => {
+    if (!pick || ran) return;
+    ran = true;
+    const W = pick === "main" ? D.whatif : D.whatif.alt, at = hhmm(placeById[W.pick].fixedStart);
+    chosen = W;
+    await sh.close(); if (!alive(t)) return;
+    island.show({ spin: true, tone: "var(--violet)", title: `공방 ${at} 넣고 다시 계산 중`, sub: "고정 시각 노드 + 나머지 제약 유지", hold: 0 });
+    await sleep(800); if (!alive(t)) return;
+    log("mip", `what_if_add(가죽공방 ${at}) · 다른 제약 유지`, W.plan.solveMs ?? undefined);
+    tl.render(W.plan, { glowNew: true, inDelay: 500 });
+    setTimeout(() => $(`.ti[data-id="${W.pick}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 1300);
+    const d = planDiff(base, W.plan);
+    setTitle($("#ttl", v), `공방을 넣으면\n${d.dropped.length}곳을 빼야 해요`);
+    island.show({ title: `${d.dropped.length}곳 빼고 공방 ${at} 넣음`, sub: "Python-MIP 실제 계산", right: W.plan.solveMs ? `${W.plan.solveMs}ms` : "", hold: 2600 });
+    const top = $("#top", v);
+    top.insertAdjacentHTML("beforeend", `<div class="deltas">
+      <div><div class="v gr">${signed(d.walk / 1000, 1)}<em>km</em></div><div class="lab">걷는 거리</div></div>
+      <div><div class="v gr">${signed(d.j)}<em>%p</em></div><div class="lab" style="--c:${P[0].color}"><i></i>${P[0].name}</div></div>
+      <div><div class="v gr">${signed(d.s)}<em>%p</em></div><div class="lab" style="--c:${P[1].color}"><i></i>${P[1].name}</div></div></div>`);
+    top.classList.add("cut");
+    $$(".deltas > div", top).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateY(20px) scale(.7)" }, { opacity: 1, transform: "none" }], "pop", { delay: 600 + i * 90 }));
+    const tray = $("#tray", v);
+    tray.innerHTML = `<div class="b peach tab tray"><div class="row between"><span class="lab" style="opacity:.75;font-weight:600">양보한 곳</span><span class="gr" style="font:500 28px var(--gr)">${d.dropped.length}</span></div><div class="row2">${d.dropped.map(s => `<span class="pill">${short(s.name)}</span>`).join("")}</div></div>`;
+    rise(tray.firstChild, 900);
+    $$(".tray .pill", tray).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateX(-30px) rotate(-6deg)" }, { opacity: 1, transform: "none" }], "pop", { delay: 1100 + i * 90 }));
+    if (placeById[W.pick].availability === "unverified") $("#note", v).textContent = `${at} 자리는 자동 조회가 막혀 있어요. 결제 전에 한 번 더 확인합니다.`;
+    log("llm", `diff → 문장화 (숫자는 솔버 값 그대로)`);
+    next.disabled = false;
+  };
+  addBtn.addEventListener("click", run);
+  v._run = async () => { $$(".slot", sh.el)[1].click(); await sleep(700); await run(); };
+}
+
+/* ---------- step 4: agree + split pay ---------- */
+async function s4(v, t) {
+  status("13:01");
+  const W = chosen || D.whatif, plan = W.plan, pay = D.pay;
+  v.innerHTML = `<div class="scr" id="sc">
+    ${topBlock("합의", `<span class="cap-up">${plan.stops.length}곳 · ${km(plan.walkM)}km</span>`, "lime cut")}
+    <div class="b cream tab cut cl" id="vb">
+      <svg class="venn" width="280" height="136" viewBox="0 0 280 136">
+        <g class="vg" id="g0"><circle cx="80" cy="68" r="52" fill="${P[0].color}" stroke="#0E2A3A" stroke-width="2.5"/><text class="who-t" x="62" y="78" text-anchor="middle">${P[0].initial}</text></g>
+        <g class="vg" id="g1"><circle cx="200" cy="68" r="52" fill="${P[1].color}" stroke="#0E2A3A" stroke-width="2.5"/><text class="who-t" x="218" y="78" text-anchor="middle">${P[1].initial}</text></g>
+        <g id="lens" opacity="0"><path d="M140 25.5A52 52 0 0 1 140 110.5 52 52 0 0 1 140 25.5z" fill="#D6F23B" stroke="#0E2A3A" stroke-width="2.5"/><path id="ck" d="M129 68l8 8 15-17" fill="none" stroke="#0E2A3A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+      </svg>
+      <div class="apps">${P.map((p, i) => `<button class="app" data-i="${i}" style="--c:${p.color}">${p.name} 승인</button>`).join("")}</div>
+    </div>
+    <div class="b mint tab tl" id="pay" style="opacity:.35">
+      <div class="chain">${plan.stops.map((s, i) => `${i ? '<span class="ln"></span>' : ""}<span class="ico" style="${s.cat === "activity" ? "background:var(--violet);color:var(--cream)" : ""}">${svg(s.cat, 18, 2)}</span>`).join("")}</div>
+      <div class="rc" style="margin-top:12px"><span>${pay.item} × ${pay.people}</span><span class="gr">${won(pay.price * pay.people)}</span></div>
+      <div class="rc"><span>나머지 ${plan.stops.length - 1}곳</span><span>현장 결제</span></div>
+      <div class="rc t"><span>${plan.stops.some(s => s.availability === "unverified") ? "자리 확인되면 결제" : "지금 결제"}</span><span class="gr">${won(pay.price * pay.people)}원</span></div>
+    </div>
+    <div class="split" id="split">${P.map((p, i) => `<div class="b ${i ? "sky" : "pink"}"><div class="lab">${p.name} 부담</div><div class="gr">${won(pay.price)}<em>원</em></div></div>`).join("")}</div>
+    <div class="mock">Agentic Pay 연동 지점 (데모 목업) · 결제 후 마이리얼트립 예약으로 연결</div>
+  </div>`;
+  setTitle($("#ttl", v), "이 일정으로\n둘 다 괜찮아?", 120);
+  ["#top", "#vb"].forEach((s, i) => rise($(s, v), 60 + i * 90));
+  A($("#pay", v), [{ opacity: 0, transform: "translateY(40px)" }, { opacity: .35, transform: "none" }], "pop", { delay: 240 });
+  $("#split", v).style.visibility = "hidden";
+  const payBtn = cta(v, "각자 결제 요청 보내기", async () => {
+    payBtn.disabled = true;
+    island.show({ spin: true, tone: "var(--peach)", title: "결제 요청 보내는 중", sub: "Agentic Pay · 목업", hold: 0 });
+    log("pay", `결제 요청 2건 (${won(pay.price)}원 × 2) · 목업`);
+    await sleep(1000); if (!alive(t)) return;
+    island.show({ icon: "card", tone: "var(--peach)", title: "결제 요청 2건 보냈어요", sub: "확정되면 마이리얼트립 예약으로", hold: 2600 });
+    payBtn.setLabel("여행 중 화면 보기");
+    payBtn.disabled = false;
+    payBtn.onclick = () => go(5);
+    A(payBtn, [{ transform: "scale(.94)" }, { transform: "none" }], "pop");
+  });
+  payBtn.disabled = true;
+  const ok = new Set();
+  const approve = async i => {
+    if (ok.has(i) || !alive(t)) return;
+    ok.add(i);
+    const b = $(`.app[data-i="${i}"]`, v);
+    b.classList.add("ok"); b.innerHTML = `${svg("check", 18, 3)} ${P[i].name} OK`;
+    A(b, [{ transform: "scale(.9)" }, { transform: "none" }], "pop");
+    log("pay", `${P[i].name} 승인`);
+    if (ok.size < 2) return;
+    await sleep(250); if (!alive(t)) return;
+    $("#g0", v).style.transform = "translateX(30px)";
+    $("#g1", v).style.transform = "translateX(-30px)";
+    await sleep(reduce ? 0 : 420); if (!alive(t)) return;
+    const lens = $("#lens", v);
+    lens.setAttribute("opacity", 1);
+    A(lens, [{ transform: "scale(0)", transformOrigin: "140px 68px" }, { transform: "scale(1)", transformOrigin: "140px 68px" }], "pop");
+    const ck = $("#ck", v), L = ck.getTotalLength();
+    ck.style.strokeDasharray = L;
+    E(ck, [{ strokeDashoffset: L }, { strokeDashoffset: 0 }], 420, { delay: 260 });
+    setTitle($("#ttl", v), "둘 다 OK.\n합의 완료");
+    island.show({ title: "합의 완료", sub: `${P[0].name} ✓  ${P[1].name} ✓`, hold: 2000 });
+    const payEl = $("#pay", v);
+    payEl.style.opacity = "";
+    A(payEl, [{ opacity: .35 }, { opacity: 1 }], "pop");
+    const split = $("#split", v);
+    split.style.visibility = "";
+    $$(".b", split).forEach((x, k) => A(x, [{ opacity: 0, transform: "translateY(30px) scale(.85)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + k * 100 }));
+    $("#sc", v).scrollTo({ top: 260, behavior: reduce ? "auto" : "smooth" });
+    payBtn.disabled = false;
+  };
+  $$(".app", v).forEach(b => b.addEventListener("click", () => approve(+b.dataset.i)));
+  v._run = async () => { await approve(0); await sleep(600); await approve(1); await sleep(1600); if (alive(t)) payBtn.click(); };
+}
+
+/* ---------- step 5: live re-plan ---------- */
+async function s5(v, t) {
+  const R = D.replan, before = D.whatif.plan, crowded = placeById[R.crowded];
+  status(hhmm(R.now));
+  v.innerHTML = `<div class="scr" id="sc">
+    ${topBlock(`여행 중 · ${hhmm(R.now)}`, `<span class="cap-up">혼잡도 샘플</span>`, "lime cut cr")}
+    <div class="b mint tab tr mapblk" id="mapB"><div id="map"></div></div>
+    <div class="chg" id="chg"></div>
+    <div id="tl"></div>
+  </div>`;
+  const top = $("#top", v);
+  setTitle($("#ttl", v), `${short(before.stops[0].name)}로\n가는 중이에요`, 120);
+  ["#top", "#mapB"].forEach((s, i) => rise($(s, v), 60 + i * 90));
+  const map = new TFMap($("#map", v), 180);
+  map.setRoute(before.stops);
+  const tl = new Timeline($("#tl", v));
+  tl.render(before, { animate: false });
+  const btn = cta(v, "붐비는 곳 빼고 다시 짜기", () => replan());
+  btn.disabled = true;
+  await sleep(1300); if (!alive(t)) return;
+  island.show({ icon: "people", tone: "var(--red)", title: `${short(crowded.name)} 지금 붐벼요`, sub: "웨이팅 약 40분 · 서울 실시간 도시데이터(샘플)", hold: 3200 });
+  log("city", `실시간 도시데이터 · ${crowded.name} 혼잡 "붐빔" (샘플)`);
+  top.classList.add("alert"); status(hhmm(R.now), true);
+  setTitle($("#ttl", v), `${hhmm(R.now)}, ${short(crowded.name)}가\n지금 붐벼요`);
+  tl.render(before, { crowd: R.crowded, animate: false });
+  map.setRoute(before.stops, { crowd: R.crowded });
+  const card = $(`.ti[data-id="${R.crowded}"] .stop`, v);
+  card?.animate([{ transform: "none" }, { transform: "translateX(-7px) rotate(-1deg)" }, { transform: "translateX(7px) rotate(1deg)" }, { transform: "translateX(-4px)" }, { transform: "none" }], { duration: reduce ? 1 : 520, iterations: 2 });
+  const lock = $(`.ti[data-id="${R.keep}"] .stop`, v);
+  if (lock && !reduce) lock.animate([{ transform: "scale(1)" }, { transform: "scale(1.03)" }, { transform: "scale(1)" }], { duration: 1100, iterations: 3, delay: 500 });
+  btn.disabled = false;
+  let done = false;
+  async function replan() {
+    if (done) return; done = true;
+    btn.disabled = true;
+    island.show({ spin: true, tone: "var(--violet)", title: "공방 16:00은 지키고 다시 계산", sub: `제외: ${short(crowded.name)}`, hold: 0 });
+    await sleep(700); if (!alive(t)) return;
+    log("mip", `reoptimize · lock(공방 16:00) · 제외(${crowded.name})`, R.plan.solveMs);
+    top.classList.remove("alert"); status(hhmm(R.now));
+    tl.render(R.plan, { glowNew: true });
+    setTimeout(() => $(`.ti[data-id="${R.keep}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 900);
+    map.setRoute(R.plan.stops);
+    setTitle($("#ttl", v), "공방 16:00은 그대로,\n나머지만 바꿨어요");
+    const d = planDiff(before, R.plan);
+    island.show({ title: `${R.plan.solveMs}ms 만에 다시 짰어요`, sub: `−${short(crowded.name)}  +${d.added.map(s => short(s.name)).join(", ")}`, hold: 3000 });
+    const chg = $("#chg", v);
+    chg.innerHTML = [
+      ...d.dropped.map(s => `<span class="pill" style="background:var(--red);color:var(--cream)">− ${short(s.name)}</span>`),
+      ...d.added.map(s => `<span class="pill" style="background:var(--lime)">+ ${short(s.name)}</span>`),
+      `<span class="pill" style="background:var(--violet);color:var(--cream)">${svg("lock", 13, 2.4)} 공방 16:00 유지</span>`,
+    ].join("");
+    $$(".pill", chg).forEach((x, i) => A(x, [{ opacity: 0, transform: "translateX(-30px) scale(.7)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + i * 100 }));
+    btn.setLabel("처음부터 다시 보기");
+    btn.disabled = false;
+    btn.onclick = () => go(0);
+  }
+  v._run = replan;
+}
+
+/* ---------- story card for a heritage spot ---------- */
+function openStory(v, id) {
+  if (v._sheet) return;
+  const pl = placeById[id], st = D.hidden.plan.stops.find(s => s.id === id);
+  const sh = openSheet(v, `
+    <div class="b lilac"><span class="grab"></span>
+      <div class="row between" style="margin-top:8px"><span class="cap-up">서울미래유산</span><span class="ico" style="color:var(--lilac)">${svg("heritage", 21, 2)}</span></div>
+      <div class="story-name">${short(pl.name)}</div>
+      <div class="lab" style="margin-top:8px">서울미래유산 · 성수${st ? ` · ${hhmm(st.start)} 도착 · ${st.end - st.start}분` : ""}</div></div>
+    <div class="b cream"><div class="story-tx">${pl.story}</div></div>
+    <div class="credit">출처: ${pl.credit} · 역사 필드를 짧게 다시 쓴 샘플 문구 · 좌표 근사</div>
+    <div class="b lime" style="padding:6px"><button class="btn navy" id="stOk"><span>일정으로 돌아가기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
+  v._sheet = sh;
+  E($(".story-tx", sh.el), [{ opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "none" }], 700, { delay: 250 });
+  log("llm", `미래유산 역사 필드 → 이야기 3줄 (출처 표기)`);
+  $("#stOk", sh.el).addEventListener("click", sh.close);
+}
+
+/* ---------- conflict sheet ---------- */
+function showConflict() {
+  const v = view.lastElementChild;
+  if (!v || v._sheet) return;
+  const C = D.conflict, to = parseFloat((C.relaxations[0] || "").match(/→ ([\d.]+)km/)?.[1] || 3);
+  const sh = openSheet(v, `
+    <div class="b cut" style="--bg:var(--red);color:var(--cream);padding-top:30px"><span class="grab"></span>
+      <div class="row between"><span class="cap-up">이대로는 안 돼요</span><span class="ico" style="background:var(--cream);color:var(--red);width:38px;height:38px">${svg("warn", 18, 2.2)}</span></div>
+      <div style="font:600 24px/1.25 var(--kr);letter-spacing:-.045em;margin-top:8px">도보 ${km(C.limitM)}km로는<br>일정이 안 나와요</div></div>
+    <div class="b cream tab">
+      <div class="lab">이것 하나만 양보하면 돼요</div>
+      <div class="cf-big gr"><span class="from">${km(C.limitM)}</span><span class="arr">→</span><span>${to.toFixed(1)}</span><em>km</em></div>
+      <div class="cf-bar"><i id="cfI" style="width:${C.limitM / 1000 / 3.5 * 100}%"></i><b style="left:${C.limitM / 1000 / 3.5 * 100}%"></b></div>
+      <div class="lab" style="margin-top:8px">${C.relaxations[0] || "제약 완화"} · diagnose()가 찾은 최소 양보</div></div>
+    <div class="b lime" style="padding:6px"><button class="btn navy" id="cfOk"><span>이렇게 바꾸기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
+  v._sheet = sh;
+  log("mip", `infeasible → diagnose: 1개씩, 안 되면 2개 조합 완화`, C.ms);
+  setTimeout(() => { const i = $("#cfI", sh.el); if (!i) return; i.style.transition = "width .9s var(--spring)"; i.style.width = (to / 3.5 * 100) + "%"; }, 450);
+  $("#cfOk", sh.el).addEventListener("click", sh.close);
+}
+
+/* ---------- navigation ---------- */
+const STEPS = [s0, s1, s2, s3, s4, s5];
+function go(i) {
+  if (i < 0 || i >= STEPS.length) return;
+  const back = i < cur;
+  cur = i; token++;
+  island.hide();
+  [...view.children].forEach(o => {
+    o.style.pointerEvents = "none";
+    o.animate([{ transform: "none", opacity: 1 }, { transform: `translateX(${back ? 30 : -30}%) scale(.94)`, opacity: 0 }], { duration: reduce ? 1 : 420, easing: EASE, fill: "forwards" }).onfinish = () => o.remove();
+  });
+  const v = document.createElement("div");
+  v.style.cssText = "position:absolute;inset:0;";
+  view.appendChild(v);
+  E(v, [{ transform: `translateX(${back ? -40 : 40}%)`, opacity: 0 }, { transform: "none", opacity: 1 }], 520);
+  $("#screen").classList.remove("scrolled");
+  STEPS[i](v, token);
+  $$("#dots i").forEach((d, k) => d.classList.toggle("on", k === i));
+  $$("#capP i").forEach((d, k) => { d.classList.toggle("on", k === i); d.classList.toggle("done", k < i); });
+  $("#capN").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${String(STEPS.length).padStart(2, "0")}`;
+  setTitle($("#capT"), CAPS[i][0]);
+  $("#capS").textContent = CAPS[i][1];
+  E($("#capS"), [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], 500, { delay: 250 });
+}
+view.addEventListener("scroll", e => { if (e.target.classList?.contains("scr")) $("#screen").classList.toggle("scrolled", e.target.scrollTop > 24); }, true);
+$("#dots").innerHTML = STEPS.map((_, k) => `<i data-k="${k}"></i>`).join("");
+$("#capP").innerHTML = STEPS.map(() => "<i></i>").join("");
+$$("#dots i").forEach(d => d.addEventListener("click", () => go(+d.dataset.k)));
+
+/* autoplay for the backup video */
+let autoId = 0;
+async function autoplay() {
+  const id = ++autoId, ok = () => id === autoId, cv = () => view.lastElementChild;
+  go(0); await sleep(5600); if (!ok()) return;
+  go(1); await sleep(8200); if (!ok()) return;
+  go(2); await sleep(2800); if (!ok()) return;
+  cv()._scaleTo(D.series.length - 1); await sleep(2600); if (!ok()) return;
+  cv()._scaleTo(0); await sleep(2600); if (!ok()) return;
+  cv()._scaleTo(D.defaultIdx); await sleep(2200); if (!ok()) return;
+  cv()._hidden(true); await sleep(2800); if (!ok()) return;
+  cv()._story(); await sleep(3400); if (!ok()) return;
+  cv()._sheet?.close(); await sleep(900); if (!ok()) return;
+  cv()._hidden(false); await sleep(1600); if (!ok()) return;
+  go(3); await sleep(1600); if (!ok()) return;
+  await cv()._run(); await sleep(3800); if (!ok()) return;
+  go(4); await sleep(1000); if (!ok()) return;
+  await cv()._run(); await sleep(2600); if (!ok()) return;
+  go(5); await sleep(3000); if (!ok()) return;
+  await cv()._run();
+}
+
+addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key, v = view.lastElementChild;
+  if (k !== "a" && k !== "A") autoId++;
+  if (k === "ArrowRight" || k === " ") { e.preventDefault(); if (v?._sheet) v._sheet.close(); else go(cur + 1); }
+  else if (k === "ArrowLeft") go(cur - 1);
+  else if (/^[1-6]$/.test(k)) go(+k - 1);
+  else if (k === "a" || k === "A") autoplay();
+  else if (k === "c" || k === "C") showConflict();
+  else if ((k === "h" || k === "H") && v?._toggleHidden) v._toggleHidden();
+  else if (k === "," && v?._scaleBy) v._scaleBy(-1);
+  else if (k === "." && v?._scaleBy) v._scaleBy(1);
+  else if (k === "e" || k === "E") { document.body.classList.toggle("no-eng"); fit(); }
+  else if (k === "r" || k === "R") { $$("#egLog .eg-row").forEach(r => r.remove()); go(0); }
+});
+
+/* ---------- fit to window ---------- */
+function fit() {
+  const vw = innerWidth, vh = innerHeight, m = vw <= 520;
+  document.body.classList.toggle("m", m);
+  if (m) { S = 1; return; }
+  const eng = vw >= 1100 && !document.body.classList.contains("no-eng"), cap = vw >= 1340;
+  $("#engine").style.display = eng ? "" : "none";
+  $("#cap").style.display = cap ? "" : "none";
+  const w = 417 + (eng ? 44 + 336 : 0) + (cap ? 44 + 330 : 0), h = 876 + 40;
+  S = Math.min(1, (vh - 32) / h, (vw - 48) / w);
+  $("#rig").style.transform = `scale(${S})`;
+}
+addEventListener("resize", fit);
+fit();
+go(0);
+</script>
+</body>
+</html>

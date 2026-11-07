@@ -1,0 +1,12 @@
+# Apple Silicon: mip 1.15 ships only an x86 CBC. 1.16rc0 has arm64 CBC,
+# which needs libgfortran -> `brew install gcc`. Linux x86-64 works with either.
+mip==1.16rc0
+# FastAPI backend (event day)
+fastapi
+uvicorn
+httpx
+pydantic
+# OpenAI-compatible LLM parsing, parent .env loading, and API regression tests.
+openai
+python-dotenv
+pytest
