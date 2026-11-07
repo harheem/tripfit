@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E2A3A">
 <meta property="og:title" content="TripFit">
-<meta property="og:description" content="둘이 한 말로, 둘 다 OK인 일정">
+<meta name="description" content="여행 성향은 달라도 함께이고 싶은 두 사람을 위해, 둘 다 OK인 하루를 계산합니다">
+<meta property="og:description" content="여행 성향은 달라도 함께이고 싶은 두 사람을 위해, 둘 다 OK인 하루를 계산합니다">
 <meta property="og:image" content="og.png">
 <title>TripFit</title>
 <link rel="icon" href="favicon.svg">
@@ -947,19 +948,19 @@ function resetConcessions() {
 }
 function ledgerLine() {
   const counts = concessionCounts();
-  return `<button class="ledger-line" data-ledger>양보 장부 <span class="pill small-pill on-dark">샘플 포함</span>${P.map(p => `<span><i class="person-dot" style="--c:${p.color}"></i>${p.name} ${counts[p.name]}</span>`).join("")}${svg("arrow",14)}</button>`;
+  return `<button class="ledger-line" data-ledger>다음엔 먼저 <span class="pill small-pill on-dark">샘플 포함</span>${P.map(p => `<span><i class="person-dot" style="--c:${p.color}"></i>${p.name} ${counts[p.name]}</span>`).join("")}${svg("arrow",14)}</button>`;
 }
 function openLedger(v) {
   if (autoPlaying || v._sheet) return;
-  const sh = openSheet(v, `<div class="b pink sheet-head"><span class="grab"></span><div class="row between"><span class="cap-up">기억하는 합의</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>양보 장부</div><div class="info-line">${P.map(p => `${p.name} ${concessionCounts()[p.name]}회`).join(", ")}, 다음엔 ${nextPerson()} 차례</div></div><div class="b cream">${allHistory().map(r => `<div class="ledger-record"><b>${escapeHTML(r.date)}, ${escapeHTML(r.place)}, ${escapeHTML(r.person)}</b> <span class="pill small-pill">${r.sample ? "샘플" : "이번 세션"}</span><div>‘${escapeHTML(r.label)}’ 양보, ${escapeHTML(r.note || "")}</div></div>`).join("") || "아직 양보 기록이 없어요."}</div>`);
+  const sh = openSheet(v, `<div class="b pink sheet-head"><span class="grab"></span><div class="row between"><span class="cap-up">기억하는 합의</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="sheet-title" data-sheet-title>다음엔 먼저</div><div class="info-line">${P.map(p => `${p.name} ${concessionCounts()[p.name]}회`).join(", ")}, 하나 뺀 사람은 다음엔 먼저 골라요</div></div><div class="b cream">${allHistory().map(r => `<div class="ledger-record"><b>${escapeHTML(r.date)}, ${escapeHTML(r.place)}, ${escapeHTML(r.person)}</b> <span class="pill small-pill">${r.sample ? "샘플" : "이번 세션"}</span><div>‘${escapeHTML(r.label)}’ 이번엔 뺌, ${escapeHTML(r.note || "")}</div></div>`).join("") || "아직 이번에 뺀 기록이 없어요."}</div>`);
   $(".sheet-close", sh.el).onclick = sh.close;
 }
 function recommendedFor(W) {
   const counts = concessionCounts();
   const options = [...W.relaxations].sort((a,b) => b.preview.minSat - a.preview.minSat || (counts[a.owner] || 0) - (counts[b.owner] || 0) || (a.id === W.recommended?.id ? -1 : 1));
   const best = options[0], due = nextPerson(), last = allHistory().at(-1);
-  const pair = P.map(p => Math.round(best.preview.sat[p.name])).join(" : ");
-  const reasons = [`양보 후 ${pair}으로 더 고르게, 낮은 쪽 ${best.preview.minSat.toFixed(1)}%`, last ? `${due !== best.owner ? "참고: " : ""}${last.date === "이번" ? "앞서 성수에선" : `지난번 ${last.place}에선`} ${last.person}이 양보했어요. 이번엔 ${due} 차례` : "양보 장부에 첫 기록을 남겨요"];
+  const pair = P.map(p => Math.round(best.preview.sat[p.name])).join(" 대 ");
+  const reasons = [`빼면 ${pair}, 더 고르게, 낮은 쪽 ${best.preview.minSat.toFixed(1)}%`, last ? `${due !== best.owner ? "참고: " : ""}${last.date === "이번" ? "앞서 성수에선" : `지난번 ${last.place}에선`} ${last.person}이 하나 뺐어요. 이번엔 ${due} 차례예요` : "이번에 하나 빼면 다음엔 먼저 골라요"];
   return {id:best.id, options, reasons};
 }
 
@@ -1002,7 +1003,7 @@ const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
   ["결국 한 명이\n참는 여행", "“‘전시는 꼭 봐야 해’, ‘나 많이 못 걸어’. 같이 여행 가면 결국 한 명이 참죠.”"],
   ["한 문장이면\n조건이 된다", `“각자 한 문장이면 꼭 지킬 것과 되면 좋은 것으로 나눠요. ${won(D.sources.orderings)}가지 순서 중 둘 다 OK인 일정 ${D.series.length}개.”`],
   ["만족도는\n한 말의 체크리스트", `“만족도는 각자 한 말이 지켜진 비율이에요. 저울을 밀면 지민 ${Math.round(D.series[0].sat["지민"])}, 서연 ${Math.round(D.series[0].sat["서연"])}부터 지민 ${Math.round(D.series.at(-1).sat["지민"])}, 서연 ${Math.round(D.series.at(-1).sat["서연"])}까지. 가운데가 ${Math.round(D.series[D.defaultIdx].sat["지민"])} 대 ${Math.round(D.series[D.defaultIdx].sat["서연"])}.”`],
-  ["넣으면, 뭘\n빼야 하는지", "“숲체험을 넣으면? 지금 조건으론 안 된다고, 대신 누가 무엇을 양보하면 되는지 바로 계산해요.”"],
+  ["넣으면, 뭘\n빼야 하는지", "“숲체험을 넣으면? 지금 조건으론 안 된다고, 대신 누가 무엇을 이번만 빼면 되는지 바로 계산해요.”"],
   ["둘 다 OK면\n결제까지", "“둘 다 승인하면 분담 결제 요청까지.”"],
   ["붐비면 바꾸고\n약속은 지킨다", "“가서 붐비면, 예약한 숲체험은 지키고 나머지만 다시 짜요. 말에서 실행까지, TripFit입니다.”"],
 ];
@@ -1261,7 +1262,7 @@ function planTitle(p) {
   if (p.id === "h") return `미래유산 한 곳 더,\n둘 다 ${Math.floor(Math.min(p.sat[P[0].name], p.sat[P[1].name]))}% 넘게`;
   const j = Math.round(p.sat[P[0].name]), s = Math.round(p.sat[P[1].name]);
   if (Math.abs(j - s) <= 8) return `둘 다 ${Math.floor(Math.min(p.sat[P[0].name], p.sat[P[1].name]))}% 넘게\n만족하는 일정`;
-  return j > s ? `지민을 위해\n서연이 양보한 일정` : `서연을 위해\n지민이 양보한 일정`;
+  return j > s ? `서연이 이번만\n하나 뺀 일정` : `지민이 이번만\n하나 뺀 일정`;
 }
 async function s2(v, t) {
   status(hhmm(D.window.start));
@@ -1391,14 +1392,14 @@ async function s2(v, t) {
     busy = true;
     drag = false;
     track.classList.add("off");
-    island.show({ spin: true, title: "양보를 반영해 다시 계산 중", hold: 0 });
+    island.show({ spin: true, title: "이번에 뺀 걸로 다시 계산 중", hold: 0 });
     try {
       const result = await api("/api/plan", { muted: nextMuted, tag_min: {} });
       if (!result.series?.length) throw new Error("빈 일정");
       if (!alive(t)) return;
       // Commit together, so failed requests preserve the previous checklist.
       muted.splice(0, muted.length, ...nextMuted);
-      recordConcession(`pref:${person}:${label}`, conceding ? {person, label, note: "이 말은 양보할게"} : null);
+      recordConcession(`pref:${person}:${label}`, conceding ? {person, label, note: "이번엔 빼도 돼"} : null);
       D.series = result.series;
       D.defaultIdx = result.defaultIdx;
       n = D.series.length;
@@ -1409,7 +1410,7 @@ async function s2(v, t) {
       thumb.classList.add("snap");
       thumb.style.left = (n === 1 ? 50 : idx / (n - 1) * 100) + "%";
       paint(plan);
-      const message = `${person}의 '${label}' ${conceding ? "양보" : "양보 취소"} → 지민 ${plan.sat["지민"]}, 서연 ${plan.sat["서연"]}`;
+      const message = `${person}의 '${label}' ${conceding ? "이번엔 뺌" : "다시 넣음"} → 지민 ${plan.sat["지민"]}, 서연 ${plan.sat["서연"]}`;
       island.show({ title: message, right: `${result.solveMs}ms`, hold: 3500 });
       log("mip", message, result.solveMs);
     } catch (_) {
@@ -1443,7 +1444,7 @@ async function s2(v, t) {
 
 /* checklist rows: label, bar, % (bars and numbers animate in place) */
 function renderChecklist(box, total, items, sat, formula, person) {
-  if (box.children.length !== items.length || [...box.children].some((row,i)=>row.dataset.label !== items[i].label)) box.innerHTML = items.map(it => `<div class="ci" role="button" tabindex="0" data-label="${escapeHTML(it.label)}" aria-label="${escapeHTML(it.label)} 이 말은 양보할게"><span><span class="ci-label">${escapeHTML(it.label)}</span><small class="pill intensity"></small><small class="pill conceded" hidden>양보</small></span><i><b style="width:0"></b></i><em></em></div>`).join("");
+  if (box.children.length !== items.length || [...box.children].some((row,i)=>row.dataset.label !== items[i].label)) box.innerHTML = items.map(it => `<div class="ci" role="button" tabindex="0" data-label="${escapeHTML(it.label)}" aria-label="${escapeHTML(it.label)} 이번엔 빼도 돼"><span><span class="ci-label">${escapeHTML(it.label)}</span><small class="pill intensity"></small><small class="pill conceded" hidden>이번엔 뺌</small></span><i><b style="width:0"></b></i><em></em></div>`).join("");
   [...box.children].forEach((row, k) => {
     const it = items[k], f = it.fulfilled, conceded = !!it.muted || it.weight === 0;
     row.classList.toggle("muted", conceded);
@@ -1546,25 +1547,26 @@ async function s3(v, t) {
     } else await sleep(800);
     if (!alive(t)) return;
     if (W.infeasible) {
-      island.show({ title: "지금 조건으론 못 넣어요", sub: "누가 무엇을 양보하면 되는지 계산했어요", hold: 3200 });
-      setTitle($("#ttl", v), `${short(placeById[W.pick].name)}을 넣으려면\n조건을 양보해야 해요`);
+      island.show({ title: "지금 조건으론 못 넣어요", sub: "누가 무엇을 이번만 빼면 되는지 계산했어요", hold: 3200 });
+      setTitle($("#ttl", v), `이대로는 안 돼요.\n하나만 빼면 ${short(placeById[W.pick].name)}이 들어가요`);
       const tray = $("#tray", v);
       if (!W.relaxations?.length) {
         chosen={pick:null,plan:base};next.setLabel("체험 없이 합의하기");next.disabled=false;
         $("#note",v).textContent=W.reason || "조건을 유지하며 넣을 수 있는 체험이 없어요.";return;
       }
+      $("#note", v).textContent = "꼭 지킬 조건도, 말한 사람이 이번만 빼면 바뀔 수 있어요";
       const recommended = recommendedFor(W);
       recommendationId = recommended.id;
       tray.innerHTML = `${ledgerLine()}${recommended.options.map(r => {
         const person = P.find(p => p.name === r.owner), best = r.id === recommended.id, preview = r.preview;
-        return `<button class="b ${person?.name === "서연" ? "sky" : "pink"} relax ${best ? "recommended" : ""}" data-id="${escapeHTML(r.id)}"><div class="relax-title"><span>${escapeHTML(r.label)}</span>${best ? '<span class="pill recommended-pill">추천</span>' : svg("arrow",18)}</div>${best ? `<div class="reasons">${recommended.reasons.map(reason => `<span>${escapeHTML(reason)}</span>`).join("")}</div>` : ""}<div class="preview">${P.map(p => `${p.name} <b>${Math.round(preview.sat[p.name])}</b>`).join(", ")}<br>빠지는 곳 ${preview.dropped.length}곳, 도보 ${km(preview.walkM)}km</div></button>`;
+        return `<button class="b ${person?.name === "서연" ? "sky" : "pink"} relax ${best ? "recommended" : ""}" data-id="${escapeHTML(r.id)}"><div class="relax-title"><span>${escapeHTML(r.label)}</span>${best ? '<span class="pill recommended-pill">이걸로 할게</span>' : svg("arrow",18)}</div>${best ? `<div class="reasons">${recommended.reasons.map(reason => `<span>${escapeHTML(reason)}</span>`).join("")}</div>` : ""}<div class="preview">${P.map(p => `${p.name} <b>${Math.round(preview.sat[p.name])}</b>`).join(", ")}<br>빠지는 곳 ${preview.dropped.length}곳, 도보 ${km(preview.walkM)}km</div></button>`;
       }).join("")}`;
       const activity = placeById[W.pick];
       tray.insertAdjacentHTML("beforeend", `<button class="b lilac activity-detail" style="width:100%;text-align:left"><span class="cap-up">넣고 싶은 체험, 장소 정보</span><div class="sheet-title">${escapeHTML(short(activity.name))}</div><span class="pill">${hhmm(activity.fixedStart)}, ${activity.duration}분 ${svg("arrow",14)}</span></button>`);
       $(".activity-detail", tray).onclick = () => openPOI(v, W.pick);
       $("[data-ledger]", tray).onclick = () => openLedger(v);
       const counts = concessionCounts();
-      log("mip", `MIP 양보안 ${W.relaxations.length}개 사전 계산, 추천 ${recommended.id} (min ${recommended.options.map(r => r.preview.minSat.toFixed(1)).join(" vs ")}), 장부 지민 ${counts["지민"]}/서연 ${counts["서연"]}`);
+      log("mip", `MIP 이번에 뺄 조건 ${W.relaxations.length}개 사전 계산, 추천 ${recommended.id} (min ${recommended.options.map(r => r.preview.minSat.toFixed(1)).join(" vs ")}), 다음엔 먼저 지민 ${counts["지민"]}, 서연 ${counts["서연"]}`);
       $$(".relax", tray).forEach((b, i) => rise(b, 100 + i * 100));
       let selecting = false;
       chooseRelaxation = async id => {
@@ -1575,17 +1577,17 @@ async function s3(v, t) {
         const option = saved.relaxations.find(r => r.id === id);
         const replay = saved.chosen?.relaxationId === id ? saved.chosen : option;
         let selected = { ...W, ...replay, relaxationId: id, infeasible: false };
-        island.show({ spin: true, tone: "var(--violet)", title: "양보한 조건으로 다시 계산 중", sub: W.relaxations.find(r => r.id === id).label, hold: 0 });
+        island.show({ spin: true, tone: "var(--violet)", title: "하나 뺀 뒤 다시 계산 중", sub: W.relaxations.find(r => r.id === id).label, hold: 0 });
         if (LIVE) {
           try {
             const result = await api("/api/what-if", { pick: W.pick, relax: id });
             if (!result.plan?.stops?.length) throw new Error("빈 일정");
             selected = { ...selected, ...result };
-          } catch (_) { log("mip", "양보 후 호출 실패, demo 데이터로 재생"); }
+          } catch (_) { log("mip", "하나 뺀 뒤 호출 실패, demo 데이터로 재생"); }
         } else await sleep(700);
         if (!alive(t)) return;
         const label = option.changes.map(c => c.kind === "category_min" ? `${({exhibit:"전시",cafe:"카페"})[c.key] || c.key} ${c.from}곳` : option.label).join(" + ");
-        if (option.owner) recordConcession("whatif", { person:option.owner, label, note:"체험을 넣기 위해 양보" });
+        if (option.owner) recordConcession("whatif", { person:option.owner, label, note:"체험을 넣으려고 이번만 뺌" });
         selected.concession = {person:option.owner, label};
         showResult(selected);
       };
@@ -1598,7 +1600,7 @@ async function s3(v, t) {
   function showResult(W) {
     const at = hhmm(placeById[W.pick].fixedStart);
     chosen = W;
-    log("mip", `what_if_add(체험 ${at})${W.relaxationId ? ", 양보: " + W.relaxationId : ", 다른 제약 유지"}`, W.plan.solveMs ?? undefined);
+    log("mip", `what_if_add(체험 ${at})${W.relaxationId ? ", 이번엔 뺌: " + W.relaxationId : ", 다른 제약 유지"}`, W.plan.solveMs ?? undefined);
     tl.render(W.plan, { glowNew: true, inDelay: 500 });
     setTimeout(() => $(`.ti[data-id="${W.pick}"]`, v)?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 1300);
     const d = planDiff(base, W.plan);
@@ -1644,7 +1646,7 @@ function renderPaymentResult(v,booked){
     const tag=$('[data-payment-status]',v);if(tag)tag.innerHTML='<span class="pill" style="background:var(--lime);color:var(--navy)">결제 완료</span>';
     const product=booked.mrt || placeById[booked.id].mrt;
     const url=new URL(product.url,location.href);
-    payEl.innerHTML=`<div class="row between"><b>결제 완료</b><span class="pill" style="background:var(--lime)">모의 결제</span></div><p class="info-line">${escapeHTML(result.item.short_name)}, ${escapeHTML(result.item.start)} <span class="pill">결제 완료</span></p>${result.lines.map(l=>`<div class="rc"><span>${escapeHTML(l.person)} ${won(l.amount)}원</span><small>승인번호 ${escapeHTML(l.approval_no)}</small></div>`).join('')}<div class="rc t"><span>합계</span><span class="gr">${won(result.total)}원</span></div><p class="info-line">기록 <code>${escapeHTML(result.hash8)}</code></p><a class="pill" href="${escapeHTML(url.protocol==='https:'?url.href:'#')}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 예약 확정</a><p class="info-line">실제 예약은 상품 페이지에서 마무리해요.</p>`;
+    payEl.innerHTML=`<div class="row between"><b>결제 완료</b><span class="pill" style="background:var(--lime)">모의 결제</span></div><p class="info-line">${escapeHTML(result.item.short_name)}, ${escapeHTML(result.item.start)} <span class="pill">결제 완료</span></p>${result.lines.map(l=>`<div class="rc"><span>${escapeHTML(l.person)} ${won(l.amount)}원</span><small>승인번호 ${escapeHTML(l.approval_no)}</small></div>`).join('')}<div class="rc t"><span>합계</span><span class="gr">${won(result.total)}원</span></div><p class="info-line">기록 <code>${escapeHTML(result.hash8)}</code></p><a class="pill" style="color:inherit;text-decoration:none;background:var(--cream)" href="${escapeHTML(url.protocol==='https:'?url.href:'#')}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 예약 확정 ${svg("arrow",13,2.4)}</a><p class="info-line">실제 예약은 상품 페이지에서 마무리해요.</p>`;
     $("#split",v).style.visibility='';
     $("#split",v).innerHTML=result.lines.map((l,i)=>`<div class="b ${i?'sky':'pink'}"><div class="lab">${escapeHTML(l.person)} 결제 완료</div><div class="gr">${won(l.amount)}<em>원</em></div></div>`).join('');
     button.disabled=true;button.querySelector('span').textContent='같이 결제 완료';
@@ -1744,7 +1746,7 @@ async function s4(v, t) {
     <div class="b peach"><div class="lab">${booked ? "같이 결제, 실제 결제 없는 모의 체험" : "이 합의 일정에는 결제할 체험이 없어요, 결제 항목 0개"}</div><button class="btn navy pay-open" id="openPay" disabled><span>예약하고 결제하기</span><span class="go">${svg("card",22)}</span></button></div>
   </div>`;
   const concession = W.concession || (W.relaxationId ? sessionHistory.find(r => r.id === "whatif") : null);
-  if (concession) $("#vb", v).insertAdjacentHTML("beforeend", `<div class="concession-next">이번 양보: ${escapeHTML(concession.person)} ‘${escapeHTML(concession.label)}’ → 다음엔 ${nextPerson()} 차례</div>`);
+  if (concession) $("#vb", v).insertAdjacentHTML("beforeend", `<div class="concession-next">이번엔 뺐어요: ${escapeHTML(concession.person)}의 '${escapeHTML(concession.label)}'. 다음엔 ${escapeHTML(concession.person)}이 먼저 골라요</div>`);
   $$("[data-poi]", v).forEach(b => b.onclick = () => openPOI(v, b.dataset.poi, plan.stops.find(s => s.id === b.dataset.poi)));
   setTitle($("#ttl", v), "이 일정으로\n둘 다 괜찮아?", 120);
   ["#top", "#vb"].forEach((s, i) => rise($(s, v), 60 + i * 90));
@@ -1773,8 +1775,8 @@ async function s4(v, t) {
     const ck = $("#ck", v), L = ck.getTotalLength();
     ck.style.strokeDasharray = L;
     E(ck, [{ strokeDashoffset: L }, { strokeDashoffset: 0 }], 420, { delay: 260 });
-    setTitle($("#ttl", v), "둘 다 OK.\n합의 완료");
-    island.show({ title: "합의 완료", sub: `${P[0].name} ✓  ${P[1].name} ✓`, hold: 2000 });
+    setTitle($("#ttl", v), concession?.person ? `${concession.person} 덕분에\n둘 다 OK` : "둘 다 OK.\n합의 완료");
+    island.show({ title: "합의 완료", sub: `${P[0].name} OK, ${P[1].name} OK`, hold: 2000 });
     const payEl = $("#pay", v);
     payEl.style.opacity = "";
     A(payEl, [{ opacity: .35 }, { opacity: 1 }], "pop");
@@ -1912,10 +1914,10 @@ function showConflict(explanation = null) {
       <div class="row between"><span class="cap-up">이대로는 안 돼요</span><span class="ico" style="background:var(--cream);color:var(--red);width:38px;height:38px">${svg("warn", 18, 2.2)}</span></div>
       <div style="font:600 24px/1.25 var(--kr);letter-spacing:-.045em;margin-top:8px">도보 ${km(C.limitM)}km로는<br>일정이 안 나와요</div></div>
     <div class="b cream tab">
-      <div class="lab">이것 하나만 양보하면 돼요</div>
+      <div class="lab">이것 하나만 이번에 빼면 돼요</div>
       <div class="cf-big gr"><span class="from">${km(C.limitM)}</span><span class="arr">→</span><span>${to.toFixed(1)}</span><em>km</em></div>
       <div class="cf-bar"><i id="cfI" style="width:${C.limitM / 1000 / 3.5 * 100}%"></i><b style="left:${C.limitM / 1000 / 3.5 * 100}%"></b></div>
-      <div class="lab" style="margin-top:8px">${C.relaxations[0] || "제약 완화"}, diagnose()가 찾은 최소 양보</div></div>
+      <div class="lab" style="margin-top:8px">${C.relaxations[0] || "제약 완화"}, 이번에 빼면 되는 가장 작은 조건</div></div>
     <div class="b lime" style="padding:6px"><button class="btn navy" id="cfOk"><span>이렇게 바꾸기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button></div>`);
   v._sheet = sh;
   log("mip", `infeasible → diagnose: 1개씩, 안 되면 2개 조합 완화`, C.ms);

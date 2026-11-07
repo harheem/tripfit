@@ -55,7 +55,7 @@ def main():
     tight = replace(REQUEST, max_walk_m=1500, must_include=["exh_dmuseum", pick])
     out = solver.solve_or_explain(tight)
     if isinstance(out, Infeasible):
-        print("실행 불가. 다음 중 하나를 양보하면 가능:")
+        print("이대로는 안 돼요. 다음 중 하나만 이번에 빼면 가능해요:")
         for r in out.relaxations:
             print("  -", r)
     else:

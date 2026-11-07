@@ -126,6 +126,7 @@ def test_real_forest_concession_and_locked_replan():
         assert {r["id"] for r in whatif["relaxations"]} == {"category_min:cafe", "category_min:exhibit"}
         assert not any(c["kind"] == "must_include" for r in whatif["relaxations"] for c in r["changes"])
         assert whatif["chosen"]["relaxationId"] == "category_min:cafe"
+        assert whatif["chosen"]["plan"]["label"] == "하나 뺀 뒤"
         assert data["pay"]["price"] == 35000 and data["pay"]["people"] == 2
         by_id = {p.id: p for p in PLACES}
         for option in whatif["relaxations"]:

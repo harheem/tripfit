@@ -55,6 +55,11 @@ def test_demo_poi_facts_fills_and_maxmin_preview(client):
     assert sorted(o["preview"]["minSat"] for o in response["relaxations"]) == [20.6, 58.8]
     assert_recommendation(response)
     assert response["recommended"]["id"] == "category_min:cafe"
+    assert response["recommended"]["reasons"] == [
+        "빼면 59 대 60, 더 고르게, 둘 중 낮은 만족도 58.8%",
+        "지난번 익선동에선 지민이 하나 뺐어요. 이번엔 서연 차례예요",
+    ]
+    assert next(o for o in response["relaxations"] if o["id"] == "category_min:cafe")["label"] == "서연의 '카페 1곳'을 빼면"
 
 
 def test_session_whatif_previews_and_fills_are_grounded(client):

@@ -189,7 +189,7 @@ def infeasible_json(result, request, places, messages=MESSAGES):
         rid = "+".join(c["kind"] + (":" + c["key"] if "key" in c else "") for c in changes)
         owner = next(iter(owners)) if len(owners) == 1 else None
         text = " + ".join(p[2] for p in parts)
-        relaxations.append({"id": rid, "label": f"{owner}의 '{text}'을 양보" if owner else f"{text} 양보",
+        relaxations.append({"id": rid, "label": f"{owner}의 '{text}'을 빼면" if owner else f"{text}을 빼면",
                             "owner": owner, "kind": parts[0][0], "changes": changes})
     return {"infeasible": True, "relaxations": relaxations, "reason": result.reason}
 
@@ -246,7 +246,7 @@ def build_whatif(solver, request, pick, base, messages=MESSAGES):
             continue
         relaxed = apply_relaxation(required, option)
         started = time.perf_counter()
-        plan = solver.solve(relaxed, label="양보 후")
+        plan = solver.solve(relaxed, label="하나 뺀 뒤")
         if plan is None:
             continue
         saved = plan_json(plan, "w", round((time.perf_counter() - started) * 1000))

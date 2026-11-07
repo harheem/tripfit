@@ -955,7 +955,7 @@ window.DEMO = {
     "지민": 100.0,
     "서연": 74.8
    },
-   "solveMs": 528,
+   "solveMs": 534,
    "checklist": {
     "지민": [
      {
@@ -1143,7 +1143,7 @@ window.DEMO = {
     "지민": 79.4,
     "서연": 83.1
    },
-   "solveMs": 528,
+   "solveMs": 534,
    "checklist": {
     "지민": [
      {
@@ -1298,7 +1298,7 @@ window.DEMO = {
     "지민": 58.8,
     "서연": 88.7
    },
-   "solveMs": 528,
+   "solveMs": 534,
    "checklist": {
     "지민": [
      {
@@ -1671,7 +1671,7 @@ window.DEMO = {
   "relaxations": [
    {
     "id": "category_min:exhibit",
-    "label": "지민의 '전시 1곳'을 양보",
+    "label": "지민의 '전시 1곳'을 빼면",
     "owner": "지민",
     "kind": "category_min",
     "changes": [
@@ -1684,7 +1684,7 @@ window.DEMO = {
     ],
     "plan": {
      "id": "w",
-     "label": "양보 후",
+     "label": "하나 뺀 뒤",
      "stops": [
       {
        "id": "alley_shoe",
@@ -1821,7 +1821,7 @@ window.DEMO = {
       "지민": 20.6,
       "서연": 78.7
      },
-     "solveMs": 447,
+     "solveMs": 399,
      "checklist": {
       "지민": [
        {
@@ -2030,7 +2030,7 @@ window.DEMO = {
        "지민": 20.6,
        "서연": 75.8
       },
-      "solveMs": 80,
+      "solveMs": 84,
       "checklist": {
        "지민": [
         {
@@ -2092,7 +2092,7 @@ window.DEMO = {
    },
    {
     "id": "category_min:cafe",
-    "label": "서연의 '카페 1곳'을 양보",
+    "label": "서연의 '카페 1곳'을 빼면",
     "owner": "서연",
     "kind": "category_min",
     "changes": [
@@ -2105,7 +2105,7 @@ window.DEMO = {
     ],
     "plan": {
      "id": "w",
-     "label": "양보 후",
+     "label": "하나 뺀 뒤",
      "stops": [
       {
        "id": "exh_dmuseum",
@@ -2235,7 +2235,7 @@ window.DEMO = {
       "지민": 58.8,
       "서연": 59.7
      },
-     "solveMs": 76,
+     "solveMs": 77,
      "checklist": {
       "지민": [
        {
@@ -2437,7 +2437,7 @@ window.DEMO = {
        "지민": 58.8,
        "서연": 54.5
       },
-      "solveMs": 51,
+      "solveMs": 54,
       "checklist": {
        "지민": [
         {
@@ -2503,7 +2503,7 @@ window.DEMO = {
    "relaxationId": "category_min:cafe",
    "plan": {
     "id": "w",
-    "label": "양보 후",
+    "label": "하나 뺀 뒤",
     "stops": [
      {
       "id": "exh_dmuseum",
@@ -2633,7 +2633,7 @@ window.DEMO = {
      "지민": 58.8,
      "서연": 59.7
     },
-    "solveMs": 76,
+    "solveMs": 77,
     "checklist": {
      "지민": [
       {
@@ -2835,7 +2835,7 @@ window.DEMO = {
       "지민": 58.8,
       "서연": 54.5
      },
-     "solveMs": 51,
+     "solveMs": 54,
      "checklist": {
       "지민": [
        {
@@ -2884,8 +2884,8 @@ window.DEMO = {
   "recommended": {
    "id": "category_min:cafe",
    "reasons": [
-    "양보 후 59 : 60으로 더 고르게, 둘 중 낮은 만족도 58.8%",
-    "지난번 익선동에선 지민이 양보했어요. 이번엔 서연 차례"
+    "빼면 59 대 60, 더 고르게, 둘 중 낮은 만족도 58.8%",
+    "지난번 익선동에선 지민이 하나 뺐어요. 이번엔 서연 차례예요"
    ]
   },
   "choices": [
@@ -2896,7 +2896,7 @@ window.DEMO = {
     "relaxations": [
      {
       "id": "category_min:exhibit",
-      "label": "지민의 '전시 1곳'을 양보",
+      "label": "지민의 '전시 1곳'을 빼면",
       "owner": "지민",
       "kind": "category_min",
       "changes": [
@@ -2909,7 +2909,7 @@ window.DEMO = {
       ],
       "plan": {
        "id": "w",
-       "label": "양보 후",
+       "label": "하나 뺀 뒤",
        "stops": [
         {
          "id": "alley_shoe",
@@ -3046,7 +3046,7 @@ window.DEMO = {
         "지민": 20.6,
         "서연": 78.7
        },
-       "solveMs": 447,
+       "solveMs": 399,
        "checklist": {
         "지민": [
          {
@@ -3255,7 +3255,7 @@ window.DEMO = {
          "지민": 20.6,
          "서연": 75.8
         },
-        "solveMs": 80,
+        "solveMs": 84,
         "checklist": {
          "지민": [
           {
@@ -3317,7 +3317,7 @@ window.DEMO = {
      },
      {
       "id": "category_min:cafe",
-      "label": "서연의 '카페 1곳'을 양보",
+      "label": "서연의 '카페 1곳'을 빼면",
       "owner": "서연",
       "kind": "category_min",
       "changes": [
@@ -3330,7 +3330,7 @@ window.DEMO = {
       ],
       "plan": {
        "id": "w",
-       "label": "양보 후",
+       "label": "하나 뺀 뒤",
        "stops": [
         {
          "id": "exh_dmuseum",
@@ -3460,7 +3460,7 @@ window.DEMO = {
         "지민": 58.8,
         "서연": 59.7
        },
-       "solveMs": 76,
+       "solveMs": 77,
        "checklist": {
         "지민": [
          {
@@ -3662,7 +3662,7 @@ window.DEMO = {
          "지민": 58.8,
          "서연": 54.5
         },
-        "solveMs": 51,
+        "solveMs": 54,
         "checklist": {
          "지민": [
           {
@@ -3728,7 +3728,7 @@ window.DEMO = {
      "relaxationId": "category_min:cafe",
      "plan": {
       "id": "w",
-      "label": "양보 후",
+      "label": "하나 뺀 뒤",
       "stops": [
        {
         "id": "exh_dmuseum",
@@ -3858,7 +3858,7 @@ window.DEMO = {
        "지민": 58.8,
        "서연": 59.7
       },
-      "solveMs": 76,
+      "solveMs": 77,
       "checklist": {
        "지민": [
         {
@@ -4060,7 +4060,7 @@ window.DEMO = {
         "지민": 58.8,
         "서연": 54.5
        },
-       "solveMs": 51,
+       "solveMs": 54,
        "checklist": {
         "지민": [
          {
@@ -4109,8 +4109,8 @@ window.DEMO = {
     "recommended": {
      "id": "category_min:cafe",
      "reasons": [
-      "양보 후 59 : 60으로 더 고르게, 둘 중 낮은 만족도 58.8%",
-      "지난번 익선동에선 지민이 양보했어요. 이번엔 서연 차례"
+      "빼면 59 대 60, 더 고르게, 둘 중 낮은 만족도 58.8%",
+      "지난번 익선동에선 지민이 하나 뺐어요. 이번엔 서연 차례예요"
      ]
     }
    }
@@ -4255,7 +4255,7 @@ window.DEMO = {
     "지민": 58.8,
     "서연": 54.5
    },
-   "solveMs": 51,
+   "solveMs": 54,
    "checklist": {
     "지민": [
      {
@@ -4466,7 +4466,7 @@ window.DEMO = {
     "지민": 89.7,
     "서연": 84.4
    },
-   "solveMs": 77,
+   "solveMs": 79,
    "checklist": {
     "지민": [
      {
@@ -4537,7 +4537,7 @@ window.DEMO = {
   "relaxations": [
    "도보 한도 1.5km → 2.4km로 늘리기"
   ],
-  "ms": 105
+  "ms": 102
  },
  "pay": {
   "item": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",

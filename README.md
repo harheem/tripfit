@@ -1,12 +1,12 @@
 # TripFit
 
-두 사람이 각자 한 문장씩 말하면, 둘 다 납득하는 반나절 일정을 수학으로 짜 주는 여행 합의 앱
+여행 성향은 달라도 함께이고 싶은 두 사람을 위해, 둘 다 OK인 하루를 계산합니다
 
 ## 화면으로 보기
 
-| 대화 | 합의 저울 | 불가능 → 양보 |
+| 대화 | 합의 저울 | 불가능 → 이번만 빼기 |
 |---|---|---|
-| ![각자 한 문장](docs/screens/01-chat.png) | ![사람별 만족도와 일정](docs/screens/02-plans.png) | ![숲체험 양보안](docs/screens/03-concession.png) |
+| ![각자 한 문장](docs/screens/01-chat.png) | ![사람별 만족도와 일정](docs/screens/02-plans.png) | ![숲체험 이번에 뺄 조건](docs/screens/03-concession.png) |
 
 | 합의와 분담 | 예약을 지키는 재계산 |
 |---|---|
@@ -21,13 +21,15 @@
 | Vooy MCP 서버 | `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` | vooy에 사용자 지정 MCP로 등록 |
 | 우리 대화로 바꿔 보기(두 사람 문장 → 일정) | 로컬 서버 `http://localhost:8000/` | OpenAI 실호출 + CBC 실계산. 아래 실행법 |
 
+이번만 빼는 거예요. 이번에 뺀 사람은 다음엔 먼저 골라요.
+
 ## 30초 요약
 
 동행 여행에서 “아무거나”라고 말해도 취향은 다릅니다. 단톡방에서 눈치를 보다 한 사람이 참습니다.
 TripFit은 각자의 말을 체크리스트로 바꾸고, MIP가 시간과 도보 조건을 지키는 파레토 일정을 계산합니다. 서로의 만족도를 숫자로 보고 고릅니다.
 
-1. **“이 말은 양보할게”**: 체크리스트를 한 번 누르면 가중치가 바뀌고 저울을 다시 계산합니다(라이브).
-2. **실상품 넣어보기**: “지금은 안 되고, 누가 무엇을 양보하면 된다”를 계산합니다.
+1. **“이번엔 빼도 돼”**: 체크리스트를 한 번 누르면 가중치가 바뀌고 저울을 다시 계산합니다(라이브).
+2. **실상품 넣어보기**: “지금은 안 되고, 누가 무엇을 이번만 빼면 된다”를 계산합니다.
 3. **여행 중 재계산**: 붐비는 곳을 빼도 예약한 체험 시각은 지킵니다.
 
 다음 값은 [demo_data.js](web/demo_data.js)의 `series`, `whatif.chosen`, `replan`에서 추출했습니다. 거리는 화면처럼 소수 첫째 자리로 표시했습니다.
@@ -35,20 +37,20 @@ TripFit은 각자의 말을 체크리스트로 바꾸고, MIP가 시간과 도�
 | 장면 | 일정, 판정 | 만족도 지민 / 서연 | 도보 |
 |---|---|---:|---:|
 | 균형안 | 소품샵 골목 → 어니언 → 연무장길 → 대림창고 전시 | 79.4% / 83.1% | 2.2km |
-| 숲체험 15:00 넣기 | 기존 조건으로 불가능 → 양보안 2개: 서연 카페 1곳 / 지민 전시 1곳 | 해당 없음 | 해당 없음 |
-| 서연 카페 양보(기본) | 13:20 디뮤지엄 → 15:00 서울숲 숲체험 → 17:04 언더스탠드에비뉴, 기존 4곳 빠짐 | 58.8% / 59.7% | 2.6km |
+| 숲체험 15:00 넣기 | 기존 조건으로 불가능 → 이번에 뺄 조건 2개: 서연 카페 1곳 / 지민 전시 1곳 | 해당 없음 | 해당 없음 |
+| 서연 카페 이번만 빼기(기본) | 13:20 디뮤지엄 → 15:00 서울숲 숲체험 → 17:04 언더스탠드에비뉴, 기존 4곳 빠짐 | 58.8% / 59.7% | 2.6km |
 | 재계산 | 디뮤지엄 혼잡 → 대림창고 전시, 숲체험 15:00 유지 | 58.8% / 54.5% | 2.9km |
 
 ## 심사 항목별 근거
 
 | 심사 항목 | 근거 | 확인 방법(파일 경로 또는 명령) |
 |---|---|---|
-| 기술적 완성도 | 솔버 8개 통과, 서버 62개 통과, 1개 skip. CBC 계산 시간 실측(실행마다 조금 다름): 파레토 대안 전체 0.4~0.7초, 양보 후 재계산, 여행 중 재계산 약 60~100ms | `solver/test_solver.py`, `server/test_api.py`, `server/test_mrt.py`, `server/test_try.py`; 아래 테스트 명령. `web/demo_data.js`의 `solveMs` |
+| 기술적 완성도 | 솔버 8개 통과, 서버 62개 통과, 1개 skip. CBC 계산 시간 실측(실행마다 조금 다름): 파레토 대안 전체 0.4~0.7초, 하나 뺀 뒤 재계산, 여행 중 재계산 약 60~100ms | `solver/test_solver.py`, `server/test_api.py`, `server/test_mrt.py`, `server/test_try.py`; 아래 테스트 명령. `web/demo_data.js`의 `solveMs` |
 | 상업적 가능성 | 동행 여행의 "어디 갈지 합의" 단계에서 실제 판매 상품(마이리얼트립 체험, 1인 35,000원)을 일정 안에 넣을 수 있는지까지 계산하고 상품으로 연결. 수익 모델은 일정에 들어간 체험, 입장권의 예약 중개 수수료와 분담 결제(SKT 절). 매출, 전환율은 아직 측정 전 | `web/demo_data.js`의 `mrt.picked`, `pay`; `solver/demo_builder.py` |
-| 팀 실행력 | CBC 엔진 → API → 화면 연결, 실상품 스냅숏과 불가능 판정, 양보 선택까지 구현하고 작업 결과 기록 | `server/app.py`, `web/index.html`, `codex/03_mrt_live.result.md`, `codex/04_whatif_concession.result.md` |
+| 팀 실행력 | CBC 엔진 → API → 화면 연결, 실상품 스냅숏과 불가능 판정, 이번에 뺄 조건 선택까지 구현하고 작업 결과 기록 | `server/app.py`, `web/index.html`, `codex/03_mrt_live.result.md`, `codex/04_whatif_concession.result.md` |
 | 스폰서 리소스 활용 | 마이리얼트립 MCP 실상품과 시각 조회와 결제 직전 실시간 재조회, OpenAI 문장 파싱, SKT Agentic Pay 위임, 분담 결제(`agentic-pay/`), vooy 원격 MCP 서버(`vooy-mcp/`, 공개 배포) | `server/parsing.py`, `scripts/fetch_mrt_snapshot.py`, `data/mrt_snapshot.json` |
 | API 활용도 | OpenAI JSON 응답 검증, 폴백, MRT `tools/list`, `searchTnas`, `getTnaDetail`, `getTnaOptions`, 갱신 실패 시 캐시 보존 | `server/parsing.py`, `solver/mrt_live.py`, `server/app.py`; `GET /api/mrt` |
-| 창의성, 시도 | 한 말의 충족률을 저울로 비교하고, 체험이 불가능하면 사람별 양보안을 계산. 카페 양보 후 기존 4곳 빠짐 | `solver/tripfit_solver.py`, `solver/demo_builder.py`; 화면 2, 3단계 |
+| 창의성, 시도 | 한 말의 충족률을 저울로 비교하고, 체험이 불가능하면 사람별 이번에 뺄 조건을 계산. 카페를 이번만 뺀 뒤 기존 4곳 빠짐 | `solver/tripfit_solver.py`, `solver/demo_builder.py`; 화면 2, 3단계 |
 | 빌더 임팩트 | API 키 없이 전체 흐름 재생, 키 없이도 CBC 재계산 가능. 공개한 개인 알고리즘을 합의 앱으로 확장 | `web/index.html`, `web/demo_data.js`, `README_RUN.md`; `A` 자동재생 |
 
 계산 시간은 저장된 실행의 기록입니다. API 전체 응답 시간이나 성능 보장이 아닙니다.
@@ -81,7 +83,7 @@ python3 -m venv .venv
 [로컬 데모](http://localhost:8000/), [API 명세](http://localhost:8000/docs).
 Apple Silicon에서 CBC 로딩 오류가 나면 `brew install gcc` 후 다시 실행합니다.
 첫 화면에서 `/api/demo`에 연결되면 `LIVE 실시간 계산`, 실패하면 재생입니다.
-라이브에서는 체크리스트 양보, 체험 추가, 여행 중 재계산을 CBC가 실제로 풉니다. 재생 모드의 체크리스트 양보 토글은 서버 연결 안내만 표시합니다.
+라이브에서는 체크리스트 이번만 빼기, 체험 추가, 여행 중 재계산을 CBC가 실제로 풉니다. 재생 모드의 체크리스트 "이번엔 빼도 돼" 토글은 서버 연결 안내만 표시합니다.
 
 **키가 있으면:** `OPENAI_API_KEY`와 `OPENAI_MODEL=gpt-6.1-sol`을 환경 변수로 설정하면 `/api/parse`가 OpenAI를 호출합니다. 키, 모델이 없거나 실패하면 규칙 파서를 사용합니다. `/api/parse`에 정확한 데모 문장을 보낸 경우에만 고정 데모 JSON을 반환합니다.
 `/api/parse`는 A.X K2 → OpenAI 순서도 지원합니다. `/api/try`는 OpenAI → 규칙 파서 순서입니다. 실호출 모델명과 소요 시간은 응답, 엔진 로그로 확인합니다.
@@ -103,7 +105,7 @@ RUN_NETWORK_TESTS=1 .venv/bin/python -m pytest server/test_mrt.py -k live_mcp -q
   → LLM(OpenAI gpt-6.1-sol, JSON): 항목, 강도, 근거 인용 추출
   → 서버 규칙, 스키마 검증 → Constraint JSON
   → Python-MIP(CBC): 시간창 오리엔티어링
-  → 파레토 대안 / what-if 불가능 진단, 양보안 / 예약 고정 재계산
+  → 파레토 대안 / what-if 불가능 진단, 이번에 뺄 조건 / 예약 고정 재계산
   → FastAPI → 합의 저울, 체크리스트, 일정 화면
                  └ 연결 실패: demo_data.js 재생
 ```
@@ -144,7 +146,7 @@ LLM 호출 동시성은 2개, CBC 호출은 기존 잠금으로 직렬화합니�
 장소 점수는 사람의 체크리스트와 별개로 목적함수에 더합니다. 만족도는 실제 행복을 측정한 수치가 아니라 공개된 규칙의 충족률입니다.
 
 체크리스트 토글은 해당 항목의 가중치를 0으로 바꾸며 필수 조건을 유지합니다.
-체험 시트의 양보안 버튼은 사용자가 고른 **필수 조건을 해제**합니다. 카페 양보 후에도 “카페에서 쉬기” 충족률 0은 만족도에 남습니다.
+체험 시트의 이번에 뺄 조건 버튼은 사용자가 고른 **필수 조건을 해제**합니다. 카페를 이번만 뺀 뒤에도 “카페에서 쉬기” 충족률 0은 만족도에 남습니다.
 상세 수식, 기준값은 [PRD §6.3](PRD.md#63-점수-로직-사람-만족도--장소-점수).
 
 ## 실호출 / 샘플
@@ -192,7 +194,7 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 
 ## Vooy 트랙: 메신저에서 부르는 TripFit MCP 서버 (`vooy-mcp/`)
 
-단톡방에서 각자 한 줄씩 말하면, vooy가 그 말을 조건으로 바꿔 이 서버를 부르고, TripFit의 같은 합의 엔진(Python-MIP)이 다들 OK인 코스와 누가 얼마나 양보하는지를 돌려줍니다. 결과는 대화 속 카드(MCP Apps 위젯)로 뜹니다. 메인 앱이 두 사람이라면 여기서는 3명 이상도 됩니다.
+단톡방에서 각자 한 줄씩 말하면, vooy가 그 말을 조건으로 바꿔 이 서버를 부르고, TripFit의 같은 합의 엔진(Python-MIP)이 다들 OK인 코스와 누가 무엇을 이번만 빼는지를 돌려줍니다. 결과는 대화 속 카드(MCP Apps 위젯)로 뜹니다. 메인 앱이 두 사람이라면 여기서는 3명 이상도 됩니다.
 
 - **원격 MCP 엔드포인트(Streamable HTTP, 인증 없음):** `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp`, [헬스체크](https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/healthz)
 - **vooy 레시피(지침, 예시 대화):** [`vooy-mcp/RECIPE.md`](vooy-mcp/RECIPE.md), 자세한 설명: [`vooy-mcp/README.md`](vooy-mcp/README.md)
@@ -200,15 +202,15 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 | 도구 | 하는 일 |
 |---|---|
 | `propose_plans` | 사람별 말(조건) → 균형안, 사람별 우선안 코스와 사람별 만족도 |
-| `adjust_plan` | "이 조건은 양보할게" 같은 후속 말로 같은 문제를 다시 계산 |
+| `adjust_plan` | "이번엔 빼도 돼" 같은 후속 말로 같은 문제를 다시 계산 |
 | `explain_infeasible` | 불가능하면 누구의 어떤 조건을 풀어야 가능한지 |
 | `find_candidates` | 조건에 맞는 장소 후보와 근거 |
 
-| 대화 속 결과 카드 | 양보 뒤 다시 계산된 카드 |
+| 대화 속 결과 카드 | 하나 뺀 뒤 다시 계산된 카드 |
 |---|---|
-| ![대화 속 결과 카드](vooy-mcp/docs/chat_card.jpg) | ![양보 뒤 카드](vooy-mcp/docs/chat_card_yield.jpg) |
+| ![대화 속 결과 카드](vooy-mcp/docs/chat_card.jpg) | ![하나 뺀 뒤 카드](vooy-mcp/docs/chat_card_yield.jpg) |
 
-검증: `pytest` 54개 통과(`cd vooy-mcp && python -m pytest -q`), 공개 서버 스모크 9회 호출 모두 통과(initialize → tools/list → 3인 제안 → 양보 → 불가능 → 이상 입력 6종, [결과 원문](vooy-mcp/scripts/smoke_result_remote.json)). MCP 프로토콜 2024-11-05 ~ 2025-11-25 네 버전의 initialize에 모두 응답합니다. 장소 데이터는 메인과 같은 성수 샘플입니다.
+검증: `pytest` 54개 통과(`cd vooy-mcp && python -m pytest -q`), 공개 서버 스모크 9회 호출 모두 통과(initialize → tools/list → 3인 제안 → 이번만 빼기 → 불가능 → 이상 입력 6종, [결과 원문](vooy-mcp/scripts/smoke_result_remote.json)). MCP 프로토콜 2024-11-05 ~ 2025-11-25 네 버전의 initialize에 모두 응답합니다. 장소 데이터는 메인과 같은 성수 샘플입니다.
 
 ## 마이리얼트립: 실제 체험을 일정에 넣을 수 있는지 계산
 
@@ -269,12 +271,12 @@ tripfit/
 - [PRD: 요구사항, 점수, 현재 상태](PRD.md)
 - [SCREENS: 화면, 시연 흐름](SCREENS.md)
 - [README_RUN: 실행, 환경 설정 기록](README_RUN.md)
-- [MRT 연동 결과](codex/03_mrt_live.result.md), [양보안 연결 결과](codex/04_whatif_concession.result.md). 과거 결과의 숫자는 현재 데모와 다를 수 있습니다.
+- [MRT 연동 결과](codex/03_mrt_live.result.md), [이번에 뺄 조건 연결 결과](codex/04_whatif_concession.result.md). 과거 결과의 숫자는 현재 데모와 다를 수 있습니다.
 
 ## 출처와 라이선스
 
 서울미래유산 이야기의 출처는 [서울특별시 서울미래유산 정보](https://www.data.go.kr/data/15052362/fileData.do)이며 공공누리 1유형(출처 표시)입니다. 화면 이야기는 샘플 문구입니다.
 체험 정보는 [마이리얼트립 MCP](https://mcp-servers.myrealtrip.com/mcp) 실호출 스냅숏이며 상품 링크에 원출처를 표시합니다.
 
-솔버는 행사 전 공개한 개인 최적화 알고리즘을 확장했습니다. 오늘 추가한 범위는 체크리스트 만족도, 장소 점수, 양보안 계산, MRT 연동, 서버, 화면입니다.
+솔버는 행사 전 공개한 개인 최적화 알고리즘을 확장했습니다. 오늘 추가한 범위는 체크리스트 만족도, 장소 점수, 이번에 뺄 조건 계산, MRT 연동, 서버, 화면입니다.
 저장소 전체 코드의 별도 라이선스 파일은 현재 없습니다. 공공데이터 이용조건을 코드 전체에 적용하지 않습니다.
