@@ -8,7 +8,8 @@
   --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.34,1.4,.64,1); --spring-ms:700ms;
 }
 
-*{box-sizing:border-box}
+*{box-sizing:border-box;scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
 html,body{margin:0;min-height:100%;color:var(--navy)}
 
 body{background:var(--stage);font-family:var(--kr);-webkit-font-smoothing:antialiased;word-break:keep-all;font-weight:500;font-size:14px;line-height:1.5}
@@ -63,7 +64,9 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke
 .eyebrow{justify-content:space-between;font-size:12px;font-weight:600}
 .hero h2{font-size:34px;line-height:1.08;letter-spacing:-.05em;margin:16px 0 12px;font-weight:600}
 .hero p{font-size:13px}
-.hero .cap-prog{margin-top:18px}
+.hero-progress{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px}
+.embed-counter{display:none}
+.hero .label{letter-spacing:normal}
 .stage-counter{font:600 14px var(--gr)}
 .avatars{display:flex}
 .avatar{display:grid;place-items:center;border:1.5px solid var(--navy);background:var(--pink);height:32px;width:32px;border-radius:50%;font-size:13px}
@@ -140,21 +143,21 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke
 .draft p{font-size:13px;margin-top:12px;line-height:1.7}
 summary{cursor:pointer}
 .summary-row{display:flex;justify-content:space-between;align-items:center}
-.checks-heading{margin-bottom:14px}
-.checks-heading h3{font-size:22px}
-.checks-heading p{font-size:12px;margin-top:5px}
-.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin-bottom:4px}
-.check{padding:14px 13px;margin:0;border-radius:24px}
-.check .check-title{display:flex;gap:6px;align-items:flex-start;font-size:13px;font-weight:600;line-height:1.35}
-.check .check-title svg{width:17px;height:17px}
-.check p{font-size:11.5px;line-height:1.45;margin-top:8px;overflow-wrap:anywhere}
-.check .repair{display:block;font-weight:600;margin-top:6px}
-.change{padding:14px 20px}
-.change h3{font-size:13px;margin-bottom:5px}
-.change p{font-size:17px;letter-spacing:-.035em}
-.price-change{display:flex;align-items:center;gap:9px;margin:7px 0}
-.price-change .num{font-size:32px;flex:1}
-.change small{display:block}
+.checks-sheet{padding:20px}
+.checks-heading{padding-bottom:16px}
+.checks-heading h3{font-size:21px;line-height:1.35;letter-spacing:-.035em}
+.change{font-size:12px;margin-top:5px;text-wrap:balance}
+.changed{color:#B82E23}
+.checks{margin:0}
+.check{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:start;padding:15px 0;border-top:1px dashed #0E2A3A40}
+.check:last-child{padding-bottom:0}
+.check dt{font-size:11px;font-weight:500;padding-top:2px}
+.check dd{position:relative;padding-right:28px;min-width:0;font-size:13px;line-height:1.6;text-wrap:balance;overflow-wrap:anywhere}
+.check p,.scope dd,.receipt-line small,.activity li span{ text-wrap:balance }
+.check .repair{display:block;font-size:11px;margin-top:5px;color:#B82E23}
+.check-mark{display:grid;place-items:center;width:18px;height:18px;position:absolute;right:0;top:2px;border-radius:50%;background:var(--lime)}
+.check-mark svg{width:12px;height:12px;stroke-width:2.3}
+.check[data-pass="false"] .check-mark{background:var(--red)}
 .split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
 .split .b{padding:16px;margin:0 0 4px}
 .split .num{font-size:37px}
@@ -230,6 +233,14 @@ body.embed .cap{display:none}
 body.embed .phone{width:100%;max-width:430px;margin:0 auto;padding:0;border-radius:0;box-shadow:none;background:var(--navy)}
 body.embed .shell{height:auto;min-height:100dvh;border-radius:0;overflow:visible}
 body.embed .home-ind{display:none}
+body.embed .hero{padding:16px 20px 22px}
+body.embed .hero .eyebrow{display:none}
+body.embed .hero h2{font-size:30px;line-height:1.1;margin:0 0 9px}
+body.embed .hero .label{font-size:11px;margin-bottom:8px}
+body.embed .hero p{font-size:12px}
+body.embed .hero-progress{margin-top:12px}
+body.embed .embed-counter{display:block;font:500 11px var(--gr)}
+body.embed .hero .cap-prog i{height:4px}
 
 @media(max-width:800px){.rig{gap:28px}
 .cap{width:250px}

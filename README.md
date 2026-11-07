@@ -19,7 +19,7 @@
 | TripFit 데모(재생) | https://harheem.github.io/tripfit/ | 키·서버 없이 1~5단계 재생. 휴대폰에서도 열림. 발표용 키: `→` `A`(자동재생) `1`~`6` |
 | SKT 같이 결제 | https://harheem.github.io/tripfit/pay/ | 저장된 조회 결과로 위임 → 재조회 → 승인 근거 → 영수증 |
 | Vooy MCP 서버 | `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` | vooy에 사용자 지정 MCP로 등록 |
-| 직접 해보기(내 두 문장 → 일정) | 로컬 서버 `http://localhost:8000/` | OpenAI 실호출 + CBC 실계산. 아래 실행법 |
+| 우리 대화로 바꿔 보기(두 사람 문장 → 일정) | 로컬 서버 `http://localhost:8000/` | OpenAI 실호출 + CBC 실계산. 아래 실행법 |
 
 ## 30초 요약
 

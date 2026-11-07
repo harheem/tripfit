@@ -11,7 +11,7 @@ const receiptTime = v => new Date(v).toLocaleString('ko-KR',{timeZone:'Asia/Seou
 const dateText = (weekday=false) => new Date(`${trip.date}T00:00:00+09:00`).toLocaleDateString('ko-KR',{month:'long',day:'numeric',...(weekday?{weekday:'short'}:{})});
 const chip = s => `<span class="pill">${esc(s)}</span>`;
 const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${({
-  check:'<path d="m5 12 4 4L19 6"/>', arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  cross:'<path d="m7 7 10 10M7 17 17 7"/>', check:'<path d="m5 12 4 4L19 6"/>', arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
   lock:'<rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>',
   exhibit:'<rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="m3.5 15.5 4.5-4.5 4 4 2.5-2.5 6 5"/><circle cx="15.5" cy="9.5" r="1.6"/>',
   activity:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/>',
@@ -60,7 +60,7 @@ async function audit(){
 function frame(body){
   clearHolds();clearTimeout(expiryTimer);paying=false;
   $('#caption-step').textContent=`0${stage} / 05`;$('#caption-progress').innerHTML=progress();
-  $('#flow').innerHTML=`<header class="b lime hero cut"><div class="eyebrow"><span>TripFit · 같이 결제</span><span class="stage-counter">0${stage} / 05</span></div><h2 id="active-title" tabindex="-1"><span class="label">${esc(labels[stage-1])}</span>${titles[stage-1]}</h2><div class="row between"><p>${stage===1?`${dateText(true)} · 성수 · 서울숲`:stage===2?'판매처·상품·상한을 정하고 각자 승인해요':stage===3?'예약 가능 여부와 가격을 다시 확인해요':stage===4?'맡긴 범위와 조회 결과를 대조했어요':'모의 결제 완료 · 실제 돈은 나가지 않아요'}</p>${stage===1?`<div class="avatars">${trip.people.map(p=>`<span class="avatar">${esc(p.name[0])}</span>`).join('')}</div>`:''}</div><nav class="cap-prog" aria-label="${stage}/5단계 · ${labels[stage-1]}">${progress()}</nav></header>${body}<p id="message" role="alert"></p>`;
+  $('#flow').innerHTML=`<header class="b lime hero cut"><div class="eyebrow"><span>TripFit · 같이 결제</span><span class="stage-counter">0${stage} / 05</span></div><h2 id="active-title" tabindex="-1"><span class="label">${esc(labels[stage-1])}</span>${titles[stage-1]}</h2><div class="row between"><p>${stage===1?`${dateText(true)} · 성수 · 서울숲`:stage===2?'판매처·상품·상한을 정하고 각자 승인해요':stage===3?'예약 가능 여부와 가격을 다시 확인해요':stage===4?'맡긴 범위와 조회 결과를 대조했어요':'모의 결제 완료 · 실제 돈은 나가지 않아요'}</p>${stage===1?`<div class="avatars">${trip.people.map(p=>`<span class="avatar">${esc(p.name[0])}</span>`).join('')}</div>`:''}</div><div class="hero-progress"><nav class="cap-prog" aria-label="${stage}/5단계 · ${labels[stage-1]}">${progress()}</nav><span class="embed-counter" aria-hidden="true">0${stage} / 05</span></div></header>${body}<p id="message" role="alert"></p>`;
   $('#test-price').disabled=stage<3||stage===5;$('#test-merchant').disabled=!confirmed;
   $('#technical').open=false;$('.shell').scrollTop=0;if(document.body.classList.contains('embed')||innerWidth<=650)scrollTo(0,0);
   fitNumbers();void audit();
@@ -166,26 +166,31 @@ function inspection(){
   const available=Boolean(item?.available);
   const inTime=all(m=>now<Date.parse(m.expires_at));
   const unused=all(m=>m.status==='APPROVED'&&m.uses===1&&!world.pay.isMandateUsed(m.id));
+  const minutes=Math.max(1,Math.ceil(remaining/60000));
+  const remainingText=minutes>=60?`${Math.floor(minutes/60)}시간${minutes%60?` ${minutes%60}분`:''} 남음`:`${minutes}분 남음`;
+  const amounts=[...new Set(quote.lines.map(l=>l.amount))];
+  const priceText=amounts.length===1?`1인 ${money(amounts[0])}`:quote.lines.map(l=>`${l.name} ${money(l.amount)}`).join(' · ');
   const checks=[
-    {key:'merchant',title:'판매처 일치',ok:merchant,evidence:merchant?`${trip.item.merchant_label} = 맡긴 판매처`:'판매처 또는 위임이 일치하지 않아요',repair:'맡긴 판매처로 다시 확인하기'},
-    {key:'product',title:'상품·시각 일치',ok:product,evidence:product?`${trip.item.short_name} ${item.option_start} = 합의 일정`:'합의한 상품·시각 또는 위임을 확인해 주세요',repair:'합의 일정부터 다시 확인하기'},
-    {key:'price',title:'가격 ≤ 상한',ok:price,evidence:quote.lines.map(l=>`${l.name} ${digits(l.amount)} ${l.amount<=(l.mandate_max??-1)?'≤':'>'} ${l.mandate_max===null?'위임 없음':digits(l.mandate_max)}`).join(' · '),repair:'새 금액으로 다시 맡기기'},
-    {key:'available',title:'예약 가능',ok:available,evidence:`${item?.option_start??trip.item.start} ${available?'예약 가능':'예약 불가'} · ${item?time(item.checked_at):'조회 필요'} 조회`,repair:'일정에서 다른 시각 선택하기'},
-    {key:'expiry',title:'기한 안',ok:inTime,evidence:inTime?`${Math.floor(remaining/60000)}분 ${Math.floor(remaining/1000)%60}초 남음 · ${time(ms.reduce((a,b)=>Date.parse(a.expires_at)<Date.parse(b.expires_at)?a:b).expires_at)}까지`:'위임 기한이 지났거나 위임이 없어요',repair:'기한을 확인하고 다시 맡기기'},
-    {key:'unused',title:`${trip.people.length===2?'두 사람':`${trip.people.length}명`} 위임 완료`,ok:unused,evidence:unused?'각자 승인 · 1회 권한 모두 미사용':'승인 누락 또는 이미 사용한 권한이 있어요',repair:'각자 새 위임 승인하기'}
+    {key:'merchant',title:'판매처',ok:merchant,evidence:merchant?`${trip.item.merchant_label} · 맡긴 곳 그대로`:'판매처 또는 위임이 일치하지 않아요',repair:'맡긴 판매처로 다시 확인하기'},
+    {key:'product',title:'상품',ok:product,evidence:product?`${trip.item.short_name} ${dateText()} ${item.option_start} · 합의한 일정 그대로`:'합의한 상품·시각 또는 위임을 확인해 주세요',repair:'합의 일정부터 다시 확인하기'},
+    {key:'price',title:'금액',ok:price,evidence:`${priceText} · ${price?'맡긴 한도 안':'맡긴 한도를 확인해 주세요'}`,repair:'새 금액으로 다시 맡기기'},
+    {key:'available',title:'예약',ok:available,evidence:`${item?.option_start??trip.item.start} ${available?'자리 있음':'자리 없음'} · ${item?`${time(item.checked_at)}에 다시 확인`:'다시 조회해 주세요'}`,repair:'일정에서 다른 시각 선택하기'},
+    {key:'expiry',title:'기한',ok:inTime,evidence:inTime?`${time(ms.reduce((a,b)=>Date.parse(a.expires_at)<Date.parse(b.expires_at)?a:b).expires_at)}까지 · ${remainingText}`:'위임 기한이 지났거나 위임이 없어요',repair:'기한을 확인하고 다시 맡기기'},
+    {key:'unused',title:'위임',ok:unused,evidence:unused?`${ms.map(m=>trip.people.find(p=>p.id===m.person_id).name).join('·')} 각 ${ms[0].uses}회 · 아직 안 씀`:'승인 누락 또는 이미 사용한 권한이 있어요',repair:'각자 새 위임 승인하기'}
   ];
   return {checks,ready:quote.status==='READY'&&quote.lines.every(l=>l.within)&&checks.every(c=>c.ok),remaining};
 }
 function splitBlocks(){return `<div class="split">${quote.lines.map((l,i)=>`<section class="b ${i===0?'pink':'sky'}"><span class="label">${esc(l.name)} 카드</span>${number(l.amount)}<small>상한 ${l.mandate_max===null?'위임 없음':money(l.mandate_max)} · ${l.within?'범위 안':'범위 밖'}</small></section>`).join('')}</div><section class="b total"><span class="label">합계<br>${quote.lines.length}명 분담</span>${number(quote.total)}</section>`;}
 function changes(){
-  const changes=quote.lines.filter(l=>l.mandate_max!==null&&l.amount!==l.mandate_max);
-  return `<section class="b ${changes.length?'peach':'cream'} change"><h3>맡길 때와 달라진 것</h3>${changes.length?`<div class="price-change"><strong class="num">${digits(changes[0].mandate_max)}</strong>${icon('arrow')}<strong class="num">${digits(changes[0].amount)}<em>원</em></strong></div><small>1인 가격 · ${changes.map(l=>esc(l.name)).join('·')}의 위임 상한과 달라요</small>`:'<p>달라진 것 없음</p>'}</section>`;
+  const changed=quote.lines.filter(l=>l.mandate_max!==null&&l.amount!==l.mandate_max);
+  const values=[...new Set(changed.map(l=>`${money(l.mandate_max)} → ${money(l.amount)}`))];
+  return `<p class="change${changed.length?' changed':''}">${changed.length?`맡길 때와 달라진 것 · ${values.map(esc).join(' · ')}`:'맡길 때와 달라진 것 없음'}</p>`;
 }
 function quoteScreen(){
   stage=4;quote=api.buildQuote(world,trip);
   const {checks,ready,remaining}=inspection();
   const canReapprove=quote.status==='NEEDS_REAPPROVAL'||quote.status==='WAITING_MANDATES';
-  frame(`<section class="b ${ready?'mint':'red'} tab checks-heading"><div class="row between"><h3>${ready?'맡긴 조건 모두 확인':'결제를 멈췄어요'}</h3><span class="pill fill">${checks.filter(c=>c.ok).length} / 6 통과</span></div><p>${esc(trip.item.merchant_label)} · ${esc(trip.item.start)} · ${dateText()}</p></section><div class="checks" aria-label="결제 범위 검사 6개">${checks.map(c=>`<section class="b check ${c.ok?'mint':'red'}" data-check="${c.key}" data-pass="${c.ok}"><div class="check-title">${icon(c.ok?'check':'stop')}<span>${esc(c.title)}</span></div><p>${esc(c.evidence)}${c.ok?'':`<span class="repair">${esc(c.repair)}</span>`}</p></section>`).join('')}</div>${changes()}${splitBlocks()}<section class="b cream consequences"><h3>누르면 일어나는 일</h3><ol><li>${quote.lines.map(l=>`${esc(l.name)} 카드 ${money(l.amount)}`).join(' · ')}을 각각 1회용 결제 권한으로 결제해요.</li><li>판매자도 같은 승인 기록을 받아요. 해시는 승인할 때 생성되며, 영수증에서 앞 8자를 확인해요.</li><li>모의 결제 — 실제 돈은 나가지 않아요.</li></ol></section>${!ready?`<section class="b red stop-reason"><h3>다시 확인하고 맡겨 주세요</h3><p>${esc(quote.reasons.join(' · ')||checks.filter(c=>!c.ok).map(c=>c.repair).join(' · '))}</p></section>`:''}<div class="action"><p>대표 ${esc(trip.people[0].name)}이 ${trip.people.length===2?'두 사람':`${trip.people.length}명`} 위임으로 결제</p>${holdMarkup(ready?`${money(quote.total)} 결제하기`:'조건 확인 전 결제 잠김')}${canReapprove?`<button id="reapprove" class="primary">${money(checked.price)}으로 다시 맡기기${icon('arrow')}</button>`:''}${!ready?'<button id="cancel" class="secondary">일정부터 다시 확인하기</button>':''}</div>`);
+  frame(`<section class="b cream checks-sheet" aria-labelledby="checks-title"><div class="checks-heading"><h3 id="checks-title">${checks.every(c=>c.ok)?`${checks.length}가지 모두 맞아요`:`${checks.filter(c=>!c.ok).length}가지 다시 확인해 주세요`}</h3>${changes()}</div><dl class="checks" aria-label="결제 범위 검사 ${checks.length}개">${checks.map(c=>`<div class="check" data-check="${c.key}" data-pass="${c.ok}"><dt>${esc(c.title)}</dt><dd><p>${esc(c.evidence)}</p>${c.ok?'':`<span class="repair">${esc(c.repair)}</span>`}<span class="check-mark" role="img" aria-label="${c.ok?'확인':'확인 필요'}">${icon(c.ok?'check':'cross')}</span></dd></div>`).join('')}</dl></section>${splitBlocks()}<section class="b cream consequences"><h3>누르면 일어나는 일</h3><ol><li>${quote.lines.map(l=>`${esc(l.name)} 카드 ${money(l.amount)}`).join(' · ')}을 각각 1회용 결제 권한으로 결제해요.</li><li>판매자도 같은 승인 기록을 받아요. 해시는 승인할 때 생성되며, 영수증에서 앞 8자를 확인해요.</li><li>모의 결제 — 실제 돈은 나가지 않아요.</li></ol></section>${!ready?`<section class="b red stop-reason"><h3>다시 확인하고 맡겨 주세요</h3><p>${esc(quote.reasons.join(' · ')||checks.filter(c=>!c.ok).map(c=>c.repair).join(' · '))}</p></section>`:''}<div class="action"><p>대표 ${esc(trip.people[0].name)}이 ${trip.people.length===2?'두 사람':`${trip.people.length}명`} 위임으로 결제</p>${holdMarkup(ready?`${money(quote.total)} 결제하기`:'조건 확인 전 결제 잠김')}${canReapprove?`<button id="reapprove" class="primary">${money(checked.price)}으로 다시 맡기기${icon('arrow')}</button>`:''}${!ready?'<button id="cancel" class="secondary">일정부터 다시 확인하기</button>':''}</div>`);
   const button=$('.hold');button.disabled=!ready;
   if(ready){const drawnAt=performance.now(),run=epoch;bindHold(button,drawnAt,async approval_ms=>{
     // Refresh the read-only inspection at the moment of approval; the engine revalidates again.

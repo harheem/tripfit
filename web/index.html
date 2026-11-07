@@ -125,6 +125,8 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .btn:disabled { opacity: .25; cursor: default; }
 .btn.navy { background: var(--navy); color: var(--cream); }
 .btn.navy .go { background: var(--lime); color: var(--navy); }
+.btn.ghost { height: 56px; margin-top: 8px; background: transparent; color: var(--navy); box-shadow: inset 0 0 0 2px var(--navy); padding: 0 6px 0 28px; }
+.btn.ghost .go { width: 44px; height: 44px; background: transparent; color: var(--navy); }
 
 /* odometer */
 .odo { display: inline-flex; }
@@ -909,7 +911,7 @@ function replaceDemo(data, custom = false) {
   P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
   placeById = Object.fromEntries(D.places.map(p => [p.id, p]));
   trying = custom; agreementPlan = null; chosen = null; muted.splice(0);
-  $("#modeLabel").textContent = custom ? "LIVE · 내 말로 계산" : modeText;
+  $("#modeLabel").textContent = custom ? "LIVE · 우리 대화로 계산" : modeText;
 }
 function returnToSample() {
   autoId++; autoPlaying = false;
@@ -1002,17 +1004,17 @@ const CAPS = [  // the one pitch script (PRD §12 and SCREENS §4 quote this)
 /* ---------- own words: commit a complete session only after a successful solve ---------- */
 function openTry(v) {
   if (!LIVE) {
-    island.show({title:"직접 해보기는 서버 연결 시 동작해요", sub:"README의 실행법 참고", hold:5000}); return;
+    island.show({title:"우리 대화 넣기는 서버를 켜면 돼요", sub:"README의 실행법을 참고해 주세요", hold:5000}); return;
   }
   if (v._sheet) return;
   const examples = [
     ["골목 산책 느긋하게, 소품샵은 꼭", "걷는 건 괜찮아 전시 위주로", "카페에서 오래 쉬고 싶어"],
     ["걷는 건 괜찮아 전시 위주로", "카페에서 오래 쉬고 싶어", "골목 산책 느긋하게, 소품샵은 꼭"],
   ];
-  const sh = openSheet(v, `<div class="b lime sheet-head"><span class="grab"></span><div class="row between"><span class="sheet-title" data-sheet-title>내 말로 해보기</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="lab">각자 하고 싶은 말을 적어주세요</div></div>
+  const sh = openSheet(v, `<div class="b lime sheet-head"><span class="grab"></span><div class="row between"><span class="sheet-title" data-sheet-title>우리 대화 넣기</span><button class="sheet-close" aria-label="닫기">×</button></div><div class="lab">오늘 어디서 뭘 하고 싶은지, 각자 한 문장이면 돼요</div></div>
     <form id="tryForm">${P.map((p,i) => `<div class="b ${i ? "sky" : "pink"}"><div class="row between"><label for="try${i}">${escapeHTML(p.name)}</label><button type="button" class="pill try-clear" data-clear="${i}">지우기</button></div><textarea id="try${i}" name="person${i}" maxlength="200" rows="3" required aria-describedby="tryHint${i} tryCount${i}">${escapeHTML(p.text)}</textarea><div class="try-meta"><span id="tryHint${i}" class="try-hint" role="alert"></span><span id="tryCount${i}" class="lab gr"></span></div><div class="try-chips">${examples[i].map((text,k)=>`<button type="button" class="pill" data-example="${i}:${k}">${escapeHTML(text)}</button>`).join("")}</div></div>`).join("")}
     <div class="b cream try-progress" id="tryProgress" hidden role="status" aria-live="polite"><div class="row between"><b>일정을 만들고 있어요</b><span class="gr" id="trySeconds">0초</span></div><ol><li>① 말을 조건으로 바꾸는 중 · OpenAI</li><li>② 꼭 지킬 것과 되면 좋은 것 나누기</li><li>③ 가능한 순서 비교 중 · CBC</li></ol><div class="lab">예상 진행 단계예요 · 응답이 오면 실제 조건과 일정을 보여드려요</div><button type="button" class="pill" id="tryCancel" hidden>취소</button></div>
-    <div class="b lime" style="padding:6px"><button type="submit" class="btn navy" id="trySubmit"><span>이 말로 일정 짜기</span><span class="go">${svg("arrow",22)}</span></button></div></form>`);
+    <div class="b lime" style="padding:6px"><button type="submit" class="btn navy" id="trySubmit"><span>이 대화로 일정 짜기</span><span class="go">${svg("arrow",22)}</span></button></div></form>`);
   sh.el.classList.add("try-sheet");
   const form = $("#tryForm", sh.el), submit = $("#trySubmit",sh.el), fields = P.map((_,i)=>$("#try"+i,sh.el));
   let controller = null, ticker = 0;
@@ -1086,7 +1088,7 @@ function openTry(v) {
 async function s0(v, t) {
   status(hhmm(D.window.start - 2));
   v.innerHTML = `<div class="scr" id="sc" style="padding-bottom:24px">
-    <div class="b top lime cut cl"><div class="row between"><span class="brand app-brand">${LOGO}</span><span class="cap-up">둘이서</span></div>${trying ? '<button class="pill sample-return" id="sampleReturn">샘플로 돌아가기</button>' : ""}
+    <div class="b top lime cut cl"><div class="row between"><span class="brand app-brand">${LOGO}</span><span class="cap-up">둘이서</span></div>${trying ? '<button class="pill sample-return" id="sampleReturn">처음 대화로 돌아가기</button>' : ""}
       <div class="row between" style="margin-top:14px;align-items:flex-end"><div style="font:500 40px/1.05 var(--kr);letter-spacing:-.055em">성수<br>반나절</div><div class="av-stack">${av(0, 44)}${av(1, 44)}</div></div></div>
     <div class="b pink tab tl row" style="padding:12px 14px 12px 12px"><div class="date-c"><b class="gr">14</b><small>Nov</small></div><div style="flex:1"><div class="lab">오늘 일정</div><div style="font:600 15px var(--kr);margin-top:2px">${hhmm(D.window.start)} – ${hhmm(D.window.end)} · ${escapeHTML(D.start.name)} 출발</div></div><span class="pill">미정</span></div>
     <div id="chat"></div>
@@ -1129,8 +1131,9 @@ async function s0(v, t) {
   const card = add(`<div style="font:500 23px/1.35 var(--kr);letter-spacing:-.045em;margin:12px 0 18px">둘이 한 말을 조건으로 바꿔서,<br>둘 다 OK인 일정을 찾아볼게요</div><button class="btn navy"><span>같이 정하기</span><span class="go">${svg("arrow", 22, 2.4)}</span></button>`, "lime");
   card.style.paddingTop = "26px";
   $(".btn", card).addEventListener("click", () => go(1));
-  card.insertAdjacentHTML("beforeend", '<button class="pill try-open" style="margin-top:12px">내 말로 해보기</button>');
+  card.insertAdjacentHTML("beforeend", `<button class="btn ghost try-open"><span>우리 대화로 바꿔 보기</span><span class="go">${svg("people", 20, 2.2)}</span></button>`);
   $(".try-open",card).onclick=()=>openTry(v);
+  { const sc = card.closest(".scr"); if (sc) requestAnimationFrame(() => sc.scrollTo({ top: sc.scrollHeight, behavior: "smooth" })); }
 }
 
 /* ---------- step 1: words → constraint chips → 773,665 → 5 ---------- */
