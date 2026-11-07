@@ -258,3 +258,9 @@ body.embed .hero .cap-prog i{height:4px}
 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+
+.simulation-buttons{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;justify-content:center}
+.simulation-buttons .pill{background:transparent;color:var(--cream);cursor:pointer;font-size:11px;min-height:34px}
+.simulation-note{background:var(--butter);margin:0 0 8px 8px}
+.revoke{background:transparent;cursor:pointer;margin-top:10px;font-size:11px;min-height:32px}
+.draft #inquiry-meta{margin-top:10px;font-size:10px}

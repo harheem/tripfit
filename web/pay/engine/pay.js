@@ -6,6 +6,7 @@ export function createPay({ clock, merchant, getMandate, nextId, record, flush }
   const payments = new Map();
 
   function issue({ person_id, merchant_id, amount_max, expires_at, mandate_id, mandate_hash, quote_hash, scope }) {
+    if (getMandate(mandate_id)?.status === 'REVOKED') throw new Error('MANDATE_REVOKED');
     const token = { id: nextId('token'), person_id, merchant_id, amount_max, expires_at, uses_left: 1 };
     grants.set(token.id, { token: structuredClone(token), mandate_id, mandate_hash, quote_hash,
       scope: structuredClone(scope) });
@@ -19,6 +20,7 @@ export function createPay({ clock, merchant, getMandate, nextId, record, flush }
     const mandate = grant ? getMandate(grant.mandate_id) : null;
     const item = grant ? merchant.lookup(grant.scope) : null;
     const now = clock.now().getTime();
+    if (mandate?.status === 'REVOKED') return 'MANDATE_REVOKED';
     // Deliberate precedence, including already-spent and forged tokens.
     if (merchant_id !== token?.merchant_id || (stored && merchant_id !== stored.merchant_id)
       || (mandate && merchant_id !== mandate.merchant_id) || (item && merchant_id !== item.merchant_id)) {

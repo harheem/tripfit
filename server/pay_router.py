@@ -3,7 +3,11 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from typing import Annotated
+
+from pydantic import BaseModel, Field
+
+from server.parsing import StrictModel, generate_inquiry
 
 router = APIRouter(prefix="/api/pay")
 
@@ -42,3 +46,22 @@ def recheck(body: RecheckRequest):
     return {"available": available, "price": price,
             "checked_at": datetime.now(timezone.utc).isoformat(),
             "source": "live", "option_start": option["start"]}
+
+
+class InquiryItem(StrictModel):
+    short_name: str = Field(min_length=1, max_length=200)
+    start: str = Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    date: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
+    meeting: str | None = Field(default=None, max_length=300)
+
+
+class InquiryRequest(StrictModel):
+    item: InquiryItem
+    people: list[Annotated[str, Field(min_length=1, max_length=80)]] = Field(min_length=2, max_length=2)
+    split: list[Annotated[int, Field(ge=0, le=9007199254740991)]] = Field(min_length=2, max_length=2)
+    question_hints: Annotated[str, Field(max_length=1000)] | Annotated[list[Annotated[str, Field(max_length=300)]], Field(max_length=8)] | None = None
+
+
+@router.post("/inquiry")
+async def inquiry(body: InquiryRequest):
+    return await generate_inquiry(body.model_dump(exclude_none=True))

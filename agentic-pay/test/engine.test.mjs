@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {
-  createWorld, fromTripFit, loadTrip, createMandate, approveMandate, recheck, buildQuote,
+  createWorld, fromTripFit, loadTrip, createMandate, approveMandate, revokeMandate, recheck, buildQuote,
   approveQuote, executeSplit, simulateMalfunction, supplierView, auditLog, verifyChain,
 } from '../../web/pay/engine/engine.js';
 import { canonicalJSON, sha256 } from '../../web/pay/engine/hash.js';
@@ -308,6 +308,60 @@ test('network exception during second charge voids first payment', async () => {
   assert.equal(result.ok, false);
   assert.equal(result.layer, 'network');
   assert.equal(result.person_id, 'seoyeon');
+  assert.equal(world.pay.payments[0].status, 'VOIDED');
+  assert.equal(supplierView(world).length, 0);
+});
+
+
+test('revocation records the owner, updates references and blocks quote approval', async () => {
+  const { world, trip, mandates } = await ready();
+  const preview = buildQuote(world, trip);
+  await revokeMandate(world, mandates[0].id, 'jimin');
+  assert.equal(mandates[0].status, 'REVOKED');
+  assert.equal(buildQuote(world, trip).status, 'WAITING_MANDATES');
+  await assert.rejects(approveQuote(world, preview, { approver_id: 'jimin', approval_ms: 1000 }), /MANDATE_REVOKED/);
+  assert.ok(auditLog(world).some(e => e.action === 'MANDATE_REVOKED' && e.detail.by === 'jimin'));
+  assert.equal(await verifyChain(auditLog(world)), true);
+});
+
+test('revocation after token issuance blocks agent and independent network charges', async () => {
+  const { world, mandates, quote, tokens } = await ready();
+  await revokeMandate(world, mandates[0].id, 'jimin');
+  assert.equal((await executeSplit(world, quote, tokens)).error_code, 'MANDATE_REVOKED');
+  assert.equal((await simulateMalfunction(world, tokens[0], { merchant_id: 'mrt:3828508', amount: 35000 })).error_code, 'MANDATE_REVOKED');
+  assert.throws(() => world.pay.issue({ mandate_id: mandates[0].id }), /MANDATE_REVOKED/);
+  assert.equal(world.pay.payments.length, 0);
+});
+
+test('only the owner may revoke, and fresh human approval restores payment', async () => {
+  const { world, trip, mandates } = await ready();
+  await assert.rejects(revokeMandate(world, mandates[0].id, 'seoyeon'), /INVALID_PERSON/);
+  assert.equal(mandates[0].status, 'APPROVED');
+  await revokeMandate(world, mandates[0].id, 'jimin');
+  await delegate(world, trip, 'jimin');
+  const quote = buildQuote(world, trip);
+  const { tokens } = await approveQuote(world, quote, { approver_id: 'jimin', approval_ms: 1000 });
+  assert.equal((await executeSplit(world, quote, tokens)).ok, true);
+});
+
+test('revocation while mandate approval hashes cannot resurrect it', async () => {
+  const { world, trip } = setup();
+  const draft = createMandate(world, trip, 'jimin', { max_per_person: 35000, expires_at: EXPIRES });
+  const pending = approveMandate(world, draft, { approval_ms: 1000 });
+  await revokeMandate(world, draft.id, 'jimin');
+  await assert.rejects(pending, /MANDATE_REVOKED/);
+  assert.equal(draft.status, 'REVOKED');
+});
+
+test('second owner revoking during split voids the first authorization', async () => {
+  const { world, mandates, quote, tokens } = await ready();
+  const charge = world.pay.charge;
+  let calls = 0;
+  world.pay.charge = async (...args) => {
+    if (++calls === 2) await revokeMandate(world, mandates[1].id, 'seoyeon');
+    return charge(...args);
+  };
+  assert.equal((await executeSplit(world, quote, tokens)).error_code, 'MANDATE_REVOKED');
   assert.equal(world.pay.payments[0].status, 'VOIDED');
   assert.equal(supplierView(world).length, 0);
 });

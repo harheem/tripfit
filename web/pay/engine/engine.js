@@ -126,6 +126,7 @@ export async function approveMandate(world, mandate, { approval_ms }) {
     try {
       const approved_at = world.clock.now().toISOString();
       const mandate_hash = await sha256(canonicalJSON({ mandate: state.value, approval_ms, approved_at }));
+      if (state.value.status === 'REVOKED') throw new Error('MANDATE_REVOKED');
       if (world.clock.now().getTime() >= Date.parse(state.value.expires_at)) throw new Error('EXPIRED');
       for (const previous of context.mandates.values()) {
         if (previous.tripKey === state.tripKey && previous.value.person_id === state.value.person_id
@@ -141,6 +142,20 @@ export async function approveMandate(world, mandate, { approval_ms }) {
       context.record('user', 'MANDATE_APPROVED', { ...state.value, approval_ms });
       return cloneApproved(state);
     } finally { state.approving = false; }
+  } finally { await context.flush(); }
+}
+
+export async function revokeMandate(world, mandate_id, by) {
+  const context = contexts.get(world);
+  try {
+    const state = context.mandates.get(mandate_id);
+    if (!state || state.value.person_id !== by) throw new Error('INVALID_PERSON');
+    if (state.value.status === 'REVOKED') return clone(state.value);
+    if (!['DRAFT', 'APPROVED'].includes(state.value.status)) throw new Error('INVALID_MANDATE');
+    Object.assign(state.value, { status: 'REVOKED', revoked_at: world.clock.now().toISOString(), revoked_by: by });
+    for (const ref of state.refs) Object.assign(ref, clone(state.value));
+    context.record('user', 'MANDATE_REVOKED', { mandate_id, by, revoked_at: state.value.revoked_at });
+    return clone(state.value);
   } finally { await context.flush(); }
 }
 
@@ -212,6 +227,7 @@ export async function approveQuote(world, quote, { approver_id, approval_ms }) {
   const context = contexts.get(world);
   try {
     const state = context.quotes.get(quote?.id);
+    if (state?.mandateIds.some(id => context.mandates.get(id)?.value.status === 'REVOKED')) throw new Error('MANDATE_REVOKED');
     if (!state || quote.status !== 'READY') throw new Error('READY_REQUIRED');
     if (state.status !== 'PREVIEW') throw new Error('QUOTE_ALREADY_APPROVED');
     if (!state.trip.people.some(p => p.id === approver_id)) throw new Error('INVALID_APPROVER');
@@ -221,6 +237,7 @@ export async function approveQuote(world, quote, { approver_id, approval_ms }) {
     try {
       const approved_at = world.clock.now().toISOString();
       const quote_hash = await sha256(canonicalJSON({ quote, approver_id, approval_ms, approved_at }));
+      if (state.mandateIds.some(id => context.mandates.get(id)?.value.status === 'REVOKED')) throw new Error('MANDATE_REVOKED');
       if (!quoteIsCurrent(world, quote, state)) throw new Error('STALE_QUOTE');
       context.record('user', 'QUOTE_APPROVED', { quote_id: quote.id, approver_id, approval_ms, approved_at, quote_hash });
       const tokens = quote.lines.map((line, index) => {
@@ -237,6 +254,7 @@ export async function approveQuote(world, quote, { approver_id, approval_ms }) {
 }
 
 function agentCheck(world, quote, state, token, index) {
+  if (contexts.get(world).mandates.get(state.mandateIds[index])?.value.status === 'REVOKED') return 'MANDATE_REVOKED';
   const stored = state.approval.tokens[index];
   const line = quote.lines[index];
   if (token?.merchant_id !== state.scope.merchant_id || token?.merchant_id !== stored.merchant_id) return 'MERCHANT_MISMATCH';

@@ -384,6 +384,9 @@ body.mobile .eg-rule { flex: none; }
 .pay-sheet .pay-header { flex:none; padding:10px 18px; color:var(--cream); display:flex; align-items:center; justify-content:space-between; }
 .pay-sheet iframe { width:100%; flex:1; min-height:0; border:0; background:var(--cream); }
 .pay-sheet .pay-empty { margin:16px; }
+.pay-stopped { color:var(--red);font-size:12px;line-height:1.6;margin:10px 0; }
+#pay .rc small { font-size:10px;overflow-wrap:anywhere; }
+#pay .rc { gap:8px;flex-wrap:wrap; }
 body.mobile .sheet.pay-sheet { inset:0; max-height:none; border-radius:0; padding-top:calc(72px + env(safe-area-inset-top)); padding-bottom:env(safe-area-inset-bottom); }
 body.mobile .try-sheet { scroll-padding:16px; }
 body.mobile .try-clear { min-height:36px; }
@@ -460,6 +463,7 @@ if (/^https?:$/.test(location.protocol)) {
   } catch (_) { /* file demo remains available if detection fails or times out */ }
 }
 let D = window.DEMO, P = D.people, trying = false, agreementPlan = null;
+const paymentResults = new Map();
 P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -767,6 +771,7 @@ class Timeline {
   html(s, o) {
     const crowd = o.crowd === s.id, lock = s.fixed;
     const tags = [];
+    if(paymentForStop(s)?.status==='paid')tags.push('<span class="pill" style="background:var(--lime);color:var(--navy)">결제 완료</span>');
     if (crowd) tags.push(`<span class="pill fill">${svg("people", 13, 2.4)} 지금 붐빔, 웨이팅 40분</span>`);
     if (lock) tags.push(`<span class="pill">${svg("lock", 12, 2.4)} ${hhmm(s.start)} 예약 고정</span>`);
     if (s.mrt?.coordSource?.startsWith("approx") || s.mrt?.durationSource === "default") tags.push(`<span class="pill">추정</span>`);
@@ -910,6 +915,7 @@ function replaceDemo(data, custom = false) {
   P = D.people;
   P[0].color = "#FFCCE5"; P[1].color = "#8EC5EE";
   placeById = Object.fromEntries(D.places.map(p => [p.id, p]));
+  paymentResults.clear();
   trying = custom; agreementPlan = null; chosen = null; muted.splice(0);
   $("#modeLabel").textContent = custom ? "LIVE 우리 대화로 계산" : modeText;
 }
@@ -1625,6 +1631,33 @@ async function s3(v, t) {
   };
 }
 
+function paymentKey(item){return JSON.stringify([D.mrt?.date,String(item.gid),item.start]);}
+function paymentForStop(stop){
+  const product=stop?.mrt || placeById[stop?.id]?.mrt;
+  return product?paymentResults.get(paymentKey({gid:product.gid,start:hhmm(stop.start)})):null;
+}
+function renderPaymentResult(v,booked){
+  const result=paymentForStop(booked);if(!result)return;
+  const button=$("#openPay",v),payEl=$("#pay",v);
+  if(result.status==='paid'){
+    payEl.style.opacity='';
+    const tag=$('[data-payment-status]',v);if(tag)tag.innerHTML='<span class="pill" style="background:var(--lime);color:var(--navy)">결제 완료</span>';
+    const product=booked.mrt || placeById[booked.id].mrt;
+    const url=new URL(product.url,location.href);
+    payEl.innerHTML=`<div class="row between"><b>결제 완료</b><span class="pill" style="background:var(--lime)">모의 결제</span></div><p class="info-line">${escapeHTML(result.item.short_name)}, ${escapeHTML(result.item.start)} <span class="pill">결제 완료</span></p>${result.lines.map(l=>`<div class="rc"><span>${escapeHTML(l.person)} ${won(l.amount)}원</span><small>승인번호 ${escapeHTML(l.approval_no)}</small></div>`).join('')}<div class="rc t"><span>합계</span><span class="gr">${won(result.total)}원</span></div><p class="info-line">기록 <code>${escapeHTML(result.hash8)}</code></p><a class="pill" href="${escapeHTML(url.protocol==='https:'?url.href:'#')}" target="_blank" rel="noopener noreferrer">마이리얼트립에서 예약 확정</a><p class="info-line">실제 예약은 상품 페이지에서 마무리해요.</p>`;
+    $("#split",v).style.visibility='';
+    $("#split",v).innerHTML=result.lines.map((l,i)=>`<div class="b ${i?'sky':'pink'}"><div class="lab">${escapeHTML(l.person)} 결제 완료</div><div class="gr">${won(l.amount)}<em>원</em></div></div>`).join('');
+    button.disabled=true;button.querySelector('span').textContent='같이 결제 완료';
+    $("#payStopped",v)?.remove();
+  }else{
+    let line=$("#payStopped",v);
+    if(!line){line=document.createElement('p');line.id='payStopped';line.className='pay-stopped';line.setAttribute('role','alert');button.before(line);}
+    line.textContent=`${result.reason}, 다시 맡기기`;
+    button.querySelector('span').textContent='다시 맡기기';
+  }
+  fitNumbers();
+}
+
 /* Payment input and the visible summary are both made from this agreement. */
 async function openPayment(v, plan, booked) {
   if(v._sheet || autoPlaying)return;
@@ -1633,7 +1666,8 @@ async function openPayment(v, plan, booked) {
   sh.el.setAttribute("aria-label","예약하고 결제하기");
   $("#closePay",sh.el).onclick=sh.close;
   if(!booked)return;
-  const controller=new AbortController();sh.onClose=()=>controller.abort();
+  const controller=new AbortController();let onResult,frameUrl;
+  sh.onClose=()=>{controller.abort();if(onResult)window.removeEventListener('message',onResult);if(frameUrl)URL.revokeObjectURL(frameUrl);};
   try{
     const [{fromTripFit},response]=await Promise.all([import(new URL("pay/engine/tripfit.js",location.href).href),fetch("pay/index.html",{signal:controller.signal})]);
     if(!response.ok)throw new Error("결제 화면 불러오기 실패");
@@ -1648,7 +1682,33 @@ async function openPayment(v, plan, booked) {
     base.after(script);doc.body.classList.add("embed");
     if(v._sheet!==sh)return;
     const frame=document.createElement("iframe");frame.title="같이 결제, 합의한 일정";
-    frame.srcdoc="<!doctype html>"+doc.documentElement.outerHTML;
+    let completed=false;
+    onResult=async event=>{
+      if(event.origin!==location.origin||event.source!==frame.contentWindow||v._sheet!==sh||completed)return;
+      const data=event.data;
+      if(data?.type!=='tripfit-pay'||!['paid','stopped'].includes(data.status)
+        ||String(data.item?.gid)!==input.item.gid||data.item?.start!==input.item.start
+        ||data.item?.short_name!==input.item.short_name||!Number.isFinite(Date.parse(data.at)))return;
+      if(data.status==='paid'){
+        if(!Number.isSafeInteger(data.total)||data.total<0||!Array.isArray(data.lines)||data.lines.length!==input.people.length
+          ||!data.lines.every((l,i)=>l.person===input.people[i].name&&Number.isSafeInteger(l.amount)&&l.amount>=0&&typeof l.approval_no==='string'&&l.approval_no.length>0)
+          ||data.lines.reduce((sum,l)=>sum+l.amount,0)!==data.total||!/^[a-f0-9]{8}$/.test(data.hash8))return;
+        completed=true;paymentResults.set(paymentKey(data.item),structuredClone(data));
+        await sh.close();
+        if(!v.isConnected)return;
+        renderPaymentResult(v,booked);
+        island.show({title:`같이 결제 완료, ${won(data.total)}원`,sub:'모의 결제, 실제 예약은 상품 페이지에서 마무리해요',hold:3500});
+        log('pay',`AGENTIC PAY 결제 완료 ${won(data.total)}원, 승인 ${data.lines.length}건, 기록 ${data.hash8}`);
+      }else{
+        if(typeof data.reason!=='string'||!data.reason.trim()||data.reason.length>1000)return;
+        if(paymentForStop(booked)?.status==='paid')return;
+        paymentResults.set(paymentKey(data.item),structuredClone(data));renderPaymentResult(v,booked);
+      }
+    };
+    window.addEventListener('message',onResult);
+    // Blob URLs retain location.origin; about:srcdoc has a null URL origin.
+    frameUrl=URL.createObjectURL(new Blob(["<!doctype html>"+doc.documentElement.outerHTML],{type:'text/html'}));
+    frame.src=frameUrl;
     $(".pay-empty",sh.el).replaceWith(frame);
     log("pay","AGENTIC PAY, 위임 2건 → 재조회 → 분담 결제(모의)");
   }catch(error){
@@ -1673,6 +1733,7 @@ async function s4(v, t) {
       </svg>
       <div class="apps">${P.map((p, i) => `<button class="app" data-i="${i}" style="--c:${p.color}">${p.name} 승인</button>`).join("")}</div>
     </div>
+    ${booked?`<div class="b stop lock" id="paymentItem"><span class="ico">${svg('activity',21,2)}</span><div><div class="nm">${escapeHTML(short(booked.name))}</div><div class="tags"><span class="pill">${hhmm(booked.start)} 예약 고정</span><span data-payment-status></span></div></div><div class="tm gr"><b>${hhmm(booked.start)}</b><small>~${hhmm(booked.end)}</small></div></div>`:''}
     <div class="b mint tab tl" id="pay" style="opacity:.35">
       <div class="chain">${plan.stops.map((s, i) => `${i ? '<span class="ln"></span>' : ""}<button class="ico" data-poi="${s.id}" aria-label="${escapeHTML(short(s.name))} 장소 정보" style="${s.cat === "activity" ? "background:var(--violet);color:var(--cream)" : ""}">${svg(s.cat, 18, 2)}</button>`).join("")}</div>
       <div class="rc" style="margin-top:12px"><span>${escapeHTML(pay.item)}${booked ? ` × ${pay.people}` : ""}</span><span class="gr">${won(pay.price * pay.people)}</span></div>
@@ -1721,9 +1782,10 @@ async function s4(v, t) {
     split.style.visibility = "";
     $$(".b", split).forEach((x, k) => A(x, [{ opacity: 0, transform: "translateY(30px) scale(.85)" }, { opacity: 1, transform: "none" }], "pop", { delay: 300 + k * 100 }));
     $("#sc", v).scrollTo({ top: 260, behavior: reduce ? "auto" : "smooth" });
-    payBtn.disabled = openPayBtn.disabled = false;
+    payBtn.disabled = false;openPayBtn.disabled = paymentForStop(booked)?.status==='paid';
   };
   $$(".app", v).forEach(b => b.addEventListener("click", () => approve(+b.dataset.i)));
+  renderPaymentResult(v,booked);
   v._run = async () => { await approve(0); await sleep(600); await approve(1); await sleep(1600); };
 }
 

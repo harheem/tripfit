@@ -155,7 +155,9 @@ def test_rate_limit_shared_across_routes_and_first_forwarded_ip(client, monkeypa
     for _ in range(3):
         assert client.post("/api/try", json=payload, headers={"X-Forwarded-For": "192.0.2.1, 10.0.0.1"}).status_code == 200
         assert client.post("/api/parse", json={"messages": people()}, headers={"X-Forwarded-For": "192.0.2.1"}).status_code == 200
-    result = client.post("/api/try", json=payload, headers={"X-Forwarded-For": "192.0.2.1, 10.0.0.2"})
+    result = client.post("/api/pay/inquiry", json={"item": {"short_name": "숲체험", "date": "2026-11-14", "start": "15:00"},
+                                                "people": ["지민", "서연"], "split": [35000, 35000]},
+                         headers={"X-Forwarded-For": "192.0.2.1, 10.0.0.2"})
     assert result.status_code == 429 and result.json() == {"error": "잠시 후 다시"}
     monkeypatch.setenv("TRY_RATE_PER_MIN", "1")
     assert client.post("/api/try", json=payload, headers={"X-Forwarded-For": "192.0.2.2"}).status_code == 200
