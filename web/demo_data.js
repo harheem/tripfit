@@ -449,7 +449,7 @@ window.DEMO = {
     "lat": 37.5437,
     "lng": 127.0397,
     "coordSource": "approx:서울숲 방문자센터",
-    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
     "locationEvidence": "제목/집결지 지명: 서울숲",
     "options": null,
     "isReal": true,
@@ -497,7 +497,7 @@ window.DEMO = {
     "lat": 37.5437,
     "lng": 127.0397,
     "coordSource": "approx:서울숲 방문자센터",
-    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
     "locationEvidence": "제목/집결지 지명: 서울숲",
     "options": null,
     "isReal": true,
@@ -545,7 +545,7 @@ window.DEMO = {
     "lat": 37.5437,
     "lng": 127.0397,
     "coordSource": "approx:서울숲 방문자센터",
-    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
     "locationEvidence": "제목/집결지 지명: 서울숲",
     "options": null,
     "isReal": true,
@@ -593,7 +593,7 @@ window.DEMO = {
     "lat": 37.5437,
     "lng": 127.0397,
     "coordSource": "approx:서울숲 방문자센터",
-    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
     "locationEvidence": "제목/집결지 지명: 서울숲",
     "options": null,
     "isReal": true,
@@ -784,7 +784,7 @@ window.DEMO = {
     "지민": 100.0,
     "서연": 74.8
    },
-   "solveMs": 708,
+   "solveMs": 517,
    "checklist": {
     "지민": [
      {
@@ -944,7 +944,7 @@ window.DEMO = {
     "지민": 79.4,
     "서연": 83.1
    },
-   "solveMs": 708,
+   "solveMs": 517,
    "checklist": {
     "지민": [
      {
@@ -1078,7 +1078,7 @@ window.DEMO = {
     "지민": 58.8,
     "서연": 88.7
    },
-   "solveMs": 708,
+   "solveMs": 517,
    "checklist": {
     "지민": [
      {
@@ -1173,7 +1173,7 @@ window.DEMO = {
     "lat": 37.5437,
     "lng": 127.0397,
     "coordSource": "approx:서울숲 방문자센터",
-    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+    "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
     "locationEvidence": "제목/집결지 지명: 서울숲",
     "options": [
      {
@@ -1548,7 +1548,7 @@ window.DEMO = {
         "lat": 37.5437,
         "lng": 127.0397,
         "coordSource": "approx:서울숲 방문자센터",
-        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
         "locationEvidence": "제목/집결지 지명: 서울숲",
         "options": null,
         "isReal": true,
@@ -1575,7 +1575,7 @@ window.DEMO = {
       "지민": 20.6,
       "서연": 78.7
      },
-     "solveMs": 480,
+     "solveMs": 397,
      "checklist": {
       "지민": [
        {
@@ -1731,7 +1731,7 @@ window.DEMO = {
          "lat": 37.5437,
          "lng": 127.0397,
          "coordSource": "approx:서울숲 방문자센터",
-         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
          "locationEvidence": "제목/집결지 지명: 서울숲",
          "options": null,
          "isReal": true,
@@ -1758,7 +1758,7 @@ window.DEMO = {
        "지민": 20.6,
        "서연": 75.8
       },
-      "solveMs": 103,
+      "solveMs": 74,
       "checklist": {
        "지민": [
         {
@@ -1875,7 +1875,7 @@ window.DEMO = {
         "lat": 37.5437,
         "lng": 127.0397,
         "coordSource": "approx:서울숲 방문자센터",
-        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
         "locationEvidence": "제목/집결지 지명: 서울숲",
         "options": null,
         "isReal": true,
@@ -1928,7 +1928,7 @@ window.DEMO = {
       "지민": 58.8,
       "서연": 59.7
      },
-     "solveMs": 95,
+     "solveMs": 76,
      "checklist": {
       "지민": [
        {
@@ -2056,7 +2056,7 @@ window.DEMO = {
          "lat": 37.5437,
          "lng": 127.0397,
          "coordSource": "approx:서울숲 방문자센터",
-         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
          "locationEvidence": "제목/집결지 지명: 서울숲",
          "options": null,
          "isReal": true,
@@ -2109,7 +2109,7 @@ window.DEMO = {
        "지민": 58.8,
        "서연": 54.5
       },
-      "solveMs": 71,
+      "solveMs": 57,
       "checklist": {
        "지민": [
         {
@@ -2217,7 +2217,7 @@ window.DEMO = {
        "lat": 37.5437,
        "lng": 127.0397,
        "coordSource": "approx:서울숲 방문자센터",
-       "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+       "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
        "locationEvidence": "제목/집결지 지명: 서울숲",
        "options": null,
        "isReal": true,
@@ -2270,7 +2270,7 @@ window.DEMO = {
      "지민": 58.8,
      "서연": 59.7
     },
-    "solveMs": 95,
+    "solveMs": 76,
     "checklist": {
      "지민": [
       {
@@ -2398,7 +2398,7 @@ window.DEMO = {
         "lat": 37.5437,
         "lng": 127.0397,
         "coordSource": "approx:서울숲 방문자센터",
-        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+        "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
         "locationEvidence": "제목/집결지 지명: 서울숲",
         "options": null,
         "isReal": true,
@@ -2451,7 +2451,7 @@ window.DEMO = {
       "지민": 58.8,
       "서연": 54.5
      },
-     "solveMs": 71,
+     "solveMs": 57,
      "checklist": {
       "지민": [
        {
@@ -2602,7 +2602,7 @@ window.DEMO = {
           "lat": 37.5437,
           "lng": 127.0397,
           "coordSource": "approx:서울숲 방문자센터",
-          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
           "locationEvidence": "제목/집결지 지명: 서울숲",
           "options": null,
           "isReal": true,
@@ -2629,7 +2629,7 @@ window.DEMO = {
         "지민": 20.6,
         "서연": 78.7
        },
-       "solveMs": 480,
+       "solveMs": 397,
        "checklist": {
         "지민": [
          {
@@ -2785,7 +2785,7 @@ window.DEMO = {
            "lat": 37.5437,
            "lng": 127.0397,
            "coordSource": "approx:서울숲 방문자센터",
-           "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+           "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
            "locationEvidence": "제목/집결지 지명: 서울숲",
            "options": null,
            "isReal": true,
@@ -2812,7 +2812,7 @@ window.DEMO = {
          "지민": 20.6,
          "서연": 75.8
         },
-        "solveMs": 103,
+        "solveMs": 74,
         "checklist": {
          "지민": [
           {
@@ -2929,7 +2929,7 @@ window.DEMO = {
           "lat": 37.5437,
           "lng": 127.0397,
           "coordSource": "approx:서울숲 방문자센터",
-          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
           "locationEvidence": "제목/집결지 지명: 서울숲",
           "options": null,
           "isReal": true,
@@ -2982,7 +2982,7 @@ window.DEMO = {
         "지민": 58.8,
         "서연": 59.7
        },
-       "solveMs": 95,
+       "solveMs": 76,
        "checklist": {
         "지민": [
          {
@@ -3110,7 +3110,7 @@ window.DEMO = {
            "lat": 37.5437,
            "lng": 127.0397,
            "coordSource": "approx:서울숲 방문자센터",
-           "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+           "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
            "locationEvidence": "제목/집결지 지명: 서울숲",
            "options": null,
            "isReal": true,
@@ -3163,7 +3163,7 @@ window.DEMO = {
          "지민": 58.8,
          "서연": 54.5
         },
-        "solveMs": 71,
+        "solveMs": 57,
         "checklist": {
          "지민": [
           {
@@ -3271,7 +3271,7 @@ window.DEMO = {
          "lat": 37.5437,
          "lng": 127.0397,
          "coordSource": "approx:서울숲 방문자센터",
-         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+         "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
          "locationEvidence": "제목/집결지 지명: 서울숲",
          "options": null,
          "isReal": true,
@@ -3324,7 +3324,7 @@ window.DEMO = {
        "지민": 58.8,
        "서연": 59.7
       },
-      "solveMs": 95,
+      "solveMs": 76,
       "checklist": {
        "지민": [
         {
@@ -3452,7 +3452,7 @@ window.DEMO = {
           "lat": 37.5437,
           "lng": 127.0397,
           "coordSource": "approx:서울숲 방문자센터",
-          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+          "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
           "locationEvidence": "제목/집결지 지명: 서울숲",
           "options": null,
           "isReal": true,
@@ -3505,7 +3505,7 @@ window.DEMO = {
         "지민": 58.8,
         "서연": 54.5
        },
-       "solveMs": 71,
+       "solveMs": 57,
        "checklist": {
         "지민": [
          {
@@ -3619,7 +3619,7 @@ window.DEMO = {
       "lat": 37.5437,
       "lng": 127.0397,
       "coordSource": "approx:서울숲 방문자센터",
-      "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 집결지 좌표 미확인: 성수역 대체 좌표; 주소 지오코딩 미실시",
+      "coordEvidence": "서울숲 방문자센터 앞(오소정원) → 서울숲 방문자센터 근처 근사 좌표; 주소 지오코딩 미실시",
       "locationEvidence": "제목/집결지 지명: 서울숲",
       "options": null,
       "isReal": true,
@@ -3672,7 +3672,7 @@ window.DEMO = {
     "지민": 58.8,
     "서연": 54.5
    },
-   "solveMs": 71,
+   "solveMs": 57,
    "checklist": {
     "지민": [
      {
@@ -3845,7 +3845,7 @@ window.DEMO = {
     "지민": 89.7,
     "서연": 84.4
    },
-   "solveMs": 94,
+   "solveMs": 72,
    "checklist": {
     "지민": [
      {
@@ -3916,7 +3916,7 @@ window.DEMO = {
   "relaxations": [
    "도보 한도 1.5km → 2.4km로 늘리기"
   ],
-  "ms": 116
+  "ms": 103
  },
  "pay": {
   "item": "[서울/성동] 서울숲 힐링 숲체험 / 깨비의숲마을과 함께 떠나요!",

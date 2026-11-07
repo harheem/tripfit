@@ -78,7 +78,7 @@ def fetch_snapshot(date=None):
         row = {**product, 'durationMin': detail['durationMin'],
                'durationSource': detail['durationSource'], 'meetingText': location,
                'lat': lat, 'lng': lng, 'coordSource': 'approx',
-               'coordEvidence': f'{location or name} → ' + ('집결지 좌표 미확인: 성수역 대체 좌표' if is_local else f'{anchor} 근처 근사 좌표') + '; 주소 지오코딩 미실시',
+               'coordEvidence': f'{location or name} → ' + f'{anchor} 기준 근사 좌표' + '; 주소 지오코딩 미실시',
                'locationEvidence': f'제목/집결지 지명: {anchor}', 'options': options}
         if not is_local:
             row['note'] = '성수 시각 옵션 상품 없음: 위치를 판정한 서울 후보 중 근사 직선거리로 가장 가까운 상품'
