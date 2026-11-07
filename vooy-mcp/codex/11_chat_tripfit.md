@@ -1,6 +1,6 @@
 # 11 — /chat 대화 데모 껍데기를 TripFit 공개 데모처럼 (ui/chat.html만)
 
-너는 `vooy-mcp/` 폴더에서 일한다. **`ui/chat.html`만 고친다.** 지금 다른 작업자가 `ui/board.html`과 `hapui/text.py`를 고치는 중이니 그 파일들은 절대 건드리지 마라. 마감 16:45, 빠르게.
+너는 `vooy-mcp/` 폴더에서 일한다. **`ui/chat.html`만 고친다.** 지금 다른 작업자가 `ui/board.html`과 `hapui/text.py`를 고치는 중이니 그 파일들은 절대 건드리지 마라. 마감 16:45, 빠르게. 20분 안에 끝내라. 완벽보다 동작이 우선.
 
 첨부: `tripfit_site_1.jpg`, `tripfit_site_2.jpg` = TripFit 공개 데모(https://harheem.github.io/tripfit/) 첫 화면. `chat_current.jpg` = 지금 `/chat`. 사용자 평가: **"채팅방 데모 디자인이 마음에 안 든다. TripFit 데모 느낌이 나게."** 원본 코드(읽기 전용): `../tripfit/web/index.html`(토큰·폰 프레임·블록·.cut/.tab 맞물림·.flag·다이내믹 아일랜드·스프링 모션), `../tripfit/SCREENS.md` §3.
 

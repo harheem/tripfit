@@ -8,9 +8,9 @@
 |---|---|---|
 | ![각자 한 문장](docs/screens/01-chat.png) | ![사람별 만족도와 일정](docs/screens/02-plans.png) | ![숲체험 이번에 뺄 조건](docs/screens/03-concession.png) |
 
-| 합의와 분담 | 예약을 지키는 재계산 |
-|---|---|
-| ![두 사람 승인](docs/screens/04-agree.png) | ![혼잡한 전시 교체](docs/screens/05-replan.png) |
+| 합의와 분담 | 예약을 지키는 재계산 | 마지막 장 |
+|---|---|---|
+| ![두 사람 승인](docs/screens/04-agree.png) | ![혼잡한 전시 교체](docs/screens/05-replan.png) | ![QR과 함께 쓴 스폰서](docs/screens/06-end.png) |
 
 **1분 영상:** [docs/tripfit_demo.mp4](docs/tripfit_demo.mp4) (자동재생 녹화, 1단계부터 마지막 장까지)
 
@@ -214,9 +214,9 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 | `explain_infeasible` | 불가능하면 누구의 어떤 조건을 풀어야 가능한지 |
 | `find_candidates` | 조건에 맞는 장소 후보와 근거 |
 
-| 대화 속 결과 카드 | 하나 뺀 뒤 다시 계산된 카드 |
+| 단톡방에서 부르기 (/chat) | 하나 빼고 다시 계산 |
 |---|---|
-| ![대화 속 결과 카드](vooy-mcp/docs/chat_card.jpg) | ![하나 뺀 뒤 카드](vooy-mcp/docs/chat_card_yield.jpg) |
+| ![단톡방 데모 첫 결과](vooy-mcp/docs/chat_live_1.jpg) | ![단톡방 데모 다시 계산](vooy-mcp/docs/chat_live_2.jpg) |
 
 검증: `pytest` 54개 통과(`cd vooy-mcp && python -m pytest -q`), 공개 서버 스모크 9회 호출 모두 통과(initialize → tools/list → 3인 제안 → 이번만 빼기 → 불가능 → 이상 입력 6종, [결과 원문](vooy-mcp/scripts/smoke_result_remote.json)). MCP 프로토콜 2024-11-05 ～ 2025-11-25 네 버전의 initialize에 모두 응답합니다. 장소 데이터는 메인과 같은 성수 샘플입니다.
 

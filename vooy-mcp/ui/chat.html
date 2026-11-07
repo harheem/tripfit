@@ -6,29 +6,31 @@
 <meta name="referrer" content='no-referrer'>
 <title>TripFit 대화 데모</title>
 <style>
-
-:root{font-family:-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;color:#1b3545;background:#f3f5f6;font-size:14px;line-height:1.4;font-variant-numeric:tabular-nums}*{box-sizing:border-box}body{margin:0;padding:24px 12px 40px}h1,p{margin:0}button,select{font:inherit;color:inherit;min-height:40px;border:1px solid #c7d2da;border-radius:20px;background:#fff;padding:0 12px;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #536b11;outline-offset:2px}button:disabled{opacity:.5;cursor:wait}[hidden]{display:none!important}.intro{max-width:700px;margin:0 auto 18px;text-align:center}.intro p{font-size:12px;color:#536673}.intro h1{font-size:24px;letter-spacing:-.05em;margin:7px 0 15px}.controls{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.controls label{display:flex;align-items:center;gap:5px;font-size:12px}.phone{--chat-bg:#bfd0de;--face:#fff;--ink:#1b3545;--muted:#526571;--line:#ccd7df;--mine:#dce7f6;width:min(390px,100%);height:844px;max-height:calc(100dvh - 195px);min-height:540px;background:var(--chat-bg);color:var(--ink);border:1px solid var(--line);border-radius:30px;box-shadow:0 16px 50px #243d5215;margin:auto;position:relative;overflow:hidden}.phone.dark{--chat-bg:#000;--face:#262626;--ink:#f6f6f6;--muted:#b3b3b3;--line:#333;--mine:#6454d9}.phone.dark .mine .bubble{color:#fff}.phone-head{height:65px;padding:13px 17px;border-bottom:1px solid var(--line);background:var(--face);display:flex;gap:11px;align-items:center}.group-icon{width:34px;height:34px;border-radius:12px;background:#d6f23b;color:#193244;display:grid;place-items:center;font-weight:700}.phone-head strong{display:block;font-size:15px}.phone-head small{font-size:12px;color:var(--muted)}.conversation{height:calc(100% - 119px);overflow-y:auto;padding:16px 13px 22px;scrollbar-width:thin}.day{font-size:12px;text-align:center;color:var(--muted);margin-bottom:18px}.message{display:flex;gap:8px;align-items:flex-start;margin-bottom:15px;min-width:0}.avatar{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;flex:none;color:#203849;font-size:12px;font-weight:650;background:#f3cfe1}.avatar.sky{background:#bcd8ef}.avatar.peach{background:#f0d7c3}.message-main{max-width:calc(100% - 38px);min-width:0}.who{font-size:12px;margin-bottom:4px;color:var(--muted)}.bubble{padding:9px 11px;background:var(--face);border-radius:4px 16px 16px 16px;font-size:14px;line-height:1.4;overflow-wrap:anywhere}.mine{justify-content:flex-end}.mine .bubble{background:var(--mine);border-radius:16px 4px 16px 16px}.bot-text{white-space:pre-line;background:var(--face);padding:10px 11px;border-radius:12px;margin-bottom:6px;font-size:14px;overflow-wrap:anywhere}.widget-slot{width:100%;min-width:0;margin-bottom:14px}iframe{width:100%;height:140px;display:block;border:0;background:transparent}.composer{height:54px;border-top:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:8px;background:var(--face);color:var(--muted);font-size:12px}.composer input{border:1px solid var(--line);border-radius:20px;padding:7px 12px;flex:1}.host-state{max-width:700px;margin:12px auto 0;min-height:18px;font-size:12px;text-align:center;color:#526571}.fullscreen-cover{position:absolute;inset:0;background:#0e2a3a;z-index:10}.fullscreen-bar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:5px 10px;color:#f3f1ea;z-index:30;font-size:13px}.fullscreen-bar button{background:#f3f1ea;color:#1b3545}.phone.fullscreen .conversation{overflow:visible}.phone.fullscreen .conversation>*{visibility:hidden}.phone.fullscreen .is-fullscreen iframe{visibility:visible;position:absolute;left:0;top:52px;width:100%;height:calc(100% - 52px)!important;z-index:20}.phone.fullscreen .composer{visibility:hidden}@media(max-width:430px){body{padding-top:14px}.intro h1{font-size:21px}.phone{max-height:calc(100dvh - 210px);border-radius:24px}.controls{gap:4px}.controls label{gap:3px}button,select{padding:0 9px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
-.bot-message{display:flex;align-items:flex-start;gap:8px;margin:6px 0 15px}.bot-avatar{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:#d6f23b;color:#0e2a3a;font-size:12px;font-weight:650}.bot-stack{width:var(--card-width,280px);min-width:0}.bot-stack .widget-slot{margin-bottom:0}.bot-stack .bot-text{font-size:12px;line-height:1.4}.skin-toggle{display:flex;gap:4px}.skin-toggle button[aria-pressed="true"]{background:#0e2a3a;color:#f3f1ea;border-color:#0e2a3a}
-
-.intro{margin-bottom:12px}.intro .honesty{color:#344d5c;line-height:1.6}.intro h1{margin:4px 0 10px;font-size:22px}.phone-head strong{display:flex;gap:7px;font-size:14px}.phone-head small{display:flex;gap:8px}.composer input{min-width:0;font:inherit;background:var(--face);color:var(--ink);height:36px}.composer button{min-height:36px;padding:0 10px;background:var(--mine);color:var(--ink);border:0}.phone{max-height:none;height:720px;min-height:500px}.conversation{height:calc(100% - 125px)}.composer{height:60px}.system-chip{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;width:fit-content;max-width:100%;margin:12px auto;padding:5px 10px;background:#dce2e8;color:#405260;border-radius:20px;font-size:11px}.dark .system-chip{background:#30343a;color:#d3dbe3}.demo-actions{max-width:460px;margin:10px auto;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.technical{max-width:700px;margin:12px auto;font-size:12px}.technical summary{cursor:pointer;padding:8px 0}.technical pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;background:#e8edf0;border-radius:12px;max-height:300px;overflow:auto}.technical table{width:100%;border-collapse:collapse;text-align:left}.technical th,.technical td{padding:5px;border-bottom:1px solid #d5dee4}.technical .note{margin:6px 0}.retry-button{margin-top:6px;font-size:12px}.bot-stack{max-width:calc(100% - 38px)}.intro .host-state{margin-top:8px}.composer input:focus-visible{outline:2px solid #536b11}.phone.fullscreen .conversation .is-fullscreen{visibility:visible}@media(max-width:430px){body{padding:10px 8px 24px}.phone{height:640px;max-height:75dvh;min-height:440px}.intro h1{font-size:20px}.controls{gap:5px}.honesty{font-size:11px!important}}
-
+:root{--navy:#0E2A3A;--cream:#F3F1EA;--lime:#D6F23B;--pink:#FFCCE5;--sky:#8EC5EE;--peach:#F8D5BC;--stage:#E7F1EC;--spring:cubic-bezier(.34,1.4,.64,1);--spring-ms:700ms;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",system-ui,sans-serif;color:var(--navy);background:var(--stage);font-size:14px;line-height:1.4;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;padding:18px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center}h1,p{margin:0}button,input{font:inherit;color:inherit}button{min-height:40px;padding:0 16px;border:1.5px solid var(--navy);border-radius:99px;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #7B5CFF;outline-offset:3px}button:disabled{opacity:.45;cursor:wait}[hidden]{display:none!important}.intro{width:min(650px,100%);margin:0 auto 16px;text-align:center}.honesty{font-size:11px;line-height:1.6;color:#3E5563}
+.phone{position:relative;flex:none;width:393px;height:min(852px,calc(100dvh - 174px));min-height:520px;padding:10px;background:#0A0D10;border-radius:59px;box-shadow:0 0 0 1.5px #4D5560,0 0 0 3px #9AA2AC,0 0 0 4px #39404A,0 24px 46px -24px #0e2a3a70}.screen{position:relative;height:100%;overflow:hidden;border-radius:49px;background:#BACEE0;isolation:isolate}.statusbar{position:absolute;inset:0 0 auto;height:49px;padding:9px 26px 0 31px;display:flex;align-items:center;justify-content:space-between;color:var(--navy);z-index:5;pointer-events:none;font-size:14px;font-weight:650;background:#fff}.status-icons{display:flex;gap:5px;align-items:center}.status-icons svg{display:block}.home-indicator{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:120px;height:4px;border-radius:4px;background:var(--navy);pointer-events:none;z-index:5}
+.room-bar{position:absolute;inset:49px 0 auto;height:56px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 14px;z-index:4}.room-back{font-size:30px;line-height:1}.room-title{flex:1;min-width:0;text-align:center;font-size:15px;font-weight:700;white-space:nowrap}.room-count{font-size:13px;color:#85919a;font-weight:400;margin-left:5px}.room-icons{display:flex;gap:12px;align-items:center}.room-icons svg{width:19px;height:19px}.conversation{position:absolute;inset:105px 0 79px;padding:18px 10px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overscroll-behavior:contain}.conversation::-webkit-scrollbar{display:none}
+.message,.bot-message{display:flex;align-items:flex-start;gap:7px;margin-bottom:15px;min-width:0;animation:rise var(--spring-ms) var(--spring) both}.avatar{display:grid;place-items:center;width:32px;height:32px;flex:none;border-radius:11px;background:var(--pink);color:#5d3248;font-size:14px;font-weight:650}.sky .avatar{background:#cce6f4;color:#345c75}.bot-avatar{border-radius:50%;background:var(--lime);color:var(--navy)}.bot-avatar svg{width:21px;height:21px}.message-main{min-width:0;max-width:calc(100% - 39px)}.who{font-size:11px;color:#435767;margin-bottom:5px}.bubble-line{display:flex;align-items:flex-end;gap:5px;min-width:0}.bubble,.bot-text{background:#fff;border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.5;font-weight:400;letter-spacing:-.025em;overflow-wrap:anywhere;white-space:pre-line;margin:0;min-width:0}.message-time{font-size:9px;line-height:1.3;color:#526574;white-space:nowrap;flex:none;padding-bottom:2px}.message.mine{justify-content:flex-end}.mine .avatar,.mine .who{display:none}.mine .message-main{max-width:87%}.mine .bubble-line{flex-direction:row-reverse}.mine .bubble{background:#E8F7A8}.bot-stack{width:280px;max-width:calc(100% - 66px);min-width:0}.bot-stack .bubble-line{position:relative}.bot-text{width:100%}.bot-stack .message-time{position:absolute;right:0;bottom:3px;transform:translateX(calc(100% + 4px));font-size:8px}.widget-slot{width:100%;min-width:0;margin-top:6px}iframe{width:100%;height:140px;display:block;border:0;background:transparent}.system-chip{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;width:fit-content;max-width:100%;margin:12px auto 18px;padding:5px 11px;background:#657c8d30;color:#435969;border-radius:99px;font-size:10px}.typing-block{opacity:.65}.typing-dots{display:flex;gap:5px;padding:10px 12px;background:#fff;border-radius:12px;width:fit-content}.typing-dots i{width:6px;height:6px;background:var(--navy);border-radius:50%;animation:typing 1s infinite}.typing-dots i:nth-child(2){animation-delay:.15s}.typing-dots i:nth-child(3){animation-delay:.3s}.mine .typing-dots{background:#E8F7A8}
+.composer{position:absolute;bottom:0;left:0;right:0;height:79px;display:flex;align-items:flex-start;gap:8px;padding:9px 10px 23px;background:#fff}.composer input{height:43px;min-width:0;flex:1;padding:0 14px;border:0;border-radius:22px;background:#f0f2f4;font-size:13px}.composer button{width:36px;height:43px;min-height:43px;padding:0;flex:none;background:var(--lime);border:0;border-radius:50%;font-size:24px;line-height:1}.composer .composer-plus{display:grid;place-items:center;width:23px;height:43px;color:#70808b;flex:none}.composer-plus svg{width:21px;height:21px}
+.demo-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:18px auto 0}.demo-actions button{font-size:12px;min-height:36px;padding:0 14px}.technical{width:min(620px,100%);margin:8px auto 0;font-size:11px}.technical>summary{text-align:center}.technical summary{cursor:pointer;padding:6px}.technical pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;background:#d8e5df;border-radius:14px;max-height:250px;overflow:auto}.technical table{width:100%;border-collapse:collapse;text-align:left}.technical th,.technical td{padding:5px;border-bottom:1px solid #b9ccc2}.technical .note{margin:8px 0}.host-state{font-size:11px;color:#3E5563;text-align:center;margin:8px 0}.retry-button{margin:8px 12px;background:var(--cream);font-size:12px}
+.fullscreen-cover{position:absolute;inset:0;background:var(--navy);z-index:10}.fullscreen-bar{position:absolute;inset:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:5px 10px;color:var(--cream);z-index:30;font-size:13px}.fullscreen-bar button{background:var(--cream);color:var(--navy)}.phone.fullscreen .conversation{position:static;overflow:visible;inset:auto}.phone.fullscreen .bot-message{position:static;animation:none}.phone.fullscreen .conversation>*{visibility:hidden}.phone.fullscreen .conversation .is-fullscreen{visibility:visible}.phone.fullscreen .is-fullscreen iframe{visibility:visible;position:absolute;left:0;top:52px;width:100%;height:calc(100% - 52px)!important;z-index:20}.phone.fullscreen .composer,.phone.fullscreen .statusbar,.phone.fullscreen .room-bar,.phone.fullscreen .home-indicator{visibility:hidden}
+@keyframes rise{from{opacity:0;transform:translateY(36px) scale(.96)}to{opacity:1;transform:none}}@keyframes rotate{to{transform:rotate(360deg)}}@keyframes typing{30%{opacity:1;transform:translateY(-3px)}}
+@media(max-width:480px){body{padding:0;justify-content:flex-start}.intro{margin:0;padding:7px 12px;background:var(--stage)}.honesty{font-size:10px}.phone{width:100%;height:calc(100dvh - 117px);min-height:420px;padding:0;border-radius:0;box-shadow:none}.screen{border-radius:0}.demo-actions{margin:9px 0 0;gap:6px}.demo-actions button{min-height:32px;font-size:11px;padding:0 12px}.technical{margin:3px 0 0;padding:0 12px}.technical>summary{padding:5px}.statusbar{padding-left:28px;padding-right:24px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<header class="intro">
-<p class="honesty">vooy 연결 화면을 재현한 데모. 계산은 공개 MCP 서버 실호출. 장소는 성수 샘플</p>
-<h1>말풍선 사이, 함께 가는 코스</h1>
-<div class="controls"><label>폰 폭 <select id="width"><option value="390">390px</option><option value="364">카드 약 260px</option><option value="419">카드 약 300px</option><option value="475">카드 약 340px</option></select></label><div class="skin-toggle" role="group" aria-label="대화 스킨"><button id="skin-light" type="button" aria-pressed="true">단톡 라이트</button><button id="skin-dark" type="button" aria-pressed="false">DM 다크</button></div></div>
-<p class="host-state" id="host-state" role="status">시작을 누르거나 @TripFit 코스 짜줘를 입력해 보세요.</p>
-</header>
-<main class="phone" id="phone" aria-label="단톡 라이트 데모">
-<header class="phone-head"><span class="group-icon" aria-hidden="true">3</span><div><strong><span>성수 토요일 나들이</span><span>3명</span></strong><small><span>민지</span><span>지훈</span><span>서연</span></small></div></header>
-<div class="conversation" id="conversation" role="log" aria-label="단톡방 대화" aria-live="polite"><p class="day">토요일 오후를 정하는 중</p></div>
-<form class="composer" id="composer"><input id="input" aria-label="메시지" placeholder="@TripFit 코스 짜줘" maxlength="2400" autocomplete="off"><button id="send" type="submit">보내기</button></form>
-<div class="fullscreen-cover" id="fullscreen-cover" hidden></div><div class="fullscreen-bar" id="fullscreen-bar" hidden><span>TripFit 전체 보드</span><button id="close-fullscreen" type="button">닫기</button></div>
-</main>
-<div class="demo-actions"><button id="start" type="button">시작</button><button id="next" type="button" disabled>다음, 서연 예산 빼기</button><button id="conflict" type="button">조건 충돌 시나리오</button></div>
-<details class="technical"><summary>기술 정보</summary><p class="note">대화는 데모 대본입니다. 계산과 위젯은 같은 출처의 실제 MCP 서버(/mcp)에서 가져옵니다.</p><p class="note">말→조건 변환은 vooy LLM 몫이라 데모에선 미리 정한 arguments를 씁니다. 이름과 함께 이번엔 빼도 된다고 말하면 그 사람의 첫 번째 조건을 빼요. 예산을 말하면 예산을 빼요.</p><table><caption>최근 호출 10개</caption><thead><tr><th>메서드</th><th>도구</th><th>ms</th><th>HTTP 상태</th></tr></thead><tbody id="call-log"></tbody></table><details><summary>실제 arguments JSON 보기</summary><pre id="arguments">아직 호출하지 않았어요.</pre></details></details>
+<header class="intro"><p class="honesty">vooy 단톡방을 재현한 데모. 계산과 위젯은 공개 MCP 서버 실호출. 장소는 성수 샘플</p></header>
+<main class="phone" id="phone" aria-label="TripFit 단톡방 데모"><div class="screen">
+<div class="statusbar" aria-hidden="true"><span>12:58</span><span class="status-icons"><svg width="17" height="13" viewBox="0 0 17 13" fill="currentColor"><rect x="0" y="8" width="3" height="5" rx=".7"/><rect x="4.5" y="5.5" width="3" height="7.5" rx=".7"/><rect x="9" y="3" width="3" height="10" rx=".7"/><rect x="13.5" width="3" height="13" rx=".7"/></svg><svg width="16" height="13" viewBox="0 0 16 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 4a11 11 0 0 1 14 0M3.5 7a7 7 0 0 1 9 0M6 10a3 3 0 0 1 4 0"/><circle cx="8" cy="12" r=".7" fill="currentColor" stroke="none"/></svg><svg width="23" height="12" viewBox="0 0 23 12" fill="currentColor"><rect x=".5" y=".5" width="19" height="11" rx="3" fill="none" stroke="currentColor" opacity=".6"/><rect x="2.5" y="2.5" width="15" height="7" rx="1"/><path d="M21 4v4c2 0 2-4 0-4"/></svg></span></div>
+<header class="room-bar" id="room-header"><span class="room-back" aria-hidden="true">‹</span><h1 class="room-title">성수 토요일 나들이<span class="room-count">4</span></h1><span class="room-icons" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></span></header>
+<div class="conversation" id="conversation" role="log" aria-label="단톡방 대화" aria-live="polite">
+</div>
+<form class="composer" id="composer"><span class="composer-plus" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v18M3 12h18"/></svg></span><input id="input" aria-label="메시지" placeholder="@TripFit 코스 짜줘" maxlength="2400" autocomplete="off"><button id="send" type="submit" aria-label="보내기">↗</button></form>
+<div class="home-indicator" aria-hidden="true"></div><div class="fullscreen-cover" id="fullscreen-cover" hidden></div><div class="fullscreen-bar" id="fullscreen-bar" hidden><span>TripFit 전체 보드</span><button id="close-fullscreen" type="button">닫기</button></div>
+</div></main>
+<div class="demo-actions"><button id="start" type="button">처음부터</button><button id="next" type="button" disabled>다음</button><button id="conflict" type="button">조건 충돌 해보기</button></div>
+<details class="technical"><summary>기술 정보</summary><p class="host-state" id="host-state" role="status">처음부터를 누르거나 @TripFit 코스 짜줘를 입력해 보세요.</p><p class="note">대화는 데모 대본입니다. 계산과 위젯은 같은 출처의 실제 MCP 서버(/mcp)에서 가져옵니다.</p><p class="note">말→조건 변환은 vooy LLM 몫이라 데모에선 미리 정한 arguments를 씁니다. 이름과 함께 이번엔 빼도 된다고 말하면 그 사람의 첫 번째 조건을 빼요. 예산을 말하면 예산을 빼요.</p><table><caption>최근 호출 10개</caption><thead><tr><th>메서드</th><th>도구</th><th>ms</th><th>HTTP 상태</th></tr></thead><tbody id="call-log"></tbody></table><details><summary>실제 arguments JSON 보기</summary><pre id="arguments">아직 호출하지 않았어요.</pre></details></details>
 <script nonce='__CSP_NONCE__'>
 'use strict';
 (() => {
@@ -38,19 +40,46 @@
   const object=x=>x!==null&&typeof x==='object'&&!Array.isArray(x)?x:{};
   const nonce=document.currentScript.nonce, mime='text/html;profile=mcp-app';
   let sequence=0,protocol='2025-06-18',connection=null,source='',current=null,scenario=SCENARIO;
-  let instances=[],active=null,scrollBefore=0,theme='light',working=false;
+  let instances=[],active=null,scrollBefore=0,working=false;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Same sampled physical spring as the public TripFit demo.
+  if(CSS.supports('transition-timing-function','linear(0, 1)')){
+    const k=320,c=15,w0=Math.sqrt(k),z=c/(2*w0),wd=w0*Math.sqrt(1-z*z);
+    const x=t=>1-Math.exp(-z*w0*t)*(Math.cos(wd*t)+(z*w0/wd)*Math.sin(wd*t));
+    let duration=.25;for(let t=0;t<4;t+=1/120)if(Math.abs(1-x(t))>.003)duration=t+1/120;
+    const points=Array.from({length:49},(_,i)=>+x(duration*i/48).toFixed(4));points[48]=1;
+    document.documentElement.style.setProperty('--spring','linear('+points.join(',')+')');
+    document.documentElement.style.setProperty('--spring-ms',Math.round(duration*1000)+'ms');
+  }
   const logs=[];
   function element(tag,cls,copy){const e=document.createElement(tag);if(cls)e.className=cls;if(copy!==undefined)e.textContent=copy;return e;}
   function spans(node,parts){node.replaceChildren(...parts.map(x=>element('span','',String(x))));}
   function scroll(){conversation.scrollTop=conversation.scrollHeight;}
+  function avatar(name){
+    const profile=element('span','avatar'+(name==='TripFit'?' bot-avatar':''),name==='TripFit'?undefined:name.slice(0,1));
+    if(name==='TripFit'){
+      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.7');path.setAttribute('d','M12 3v17M4 8h16M4 8l-3 7h6L4 8Zm16 0-3 7h6l-3-7ZM7 21h10');svg.append(path);profile.append(svg);
+    }
+    return profile;
+  }
+  function timedBubble(copy,cls='bubble'){
+    const line=element('div','bubble-line');line.append(element('p',cls,copy),element('time','message-time','오후 1:02'));return line;
+  }
   function human(name,phrase,mine=false){
-    const row=element('div','message'+(mine?' mine':'')),main=element('div','message-main');
-    if(!mine)row.append(element('span','avatar'+(name==='지훈'?' sky':name==='서연'?' peach':''),name.slice(0,1)));
-    main.append(element('p','who',name),element('p','bubble',phrase));row.append(main);conversation.append(row);scroll();
+    const me=mine||name==='서연',person=me?'서연':name;
+    const row=element('div','message'+(me?' mine':name==='지훈'?' sky':'')),main=element('div','message-main');
+    row.append(avatar(person));main.append(element('p','who',person),timedBubble(phrase));row.append(main);conversation.append(row);scroll();
   }
   function bot(phrase){
     const row=element('div','bot-message'),stack=element('div','bot-stack');
-    stack.append(element('p','who','TripFit'),element('p','bot-text',phrase));row.append(element('span','bot-avatar','T'),stack);conversation.append(row);scroll();return stack;
+    stack.append(element('p','who','TripFit'),timedBubble(phrase,'bot-text'));row.append(avatar('TripFit'),stack);conversation.append(row);scroll();return stack;
+  }
+  function typing(name='TripFit'){
+    const row=element('div','message typing-block'+(name==='서연'?' mine':name==='지훈'?' sky':''));
+    const main=element('div','message-main'),dots=element('div','typing-dots');
+    dots.setAttribute('aria-label',name+' 입력 중');for(let i=0;i<3;i++)dots.append(element('i'));
+    row.append(avatar(name));main.append(element('p','who',name),dots);row.append(main);conversation.append(row);scroll();return row;
   }
   function firstText(result){return (result.content||[]).find(x=>x.type==='text'&&typeof x.text==='string')?.text.split('\n').find(x=>x.trim())||'코스를 계산했어요.';}
   function log(method,params,ms,status){
@@ -113,7 +142,7 @@
   }
   function send(view,method,params={}){view.frame.contentWindow.postMessage({jsonrpc:'2.0',method,params},'*');}
   function reply(view,id,result,error){const m={jsonrpc:'2.0',id};if(error)m.error=error;else m.result=result;view.frame.contentWindow.postMessage(m,'*');}
-  function hostContext(view){return {theme,displayMode:active===view?'fullscreen':'inline',availableDisplayModes:['inline','fullscreen'],containerDimensions:{maxWidth:active===view?phone.clientWidth:view.slot.clientWidth},locale:'ko-KR',platform:'mobile',safeAreaInsets:{top:0,right:0,bottom:0,left:0}};}
+  function hostContext(view){return {theme:'light',displayMode:active===view?'fullscreen':'inline',availableDisplayModes:['inline','fullscreen'],containerDimensions:{maxWidth:active===view?phone.querySelector('.screen').clientWidth:view.slot.clientWidth},locale:'ko-KR',platform:'mobile',safeAreaInsets:{top:0,right:0,bottom:0,left:0}};}
   function changeMode(view,mode){
     if(mode==='fullscreen'&&active!==view){if(active)changeMode(active,'inline');scrollBefore=conversation.scrollTop;active=view;view.slot.classList.add('is-fullscreen');phone.classList.add('fullscreen');$('fullscreen-cover').hidden=false;$('fullscreen-bar').hidden=false;$('close-fullscreen').focus();}
     else if(mode==='inline'&&active===view){view.slot.classList.remove('is-fullscreen');active=null;phone.classList.remove('fullscreen');$('fullscreen-cover').hidden=true;$('fullscreen-bar').hidden=true;view.frame.style.height=view.height+'px';conversation.scrollTop=scrollBefore;view.frame.focus();}
@@ -135,12 +164,14 @@
     button.addEventListener('click',()=>{if(working)return;button.disabled=true;exclusive(retry).catch(()=>{}).finally(()=>{button.disabled=false;});});scroll();
   }
   async function calculate(name,args,options={}){
-    const scriptScenario=options.scenario||scenario,chip=element('p','system-chip');spans(chip,['TripFit',name,'호출 중…']);conversation.append(chip);scroll();
+    const scriptScenario=options.scenario||scenario,chip=element('p','system-chip');spans(chip,['TripFit이',name,'호출 중']);conversation.append(chip);scroll();
+    const pending=typing();
     const began=performance.now();let callBegan;
     try{
       await connect();callBegan=performance.now();
       const result=await rpc('tools/call',{name,arguments:args});
-      spans(chip,['TripFit',name,((performance.now()-callBegan)/1000).toFixed(1)+'초']);
+      const elapsed=((performance.now()-callBegan)/1000).toFixed(1)+'초';
+      spans(chip,[name,elapsed]);pending.remove();
       if(result.isError){
         const error=new Error(firstText(result));
         if(options.view){spans(chip,['TripFit',name,'실패']);failure(name,error,()=>calculate(name,args,options));return result;}
@@ -152,6 +183,7 @@
       else{current=result.structuredContent;scenario=scriptScenario;card(result,args,scriptScenario);}
       return result;
     }catch(error){
+      pending.remove();
       spans(chip,['TripFit',name,'실패',((performance.now()-(callBegan||began))/1000).toFixed(1)+'초']);
       failure(name,error,()=>calculate(name,args,options));throw error;
     }
@@ -176,10 +208,12 @@
     bot("'○○은 이번엔 빼도 돼'처럼 말해 보세요. 실제 vooy에서는 vooy가 말을 조건으로 바꿔 줍니다");
   }
   async function play(conflict=false){
+    if(active)changeMode(active,'inline');
+    instances=[];conversation.replaceChildren();conversation.scrollTop=0;phone.querySelector('.screen').classList.remove('scrolled');
     scenario=conflict?IMPOSSIBLE:SCENARIO;current=null;
     const lines=conflict?[['민지','디뮤지엄 꼭, 공방 14시도 꼭'],['지훈','1km 넘게는 못 걸어']]:[['민지','난 전시 하나는 꼭'],['지훈','많이 걷기 싫어. 3시 전엔 밥'],['서연','카페에서 좀 쉬고 싶고 2만원 안으로']];
     lines.push(['서연','@TripFit 성수 13시부터 18시까지 코스 짜줘']);
-    for(let i=0;i<lines.length;i++){if(i)await new Promise(resolve=>setTimeout(resolve,800));human(...lines[i]);}
+    for(const line of lines){const pending=typing(line[0]);await new Promise(resolve=>setTimeout(resolve,reduced.matches?0:650));pending.remove();human(...line);}
     await calculate('propose_plans',scenario);
   }
   function applyAction(raw){
@@ -231,10 +265,8 @@
   $('composer').addEventListener('submit',event=>{event.preventDefault();const phrase=$('input').value.trim();if(!phrase||working)return;$('input').value='';human('나',phrase,true);run(()=>processText(phrase));});
   $('close-fullscreen').addEventListener('click',()=>{if(active)changeMode(active,'inline');});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&active)changeMode(active,'inline');});
-  function broadcast(){phone.style.setProperty('--card-width',Math.min(340,phone.clientWidth*.72)+'px');instances.filter(v=>v.ready).forEach(v=>send(v,'ui/notifications/host-context-changed',hostContext(v)));}
-  function setSkin(value){theme=value;phone.classList.toggle('dark',theme==='dark');$('skin-light').setAttribute('aria-pressed',String(theme==='light'));$('skin-dark').setAttribute('aria-pressed',String(theme==='dark'));phone.setAttribute('aria-label',theme==='dark'?'DM 다크 데모':'단톡 라이트 데모');broadcast();}
-  $('skin-light').addEventListener('click',()=>setSkin('light'));$('skin-dark').addEventListener('click',()=>setSkin('dark'));
-  $('width').addEventListener('change',()=>{phone.style.width='min('+$('width').value+'px,100%)';broadcast();});
+  function broadcast(){instances.filter(v=>v.ready).forEach(v=>send(v,'ui/notifications/host-context-changed',hostContext(v)));}
+  conversation.addEventListener('scroll',()=>phone.querySelector('.screen').classList.toggle('scrolled',conversation.scrollTop>45),{passive:true});
   window.addEventListener('resize',broadcast);broadcast();
 
 })();

@@ -188,13 +188,13 @@ vooy 서비스 연결(사용자 지정 MCP) 화면에 URL 붙여넣기 → 도�
 
 ## 스크린샷
 
-단톡방 대화 흐름 안에서 MCP Apps 위젯으로 뜨는 카드입니다. [ui/preview.html](ui/preview.html)(MCP Apps 호스트 미리보기)에서 **공개 서버의 실제 결과**(장소는 성수 샘플)를 그대로 띄워 찍었습니다. 카드 높이는 360～440px로 말풍선 사이에 들어가고, "크게 보기"를 누르면 전체 보드로 열립니다.
+단톡방 대화 흐름 안에서 MCP Apps 위젯으로 뜨는 카드입니다. 공개 서버의 `/chat`(vooy 단톡방을 재현한 데모 화면)에서 실제 `/mcp` 호출 결과를 그대로 띄워 찍었습니다. 장소는 성수 샘플입니다.
 
 | 첫 결과 | 서연이 예산을 이번엔 뺀 뒤 (새 메시지의 새 카드) |
 |---|---|
 | ![대화 속 결과 카드](docs/chat_card.jpg) | ![빼기 뒤 다시 계산된 카드](docs/chat_card_yield.jpg) |
 
-미리보기 실행: `cd ui && python3 -m http.server 8791` → `http://localhost:8791/preview.html`
+직접 보기: https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/chat 에서 처음부터를 누르면 대화가 재생되고, 입력창에 `@TripFit 코스 짜줘`를 직접 보낼 수도 있습니다.
 
 ## 도구 4개
 
