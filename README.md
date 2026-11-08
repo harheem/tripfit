@@ -2,6 +2,10 @@
 
 여행 성향은 달라도 함께이고 싶은 두 사람을 위해, 둘 다 OK인 하루를 계산합니다
 
+**OBA.RUN 2nd 해커톤(2026-11-07) 2등.** 600명 넘는 지원자 가운데 빌더 60명이 참가한 행사에서 하루 동안 만들었습니다.
+
+> 행사 뒤 상태(2026-11-08): 비용 정리를 위해 공개 vooy MCP 서버(AWS Lightsail)를 내렸습니다. TripFit 재생 데모와 같이 결제 화면은 GitHub Pages에서 계속 열립니다. vooy 서버와 라이브 모드는 아래 실행법대로 로컬에서 띄우면 행사 때와 같은 코드로 동작합니다.
+
 ## 화면으로 보기
 
 | 대화 | 합의 저울 | 불가능 → 이번만 빼기 |
@@ -20,8 +24,8 @@
 |---|---|---|
 | TripFit 데모(재생) | https://harheem.github.io/tripfit/ | 키, 서버 없이 1～5단계 재생. 휴대폰에서도 열림. 발표용 키: `→` `A`(자동재생) `1`～`6` |
 | SKT 같이 결제 | https://harheem.github.io/tripfit/pay/ | 위임, 재조회, 승인 근거, Articul8 Bivia 마지막 판단, 영수증(공개 링크는 서버가 없어 저장된 조회 결과와 규칙 판단) |
-| vooy 단톡방 데모 | https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/chat | 단톡방에서 @TripFit을 부르면 실제 MCP 도구가 호출되고 결과 카드가 대화에 뜹니다 |
-| Vooy MCP 서버 | `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` | vooy에 사용자 지정 MCP로 등록 |
+| vooy 단톡방 데모 | 로컬 `http://localhost:8770/chat` | 행사 기간에는 공개 주소로 열었고 지금은 내렸습니다. [실행법](vooy-mcp/README.md#로컬-실행-테스트), 아래 스크린샷 |
+| Vooy MCP 서버 | 로컬 `http://localhost:8770/mcp` | vooy에 사용자 지정 MCP로 등록하려면 https 주소로 배포해야 합니다. [배포 순서](vooy-mcp/README.md) |
 | 우리 대화로 바꿔 보기(두 사람 문장 → 일정) | 로컬 서버 `http://localhost:8000/` | OpenAI 실호출 + CBC 실계산. 아래 실행법 |
 
 이번만 빼는 거예요. 이번에 뺀 사람은 다음엔 먼저 골라요.
@@ -203,9 +207,9 @@ TripFit 4단계 "예약하고 결제하기"입니다. 합의 일정에 들어 �
 
 단톡방에서 각자 한 줄씩 말하면, vooy가 그 말을 조건으로 바꿔 이 서버를 부르고, TripFit의 같은 합의 엔진(Python-MIP)이 다들 OK인 코스와 누가 무엇을 이번만 빼는지를 돌려줍니다. 결과는 대화 속 카드(MCP Apps 위젯)로 뜹니다. 메인 앱이 두 사람이라면 여기서는 3명 이상도 됩니다.
 
-- **원격 MCP 엔드포인트(Streamable HTTP, 인증 없음):** `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp`, [헬스체크](https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/healthz)
+- **MCP 엔드포인트(Streamable HTTP, 인증 없음):** 행사 기간에는 AWS Lightsail 서울에 공개했고, 공개 서버 스모크 9회 호출이 모두 통과했습니다. 행사 뒤 서버를 내렸고, 지금은 `cd vooy-mcp && .venv/bin/python -m hapui.server --port 8770`으로 띄운 뒤 `http://localhost:8770/mcp`를 씁니다.
 - **vooy 레시피(지침, 예시 대화):** [`vooy-mcp/RECIPE.md`](vooy-mcp/RECIPE.md), 자세한 설명: [`vooy-mcp/README.md`](vooy-mcp/README.md)
-- **단톡방 데모(vooy 계정 없이 보기):** https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/chat 시작을 누르면 세 사람의 대화 뒤에 @TripFit 호출이 나가고, 실제 `tools/call`(약 4초)과 MCP Apps 카드가 대화 속에 뜹니다.
+- **단톡방 데모(vooy 계정 없이 보기):** 같은 로컬 서버의 `http://localhost:8770/chat`. 시작을 누르면 세 사람의 대화 뒤에 @TripFit 호출이 나가고, 실제 `tools/call`과 MCP Apps 카드가 대화 속에 뜹니다. 아래 스크린샷은 행사 때 공개 서버에서 찍었습니다.
 
 | 도구 | 하는 일 |
 |---|---|

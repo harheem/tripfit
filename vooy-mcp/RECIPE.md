@@ -2,7 +2,7 @@
 
 vooy Recipe Studio에 붙여 넣는 지침과 예시 대화. MCP 서버를 vooy 서비스 연결(사용자 지정 MCP)에 등록한 뒤 이 레시피에서 도구 4개를 고른다.
 
-- MCP 엔드포인트: `https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` (Streamable HTTP, 인증 없음)
+- MCP 엔드포인트: 직접 배포한 https 주소의 `/mcp` (Streamable HTTP, 인증 없음). 행사 때 쓰던 공개 서버는 내렸습니다.
 - 도구: `propose_plans`, `adjust_plan`, `explain_infeasible`, `find_candidates`
 
 ## 지침 (그대로 붙여 넣기)

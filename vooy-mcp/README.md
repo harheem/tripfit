@@ -7,7 +7,7 @@ TripFit의 합의 엔진을 vooy 메신저 도구로 연 MCP 서버
 
 ### /chat 데모
 
-링크 하나로 보기: https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/chat (vooy 연결 화면을 재현한 데모, 계산과 위젯은 공개 MCP 서버 실호출, 장소는 성수 샘플)
+행사 기간(2026-11-07)에는 공개 주소로 열었고, 행사 뒤 비용 정리를 위해 서버를 내렸습니다. 지금은 아래 [로컬 실행](#로컬-실행-테스트) 뒤 `http://localhost:8770/chat`에서 같은 화면을 봅니다(vooy 연결 화면을 재현한 데모, 계산과 위젯은 MCP 서버 실호출, 장소는 성수 샘플).
 
 ![데모 첫 결과](docs/chat_live_1.jpg)
 ![데모에서 다시 고른 코스](docs/chat_live_2.jpg)
@@ -16,10 +16,10 @@ TripFit의 합의 엔진을 vooy 메신저 도구로 연 MCP 서버
 **서버 URL**
 
 ```text
-https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp
+http://localhost:8770/mcp   (로컬 실행 시. vooy 등록에는 https로 배포한 주소가 필요)
 ```
 
-vooy 서비스 연결(사용자 지정 MCP) 화면에 URL 붙여넣기 → 도구 4개가 보이면 연결 완료입니다. 전송 방식은 **Streamable HTTP**, 현재 공개 서버는 **인증 없음**입니다. AWS Lightsail 서울에서 실행합니다. [헬스체크](https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/healthz)는 `/healthz`입니다.
+vooy 서비스 연결(사용자 지정 MCP) 화면에 https 주소를 붙여 넣고 도구 4개가 보이면 연결 완료입니다. 전송 방식은 **Streamable HTTP**, 인증은 없습니다. 행사 때는 AWS Lightsail 서울에서 실행했고, 다시 배포하는 순서는 아래 "배포" 절에 있습니다. 헬스체크는 `/healthz`입니다.
 
 연결 뒤 다음처럼 말해 보세요.
 
@@ -32,7 +32,7 @@ vooy 서비스 연결(사용자 지정 MCP) 화면에 URL 붙여넣기 → 도�
 | 항목 | 결과 |
 |---|---|
 | 단위, 통합 테스트 | `pytest` **60개 통과** (로컬 macOS) |
-| 공개 서버 스모크 | `scripts/smoke_mcp.py https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp` → **9회 호출 모두 통과** (Lightsail 서울, small 0.5 vCPU). 결과 원문: [smoke_result_remote.json](scripts/smoke_result_remote.json) |
+| 공개 서버 스모크 (행사 당시) | `scripts/smoke_mcp.py <공개 주소>/mcp` → **9회 호출 모두 통과** (Lightsail 서울, small 0.5 vCPU, 서버는 행사 뒤 내림). 결과 원문: [smoke_result_remote.json](scripts/smoke_result_remote.json) |
 | 공개 서버 응답 시간(같은 실행) | `propose_plans` 3인 3.9초, `adjust_plan` 빼기 7.0초, 불가능 시나리오 0.8초, 입력 오류 0.2초 이하 (v5, 14:2x 실행) |
 | 이상 입력 | 빈 인원, 이름 중복, 이모지, 모르는 `kind`, 끝이 시작보다 이른 시간창, 1000자 말, `<img onerror>` 이름 → 서버가 죽지 않고 한국어 오류나 정상 결과로 답함 |
 | 로컬 스모크 | 같은 9회 호출 통과. 아래 "예시 대화"는 이 실행의 실제 출력: [smoke_result.json](scripts/smoke_result.json) |
@@ -194,7 +194,7 @@ vooy 서비스 연결(사용자 지정 MCP) 화면에 URL 붙여넣기 → 도�
 |---|---|
 | ![대화 속 결과 카드](docs/chat_card.jpg) | ![빼기 뒤 다시 계산된 카드](docs/chat_card_yield.jpg) |
 
-직접 보기: https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/chat 에서 처음부터를 누르면 대화가 재생되고, 입력창에 `@TripFit 코스 짜줘`를 직접 보낼 수도 있습니다.
+직접 보기: 로컬 서버의 `http://localhost:8770/chat`에서 처음부터를 누르면 대화가 재생되고, 입력창에 `@TripFit 코스 짜줘`를 직접 보낼 수도 있습니다.
 
 ## 도구 4개
 
@@ -356,8 +356,8 @@ aws lightsail push-container-image --service-name hapui --label hapui --image ha
       "environment": {
         "HAPUI_HOST": "0.0.0.0",
         "HAPUI_PORT": "8080",
-        "HAPUI_PUBLIC_HOST": "hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com",
-        "HAPUI_PUBLIC_URL": "https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com",
+        "HAPUI_PUBLIC_HOST": "<서비스 주소>.ap-northeast-2.cs.amazonlightsail.com",
+        "HAPUI_PUBLIC_URL": "https://<서비스 주소>.ap-northeast-2.cs.amazonlightsail.com",
         "HAPUI_TRUST_PROXY": "1",
         "HAPUI_RATE_PER_MIN": "60",
         "HAPUI_SOLVER_PER_MIN": "20"
@@ -381,7 +381,7 @@ aws lightsail push-container-image --service-name hapui --label hapui --image ha
 
 ```sh
 aws lightsail create-container-service-deployment --cli-input-json file://deployment.json --region ap-northeast-2
-.venv/bin/python scripts/smoke_mcp.py https://hapui.z2p0c2j9j5zsp.ap-northeast-2.cs.amazonlightsail.com/mcp
+.venv/bin/python scripts/smoke_mcp.py https://<서비스 주소>.ap-northeast-2.cs.amazonlightsail.com/mcp
 ```
 
 공개 체험과 같은 인증 없음 설정이므로 JSON에서 `HAPUI_TOKEN`은 생략합니다. 인증을 켤 때만 값을 추가하고 vooy에도 Bearer 값을 설정합니다. 배포 필드는 [AWS CLI 배포 문서](https://docs.aws.amazon.com/cli/latest/reference/lightsail/create-container-service-deployment.html)를 따릅니다.
